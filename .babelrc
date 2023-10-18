@@ -1,0 +1,6 @@
+{
+  "presets": [
+    // can remove this if only using TypeScript
+    "@babel/preset-react"
+  ]
+}
