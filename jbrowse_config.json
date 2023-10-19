@@ -1,8 +1,0 @@
-{
-  "plugins": [
-    {
-      "name": "Template",
-      "url": "http://localhost:9000/dist/jbrowse-plugin-template.umd.development.js"
-    }
-  ]
-}

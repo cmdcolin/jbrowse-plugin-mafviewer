@@ -33,13 +33,13 @@
     // Can remove this if only using TypeScript
     "allowJs": true,
     // Allow importing JSON files
-    "resolveJsonModule": false,
+    "resolveJsonModule": false
   },
   // Jest uses ts-node to load the jest.config.ts file
   "ts-node": {
     "transpileOnly": true,
-    "project": "./tsconfig.test.json",
+    "project": "./tsconfig.test.json"
   },
   "include": ["src"],
-  "exclude": ["**/dist/"],
+  "exclude": ["**/dist/"]
 }
