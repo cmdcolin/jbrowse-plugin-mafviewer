@@ -3,6 +3,8 @@ import PluginManager from '@jbrowse/core/PluginManager'
 
 import { version } from '../package.json'
 import BigMafAdapterF from './BigMafAdapter'
+import MafTrackF from './MafTrack'
+import LinearMafDisplayF from './LinearMafDisplay'
 
 export default class MafViewerPlugin extends Plugin {
   name = 'MafViewerPlugin'
@@ -10,6 +12,8 @@ export default class MafViewerPlugin extends Plugin {
 
   install(pluginManager: PluginManager) {
     BigMafAdapterF(pluginManager)
+    MafTrackF(pluginManager)
+    LinearMafDisplayF(pluginManager)
   }
 
   configure(pluginManager: PluginManager) {}

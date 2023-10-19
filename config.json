@@ -75,7 +75,7 @@
       ]
     },
     {
-      "type": "FeatureTrack",
+      "type": "MafTrack",
       "trackId": "bigMaf",
       "name": "bigMaf",
       "adapter": {
