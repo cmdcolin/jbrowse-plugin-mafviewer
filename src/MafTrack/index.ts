@@ -6,8 +6,8 @@ import {
 import configSchemaF from './configSchema'
 
 export default function MafTrackF(pluginManager: PluginManager) {
-  const configSchema = configSchemaF(pluginManager)
   return pluginManager.addTrackType(() => {
+    const configSchema = configSchemaF(pluginManager)
     return new TrackType({
       name: 'MafTrack',
       configSchema,
