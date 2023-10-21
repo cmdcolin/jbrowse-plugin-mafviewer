@@ -6,8 +6,8 @@ import ReactComponent from './components/ReactComponent'
 
 export default function LinearMafDisplayF(pluginManager: PluginManager) {
   pluginManager.addDisplayType(() => {
-    const configSchema = configSchemaF()
-    const stateModel = stateModelFactory(configSchema)
+    const configSchema = configSchemaF(pluginManager)
+    const stateModel = stateModelFactory(configSchema, pluginManager)
     return new DisplayType({
       name: 'LinearMafDisplay',
       configSchema,

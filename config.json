@@ -86,5 +86,59 @@
       },
       "assemblyNames": ["hg38"]
     }
-  ]
+  ],
+  "defaultSession": {
+    "drawerPosition": "right",
+    "drawerWidth": 384,
+    "widgets": {
+      "hierarchicalTrackSelector": {
+        "id": "hierarchicalTrackSelector",
+        "type": "HierarchicalTrackSelectorWidget",
+        "initialized": true,
+        "collapsed": {},
+        "view": "9FHA1gDRei03FQQZyBo0s"
+      }
+    },
+    "activeWidgets": {
+      "hierarchicalTrackSelector": "hierarchicalTrackSelector"
+    },
+    "minimized": false,
+    "id": "dfnCTGRvMRZ8wFmXFEZhL",
+    "name": "New session 10/21/2023, 1:31:18 AM",
+    "margin": 0,
+    "views": [
+      {
+        "id": "9FHA1gDRei03FQQZyBo0s",
+        "minimized": false,
+        "type": "LinearGenomeView",
+        "offsetPx": 0,
+        "bpPerPx": 103.82506887052341,
+        "displayedRegions": [
+          {
+            "refName": "22_KI270731v1_random",
+            "start": 0,
+            "end": 150754,
+            "reversed": false,
+            "assemblyName": "hg38"
+          }
+        ],
+        "tracks": [],
+        "hideHeader": false,
+        "hideHeaderOverview": false,
+        "hideNoTracksActive": false,
+        "trackSelectorType": "hierarchical",
+        "trackLabels": "offset",
+        "showCenterLine": false,
+        "showCytobandsSetting": true,
+        "showGridlines": true
+      }
+    ],
+    "sessionTracks": [],
+    "sessionAssemblies": [],
+    "temporaryAssemblies": [],
+    "connectionInstances": [],
+    "sessionConnections": [],
+    "focusedViewId": "9FHA1gDRei03FQQZyBo0s",
+    "sessionPlugins": []
+  }
 }
