@@ -1,6 +1,5 @@
 import React from 'react'
 import { getContainingView } from '@jbrowse/core/util'
-import { when } from 'mobx'
 import {
   ExportSvgDisplayOptions,
   LinearGenomeViewModel,

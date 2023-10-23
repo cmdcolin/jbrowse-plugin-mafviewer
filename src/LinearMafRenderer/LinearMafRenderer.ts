@@ -34,24 +34,24 @@ function makeImageData({
   renderArgs,
 }: {
   ctx: CanvasRenderingContext2D
-  renderArgs: RenderArgsDeserialized
+  renderArgs: RenderArgsDeserialized & {
+    sources: { name: string; color?: string }[]
+  }
 }) {
-  const { regions, bpPerPx, theme: configTheme } = renderArgs
+  const { regions, bpPerPx, theme: configTheme, sources } = renderArgs
   const [region] = regions
   const features = renderArgs.features as Map<string, Feature>
   const h = 20
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
+  const sampleToRowMap = new Map(sources.map((s, i) => [s.name, i]))
+  const scale = 1 / bpPerPx
+  const correctionFactor = getCorrectionFactor(bpPerPx)
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-    const vals = feature.get('alignments')
+    const vals = feature.get('alignments') as Record<string, { data: string }>
     const seq = feature.get('seq').toLowerCase()
-    const correctionFactor = getCorrectionFactor(bpPerPx)
-    const scale = 1 / bpPerPx
-    const samples = Object.keys(vals)
-    for (let j = 0; j < samples.length; j++) {
-      const key = samples[j]
-      const val = vals[key]
+    for (const [sample, val] of Object.entries(vals)) {
       const origAlignment = val.data
       const alignment = origAlignment.toLowerCase()
 
@@ -60,7 +60,11 @@ function makeImageData({
       ctx.fillStyle = 'black'
       const offset0 = (5 / 12) * h
       const h6 = h / 6
-      const t = h * j
+      const row = sampleToRowMap.get(sample)
+      if (row === undefined) {
+        throw new Error('unknown row encountered')
+      }
+      const t = h * row
       for (let i = 0; i < alignment.length; i++) {
         const l = leftPx + scale * i
         if (alignment[i] === '-') {
@@ -111,7 +115,11 @@ function makeImageData({
   }
 }
 export default class LinearMafRenderer extends FeatureRendererType {
-  async render(renderProps: RenderArgsDeserialized) {
+  async render(
+    renderProps: RenderArgsDeserialized & {
+      sources: { name: string; color?: string }[]
+    },
+  ) {
     const { regions, bpPerPx } = renderProps
     const [region] = regions
     const height = 100

@@ -51,7 +51,6 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
       )
       for (const feature of features) {
         const data = (feature.get('field5') as string).split(',')
-        console.log({ data })
         const alignments = {} as Record<string, OrganismRecord>
         const main = data[0]
         const aln = main.split(':')[5]

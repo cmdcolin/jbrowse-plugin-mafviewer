@@ -77,8 +77,8 @@ export default function stateModelFactory(
         )
       },
     }))
-    .actions(self => {
-      const { renderProps: superRenderProps, renderSvg: superRenderSvg } = self
+    .views(self => {
+      const { renderProps: superRenderProps } = self
       return {
         /**
          * #method
@@ -89,6 +89,11 @@ export default function stateModelFactory(
             sources: self.sources,
           }
         },
+      }
+    })
+    .actions(self => {
+      const { renderSvg: superRenderSvg } = self
+      return {
         /**
          * #action
          */

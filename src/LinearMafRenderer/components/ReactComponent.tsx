@@ -1,12 +1,9 @@
 import { PrerenderedCanvas } from '@jbrowse/core/ui'
+import { observer } from 'mobx-react'
 import React from 'react'
 
-function ReactComponent(props: any) {
-  return (
-    <div>
-      <PrerenderedCanvas {...props} />
-    </div>
-  )
-}
+const LinearMafRendering = observer(function (props: any) {
+  return <PrerenderedCanvas {...props} />
+})
 
-export default ReactComponent
+export default LinearMafRendering
