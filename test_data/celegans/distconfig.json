@@ -1,0 +1,52 @@
+{
+  "plugins": [
+    {
+      "name": "MafViewer",
+      "url": "https://unpkg.com/jbrowse-plugin-mafviewer/dist/jbrowse-plugin-mafviewer.umd.production.min.js"
+    }
+  ],
+  "assemblies": [
+    {
+      "name": "c_elegans",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "c_elegans-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "BgzipFastaAdapter",
+          "fastaLocation": {
+            "uri": "chrI.fa.gz"
+          },
+          "faiLocation": {
+            "uri": "chrI.fa.gz.fai"
+          },
+          "gziLocation": {
+            "uri": "chrI.fa.gz.gzi"
+          }
+        }
+      }
+    }
+  ],
+  "defaultSession": {
+    "name": "New Session"
+  },
+  "tracks": [
+    {
+      "type": "MafTrack",
+      "trackId": "chrI.bed",
+      "name": "chrI.bed",
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "samples": ["ce10", "cb4", "caeSp111", "caeRem4", "caeJap4", "caePb3"],
+        "bedGzLocation": {
+          "uri": "chrI.bed.gz"
+        },
+        "index": {
+          "location": {
+            "uri": "chrI.bed.gz.tbi"
+          }
+        }
+      },
+      "assemblyNames": ["c_elegans"]
+    }
+  ]
+}
