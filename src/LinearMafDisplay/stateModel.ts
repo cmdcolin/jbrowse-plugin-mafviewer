@@ -9,6 +9,10 @@ import { getEnv } from '@jbrowse/core/util'
 import PluginManager from '@jbrowse/core/PluginManager'
 import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
 
+function isStrs(array: unknown[]): array is string[] {
+  return typeof array[0] === 'string'
+}
+
 /**
  * #stateModel LinearMafDisplay
  * extends LinearBasicDisplay
@@ -46,8 +50,14 @@ export default function stateModelFactory(
        * #getter
        */
       get samples() {
-        const r = self.adapterConfig.samples as string[]
-        return r.map(elt => ({ name: elt, color: undefined }))
+        const r = self.adapterConfig.samples as
+          | string[]
+          | { id: string; label: string; color?: string }[]
+        if (isStrs(r)) {
+          return r.map(elt => ({ id: elt, label: elt, color: undefined }))
+        } else {
+          return r
+        }
       },
       /**
        * #getter

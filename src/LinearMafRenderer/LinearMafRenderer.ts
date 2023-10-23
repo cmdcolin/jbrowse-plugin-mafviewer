@@ -44,7 +44,7 @@ function makeImageData({
 }: {
   ctx: CanvasRenderingContext2D
   renderArgs: RenderArgsDeserialized & {
-    samples: { name: string; color?: string }[]
+    samples: { id: string; color?: string }[]
     rowHeight: number
   }
 }) {
@@ -61,7 +61,7 @@ function makeImageData({
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
   const contrastForBase = getContrastBaseMap(theme)
-  const sampleToRowMap = new Map(samples.map((s, i) => [s.name, i]))
+  const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const scale = 1 / bpPerPx
   const correctionFactor = getCorrectionFactor(bpPerPx)
 
@@ -138,7 +138,7 @@ function makeImageData({
 export default class LinearMafRenderer extends FeatureRendererType {
   async render(
     renderProps: RenderArgsDeserialized & {
-      samples: { name: string; color?: string }[]
+      samples: { id: string; color?: string }[]
       rowHeight: number
     },
   ) {

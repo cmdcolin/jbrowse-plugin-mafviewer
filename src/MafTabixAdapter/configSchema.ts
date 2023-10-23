@@ -13,7 +13,8 @@ const configSchema = ConfigurationSchema(
      * #slot
      */
     samples: {
-      type: 'stringArray',
+      type: 'frozen',
+      description: 'string[] or {id:string,label:string,color?:string}[]',
       defaultValue: [],
     },
     /**

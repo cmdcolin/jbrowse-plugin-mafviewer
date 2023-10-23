@@ -49,7 +49,7 @@ export const YScaleBars = observer(function (props: {
 
   const labelWidth = Math.max(
     ...(samples
-      .map(s => measureText(s, svgFontSize))
+      .map(s => measureText(s.label, svgFontSize))
       .map(width => (canDisplayLabel ? width : minWidth)) || [0]),
   )
 
