@@ -1,9 +1,11 @@
+import React from 'react'
 import { getEnv } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
-import React from 'react'
+import YScaleBars from './YScaleBars'
 
 const LinearMafDisplay = observer(function (props: any) {
-  const { pluginManager } = getEnv(props.model)
+  const { model } = props
+  const { pluginManager } = getEnv(model)
 
   const LinearGenomePlugin = pluginManager.getPlugin(
     'LinearGenomeViewPlugin',
@@ -13,6 +15,7 @@ const LinearMafDisplay = observer(function (props: any) {
   return (
     <div>
       <BaseLinearDisplayComponent {...props} />
+      <YScaleBars model={model} />
     </div>
   )
 })

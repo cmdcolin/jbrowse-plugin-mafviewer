@@ -12,6 +12,13 @@ const configSchema = ConfigurationSchema(
     /**
      * #slot
      */
+    sources: {
+      type: 'stringArray',
+      defaultValue: [],
+    },
+    /**
+     * #slot
+     */
     bigBedLocation: {
       type: 'fileLocation',
       defaultValue: {

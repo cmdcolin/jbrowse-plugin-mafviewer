@@ -1,5 +1,6 @@
-import { types } from 'mobx-state-tree'
+import { Instance, types } from 'mobx-state-tree'
 import {
+  AnyConfigurationModel,
   AnyConfigurationSchemaType,
   ConfigurationReference,
   getConf,
@@ -7,6 +8,9 @@ import {
 import { getEnv } from '@jbrowse/core/util'
 import PluginManager from '@jbrowse/core/PluginManager'
 
+/**
+ * #stateModel LinearMafDisplay
+ */
 export default function stateModelFactory(
   configSchema: AnyConfigurationSchemaType,
   pluginManager: PluginManager,
@@ -33,10 +37,17 @@ export default function stateModelFactory(
       }),
     )
     .views(self => ({
+      get sources() {
+        const r = self.adapterConfig.sources as string[]
+        return r.slice(1).map(elt => ({ name: elt, color: undefined }))
+      },
+      get rowHeight() {
+        return 20
+      },
       get rendererTypeName() {
         return 'LinearMafRenderer'
       },
-      get rendererConfig() {
+      get rendererConfig(): AnyConfigurationModel {
         const configBlob = getConf(self, ['renderer']) || {}
         const config = configBlob as Omit<typeof configBlob, symbol>
 
@@ -50,3 +61,6 @@ export default function stateModelFactory(
       },
     }))
 }
+
+export type LinearMafDisplayStateModel = ReturnType<typeof stateModelFactory>
+export type LinearMafDisplayModel = Instance<LinearMafDisplayStateModel>

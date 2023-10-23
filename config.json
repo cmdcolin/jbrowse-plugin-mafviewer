@@ -80,6 +80,7 @@
       "name": "bigMaf",
       "adapter": {
         "type": "BigMafAdapter",
+        "sources": ["hg38", "panTro4", "rheMac3", "mm10", "rn5", "canFam3"],
         "bigBedLocation": {
           "uri": "bigMaf.bb"
         }
