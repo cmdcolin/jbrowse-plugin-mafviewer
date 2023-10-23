@@ -7,6 +7,7 @@ import {
 } from '@jbrowse/core/configuration'
 import { getEnv } from '@jbrowse/core/util'
 import PluginManager from '@jbrowse/core/PluginManager'
+import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
 
 /**
  * #stateModel LinearMafDisplay
@@ -60,6 +61,19 @@ export default function stateModelFactory(
         )
       },
     }))
+    .actions(self => {
+      const { renderSvg: superRenderSvg } = self
+      return {
+        /**
+         * #action
+         */
+        async renderSvg(opts: ExportSvgDisplayOptions): Promise<any> {
+          const { renderSvg } = await import('./renderSvg')
+          // @ts-expect-error
+          return renderSvg(self, opts, superRenderSvg)
+        },
+      }
+    })
 }
 
 export type LinearMafDisplayStateModel = ReturnType<typeof stateModelFactory>
