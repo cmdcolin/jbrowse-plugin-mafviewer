@@ -20,6 +20,15 @@ function getCorrectionFactor(scale: number) {
   }
 }
 
+export function getContrastBaseMap(theme: Theme) {
+  return Object.fromEntries(
+    Object.entries(getColorBaseMap(theme)).map(([key, value]) => [
+      key,
+      theme.palette.getContrastText(value),
+    ]),
+  )
+}
+
 export function getColorBaseMap(theme: Theme) {
   const { bases } = theme.palette
   return {
@@ -44,9 +53,14 @@ function makeImageData({
   const h = 20
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
+  const contrastForBase = getContrastBaseMap(theme)
   const sampleToRowMap = new Map(sources.map((s, i) => [s.name, i]))
   const scale = 1 / bpPerPx
   const correctionFactor = getCorrectionFactor(bpPerPx)
+
+  // sample as alignments
+  ctx.font = 'bold 10px Courier New,monospace'
+
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
     const vals = feature.get('alignments') as Record<string, { data: string }>
@@ -99,7 +113,6 @@ function makeImageData({
       }
 
       // font
-      ctx.fillStyle = 'white'
       const charSize = { w: 10 }
       if (scale >= charSize.w) {
         for (let i = 0; i < alignment.length; i++) {
@@ -107,7 +120,8 @@ function makeImageData({
           const offset = (scale - charSize.w) / 2 + 1
           const c = alignment[i]
           if (seq[i] !== c && c !== '-') {
-            ctx.fillText(origAlignment[i], l + offset, h2 + t + 4)
+            ctx.fillStyle = contrastForBase[c] ?? 'black'
+            ctx.fillText(origAlignment[i], l + offset, h2 + t + 3)
           }
         }
       }
