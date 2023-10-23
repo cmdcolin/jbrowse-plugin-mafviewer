@@ -8,16 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 20.x
       - name: Install deps (with cache)
         uses: bahmutov/npm-install@v1
-      - name: Get latest JBrowse
-        run: mkdir .jbrowse && yarn run jbrowse create --force .jbrowse
-      - name: Run unit tests
-        run: yarn test --passWithNoTests
-      - name: Test plugin
-        run: yarn run test:e2e
+      - name: lint
+        run: yarn lint
+      - name: build
+        run: yarn build

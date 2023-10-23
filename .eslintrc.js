@@ -8,10 +8,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-unused-vars': [
       'warn',
-      {
-        args: 'after-used',
-        ignoreRestSiblings: true,
-      },
+      { argsIgnorePattern: '^_', ignoreRestSiblings: true },
     ],
   },
 }

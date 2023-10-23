@@ -22,5 +22,5 @@ export default class MafViewerPlugin extends Plugin {
     MafAddTrackWorkflowF(pluginManager)
   }
 
-  configure(pluginManager: PluginManager) {}
+  configure(_pluginManager: PluginManager) {}
 }
