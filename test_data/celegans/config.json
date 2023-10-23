@@ -36,7 +36,7 @@
       "name": "chrI.bed",
       "adapter": {
         "type": "MafTabixAdapter",
-        "sources": ["ce10", "cb4", "caeSp111", "caeRem4", "caeJap4", "caePb3"],
+        "samples": ["ce10", "cb4", "caeSp111", "caeRem4", "caeJap4", "caePb3"],
         "bedGzLocation": {
           "uri": "chrI.bed.gz"
         },

@@ -44,7 +44,7 @@ function makeImageData({
 }: {
   ctx: CanvasRenderingContext2D
   renderArgs: RenderArgsDeserialized & {
-    sources: { name: string; color?: string }[]
+    samples: { name: string; color?: string }[]
     rowHeight: number
   }
 }) {
@@ -53,7 +53,7 @@ function makeImageData({
     bpPerPx,
     rowHeight,
     theme: configTheme,
-    sources,
+    samples,
   } = renderArgs
   const [region] = regions
   const features = renderArgs.features as Map<string, Feature>
@@ -61,7 +61,7 @@ function makeImageData({
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
   const contrastForBase = getContrastBaseMap(theme)
-  const sampleToRowMap = new Map(sources.map((s, i) => [s.name, i]))
+  const sampleToRowMap = new Map(samples.map((s, i) => [s.name, i]))
   const scale = 1 / bpPerPx
   const correctionFactor = getCorrectionFactor(bpPerPx)
 
@@ -138,13 +138,13 @@ function makeImageData({
 export default class LinearMafRenderer extends FeatureRendererType {
   async render(
     renderProps: RenderArgsDeserialized & {
-      sources: { name: string; color?: string }[]
+      samples: { name: string; color?: string }[]
       rowHeight: number
     },
   ) {
-    const { regions, bpPerPx, sources, rowHeight } = renderProps
+    const { regions, bpPerPx, samples, rowHeight } = renderProps
     const [region] = regions
-    const height = sources.length * rowHeight
+    const height = samples.length * rowHeight
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
     const res = await renderToAbstractCanvas(width, height, renderProps, ctx =>

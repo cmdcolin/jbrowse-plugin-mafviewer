@@ -12,7 +12,7 @@ const configSchema = ConfigurationSchema(
     /**
      * #slot
      */
-    sources: {
+    samples: {
       type: 'stringArray',
       defaultValue: [],
     },

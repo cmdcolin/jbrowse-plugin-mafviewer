@@ -12,16 +12,16 @@ const ColorLegend = observer(function ({
   model: LinearMafDisplayModel
   labelWidth: number
 }) {
-  const { sources, rowHeight } = model
+  const { samples, rowHeight } = model
   const svgFontSize = Math.min(rowHeight, 12)
   const canDisplayLabel = rowHeight > 11
   const colorBoxWidth = 15
   const legendWidth = labelWidth + colorBoxWidth + 5
   const extraOffset = 0
 
-  return sources ? (
+  return samples ? (
     <>
-      {sources.map((source, idx) => {
+      {samples.map((source, idx) => {
         const boxHeight = Math.min(20, rowHeight)
         return (
           <React.Fragment key={`${source.name}-${idx}`}>

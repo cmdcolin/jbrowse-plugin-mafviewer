@@ -45,8 +45,8 @@ export default function stateModelFactory(
       /**
        * #getter
        */
-      get sources() {
-        const r = self.adapterConfig.sources as string[]
+      get samples() {
+        const r = self.adapterConfig.samples as string[]
         return r.map(elt => ({ name: elt, color: undefined }))
       },
       /**
@@ -86,7 +86,7 @@ export default function stateModelFactory(
         renderProps() {
           return {
             ...superRenderProps(),
-            sources: self.sources,
+            samples: self.samples,
             rowHeight: self.rowHeight,
           }
         },

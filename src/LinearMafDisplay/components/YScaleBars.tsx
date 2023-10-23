@@ -18,7 +18,7 @@ const Wrapper = observer(function ({
   if (exportSVG) {
     return <>{children}</>
   } else {
-    const { height } = model
+    const { rowHeight, samples } = model
     return (
       <svg
         style={{
@@ -26,7 +26,7 @@ const Wrapper = observer(function ({
           top: 0,
           left: 0,
           pointerEvents: 'none',
-          height,
+          height: samples.length * rowHeight,
           width: getContainingView(model).width,
         }}
       >
@@ -42,13 +42,13 @@ export const YScaleBars = observer(function (props: {
   exportSVG?: boolean
 }) {
   const { model } = props
-  const { rowHeight, sources } = model
+  const { rowHeight, samples } = model
   const svgFontSize = Math.min(rowHeight, 12)
   const canDisplayLabel = rowHeight > 11
   const minWidth = 20
 
   const labelWidth = Math.max(
-    ...(sources
+    ...(samples
       .map(s => measureText(s, svgFontSize))
       .map(width => (canDisplayLabel ? width : minWidth)) || [0]),
   )
