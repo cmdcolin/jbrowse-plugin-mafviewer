@@ -56,15 +56,15 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         const alns = []
         const alignments = {} as Record<string, OrganismRecord>
         const blocks2 = []
-        for (let i = 0; i < blocks.length; i++) {
-          if (blocks[i][0] === 's') {
+        for (const block of blocks) {
+          if (block[0] === 's') {
             if (!aln) {
-              aln = blocks[i].split(/ +/)[6]
+              aln = block.split(/ +/)[6]
               alns.push(aln)
-              blocks2.push(blocks[i])
+              blocks2.push(block)
             } else {
-              alns.push(blocks[i].split(/ +/)[6])
-              blocks2.push(blocks[i])
+              alns.push(block.split(/ +/)[6])
+              blocks2.push(block)
             }
           }
         }

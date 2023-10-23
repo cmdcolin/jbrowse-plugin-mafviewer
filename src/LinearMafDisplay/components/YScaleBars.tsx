@@ -41,12 +41,11 @@ export const YScaleBars = observer(function (props: {
   orientation?: string
   exportSVG?: boolean
 }) {
-  const { model, exportSVG } = props
+  const { model } = props
   const { rowHeight, sources } = model
   const svgFontSize = Math.min(rowHeight, 12)
   const canDisplayLabel = rowHeight > 11
   const minWidth = 20
-  console.log({ exportSVG })
 
   const labelWidth = Math.max(
     ...(sources
@@ -57,7 +56,6 @@ export const YScaleBars = observer(function (props: {
   return (
     <Wrapper {...props}>
       <ColorLegend
-        exportSVG={exportSVG}
         model={model}
         rowHeight={model.rowHeight}
         labelWidth={labelWidth}

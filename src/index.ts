@@ -6,6 +6,7 @@ import BigMafAdapterF from './BigMafAdapter'
 import MafTrackF from './MafTrack'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
+import MafTabixAdapterF from './MafTabixAdapter'
 
 export default class MafViewerPlugin extends Plugin {
   name = 'MafViewerPlugin'
@@ -16,6 +17,7 @@ export default class MafViewerPlugin extends Plugin {
     MafTrackF(pluginManager)
     LinearMafDisplayF(pluginManager)
     LinearMafRendererF(pluginManager)
+    MafTabixAdapterF(pluginManager)
   }
 
   configure(pluginManager: PluginManager) {}

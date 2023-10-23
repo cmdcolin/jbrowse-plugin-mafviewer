@@ -40,6 +40,7 @@ export default function stateModelFactory(
     .views(self => ({
       get sources() {
         const r = self.adapterConfig.sources as string[]
+        console.log({ r })
         return r.slice(1).map(elt => ({ name: elt, color: undefined }))
       },
       get rowHeight() {
