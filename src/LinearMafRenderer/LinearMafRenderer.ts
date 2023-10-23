@@ -45,12 +45,19 @@ function makeImageData({
   ctx: CanvasRenderingContext2D
   renderArgs: RenderArgsDeserialized & {
     sources: { name: string; color?: string }[]
+    rowHeight: number
   }
 }) {
-  const { regions, bpPerPx, theme: configTheme, sources } = renderArgs
+  const {
+    regions,
+    bpPerPx,
+    rowHeight,
+    theme: configTheme,
+    sources,
+  } = renderArgs
   const [region] = regions
   const features = renderArgs.features as Map<string, Feature>
-  const h = 20
+  const h = rowHeight
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
   const contrastForBase = getContrastBaseMap(theme)
@@ -76,7 +83,7 @@ function makeImageData({
       const h6 = h / 6
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
-        throw new Error('unknown row encountered')
+        throw new Error(`unknown sample encountered: ${sample}`)
       }
       const t = h * row
       for (let i = 0; i < alignment.length; i++) {
@@ -132,11 +139,12 @@ export default class LinearMafRenderer extends FeatureRendererType {
   async render(
     renderProps: RenderArgsDeserialized & {
       sources: { name: string; color?: string }[]
+      rowHeight: number
     },
   ) {
-    const { regions, bpPerPx } = renderProps
+    const { regions, bpPerPx, sources, rowHeight } = renderProps
     const [region] = regions
-    const height = 100
+    const height = sources.length * rowHeight
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
     const res = await renderToAbstractCanvas(width, height, renderProps, ctx =>

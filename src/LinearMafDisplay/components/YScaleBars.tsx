@@ -55,11 +55,7 @@ export const YScaleBars = observer(function (props: {
 
   return (
     <Wrapper {...props}>
-      <ColorLegend
-        model={model}
-        rowHeight={model.rowHeight}
-        labelWidth={labelWidth}
-      />
+      <ColorLegend model={model} labelWidth={labelWidth} />
     </Wrapper>
   )
 })

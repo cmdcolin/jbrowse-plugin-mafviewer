@@ -7,14 +7,12 @@ import RectBg from './RectBg'
 
 const ColorLegend = observer(function ({
   model,
-  rowHeight,
   labelWidth,
 }: {
   model: LinearMafDisplayModel
-  rowHeight: number
   labelWidth: number
 }) {
-  const { sources } = model
+  const { sources, rowHeight } = model
   const svgFontSize = Math.min(rowHeight, 12)
   const canDisplayLabel = rowHeight > 11
   const colorBoxWidth = 15

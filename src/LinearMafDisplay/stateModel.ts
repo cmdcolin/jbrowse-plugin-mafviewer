@@ -87,6 +87,7 @@ export default function stateModelFactory(
           return {
             ...superRenderProps(),
             sources: self.sources,
+            rowHeight: self.rowHeight,
           }
         },
       }

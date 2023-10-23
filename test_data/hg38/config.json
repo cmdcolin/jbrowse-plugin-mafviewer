@@ -80,7 +80,15 @@
       "name": "bigMaf",
       "adapter": {
         "type": "BigMafAdapter",
-        "sources": ["hg38", "panTro4", "rheMac3", "mm10", "rn5", "canFam3"],
+        "sources": [
+          "hg38",
+          "panTro4",
+          "rheMac3",
+          "mm10",
+          "rn5",
+          "canFam3",
+          "monDom5"
+        ],
         "bigBedLocation": {
           "uri": "bigMaf.bb"
         }
@@ -122,24 +130,8 @@
             "reversed": false,
             "assemblyName": "hg38"
           }
-        ],
-        "tracks": [],
-        "hideHeader": false,
-        "hideHeaderOverview": false,
-        "hideNoTracksActive": false,
-        "trackSelectorType": "hierarchical",
-        "trackLabels": "offset",
-        "showCenterLine": false,
-        "showCytobandsSetting": true,
-        "showGridlines": true
+        ]
       }
-    ],
-    "sessionTracks": [],
-    "sessionAssemblies": [],
-    "temporaryAssemblies": [],
-    "connectionInstances": [],
-    "sessionConnections": [],
-    "focusedViewId": "9FHA1gDRei03FQQZyBo0s",
-    "sessionPlugins": []
+    ]
   }
 }
