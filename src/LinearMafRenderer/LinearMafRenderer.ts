@@ -79,8 +79,8 @@ function makeImageData({
       // gaps
       ctx.beginPath()
       ctx.fillStyle = 'black'
-      const offset0 = (5 / 12) * h
-      const h6 = h / 6
+      const offset = h / 4
+      const h2 = h / 2
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
         throw new Error(`unknown sample encountered: ${sample}`)
@@ -89,12 +89,11 @@ function makeImageData({
       for (let i = 0; i < alignment.length; i++) {
         const l = leftPx + scale * i
         if (alignment[i] === '-') {
-          ctx.rect(l, offset0 + t, scale + correctionFactor, h6)
+          ctx.moveTo(l, t + h2)
+          ctx.lineTo(l + scale + correctionFactor, t + h2)
         }
       }
-      ctx.fill()
-      const offset = (1 / 4) * h
-      const h2 = h / 2
+      ctx.stroke()
 
       // matches
       ctx.beginPath()

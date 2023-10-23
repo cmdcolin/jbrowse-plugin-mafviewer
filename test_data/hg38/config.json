@@ -617,6 +617,23 @@
         }
       },
       "assemblyNames": ["hg38"]
+    },
+    {
+      "trackId": "MAF2",
+      "name": "100-way alignment CF",
+      "type": "FeatureTrack",
+      "assemblyNames": ["hg38"],
+      "adapter": {
+        "type": "BedTabixAdapter",
+        "bedGzLocation": {
+          "uri": "out.txt.gz"
+        },
+        "index": {
+          "location": {
+            "uri": "out.txt.gz.tbi"
+          }
+        }
+      }
     }
   ]
 }
