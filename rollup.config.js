@@ -3,7 +3,7 @@ import { createRollupConfig } from '@jbrowse/development-tools'
 
 function stringToBoolean(string) {
   if (string === undefined) {
-    return undefined
+    return false
   }
   if (string === 'true') {
     return true
@@ -14,7 +14,7 @@ function stringToBoolean(string) {
   throw new Error('unknown boolean string')
 }
 
-const includeUMD = stringToBoolean(process.env.JB_UMD)
+const includeUMD = true
 const includeCJS = stringToBoolean(process.env.JB_CJS)
 const includeESMBundle = stringToBoolean(process.env.JB_ESM_BUNDLE)
 const includeNPM = stringToBoolean(process.env.JB_NPM)

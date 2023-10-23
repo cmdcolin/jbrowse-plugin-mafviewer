@@ -42,6 +42,11 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
     return adapter.getRefNames()
   }
 
+  async getHeader() {
+    const { adapter } = await this.setup()
+    return adapter.getHeader()
+  }
+
   getFeatures(query: Region) {
     return ObservableCreate<Feature>(async observer => {
       const { adapter } = await this.setup()
