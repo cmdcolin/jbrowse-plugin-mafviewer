@@ -31,11 +31,9 @@ export function getColorBaseMap(theme: Theme) {
 }
 function makeImageData({
   ctx,
-  canvasWidth,
   renderArgs,
 }: {
   ctx: CanvasRenderingContext2D
-  canvasWidth: number
   renderArgs: RenderArgsDeserialized
 }) {
   const { regions, bpPerPx, theme: configTheme } = renderArgs
@@ -122,7 +120,6 @@ export default class LinearMafRenderer extends FeatureRendererType {
     const res = await renderToAbstractCanvas(width, height, renderProps, ctx =>
       makeImageData({
         ctx,
-        canvasWidth: width,
         renderArgs: {
           ...renderProps,
           features,

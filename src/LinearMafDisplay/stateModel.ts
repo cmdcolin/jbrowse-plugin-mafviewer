@@ -11,6 +11,7 @@ import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
 
 /**
  * #stateModel LinearMafDisplay
+ * extends LinearBasicDisplay
  */
 export default function stateModelFactory(
   configSchema: AnyConfigurationSchemaType,
@@ -37,18 +38,32 @@ export default function stateModelFactory(
         configuration: ConfigurationReference(configSchema),
       }),
     )
+    .volatile(() => ({
+      prefersOffset: true,
+    }))
     .views(self => ({
+      /**
+       * #getter
+       */
       get sources() {
         const r = self.adapterConfig.sources as string[]
-        console.log({ r })
-        return r.slice(1).map(elt => ({ name: elt, color: undefined }))
+        return r.map(elt => ({ name: elt, color: undefined }))
       },
+      /**
+       * #getter
+       */
       get rowHeight() {
         return 20
       },
+      /**
+       * #getter
+       */
       get rendererTypeName() {
         return 'LinearMafRenderer'
       },
+      /**
+       * #getter
+       */
       get rendererConfig(): AnyConfigurationModel {
         const configBlob = getConf(self, ['renderer']) || {}
         const config = configBlob as Omit<typeof configBlob, symbol>
@@ -63,8 +78,17 @@ export default function stateModelFactory(
       },
     }))
     .actions(self => {
-      const { renderSvg: superRenderSvg } = self
+      const { renderProps: superRenderProps, renderSvg: superRenderSvg } = self
       return {
+        /**
+         * #method
+         */
+        renderProps() {
+          return {
+            ...superRenderProps(),
+            sources: self.sources,
+          }
+        },
         /**
          * #action
          */
