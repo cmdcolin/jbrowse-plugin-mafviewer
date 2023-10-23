@@ -53,9 +53,9 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         const maf = feature.get('mafBlock') as string
         const blocks = maf.split(';')
         let aln: string | undefined
-        const alns = []
+        const alns = [] as string[]
         const alignments = {} as Record<string, OrganismRecord>
-        const blocks2 = []
+        const blocks2 = [] as string[]
         for (const block of blocks) {
           if (block[0] === 's') {
             if (!aln) {
