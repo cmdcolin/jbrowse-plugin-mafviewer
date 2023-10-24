@@ -44,7 +44,7 @@ export const YScaleBars = observer(function (props: {
   const { model } = props
   const { rowHeight, samples } = model
   const svgFontSize = Math.min(rowHeight, 12)
-  const canDisplayLabel = rowHeight > 11
+  const canDisplayLabel = rowHeight >= 10
   const minWidth = 20
 
   const labelWidth = Math.max(

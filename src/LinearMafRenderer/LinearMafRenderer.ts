@@ -46,6 +46,7 @@ function makeImageData({
   renderArgs: RenderArgsDeserialized & {
     samples: { id: string; color?: string }[]
     rowHeight: number
+    rowProportion: number
   }
 }) {
   const {
@@ -54,6 +55,7 @@ function makeImageData({
     rowHeight,
     theme: configTheme,
     samples,
+    rowProportion,
   } = renderArgs
   const [region] = regions
   const features = renderArgs.features as Map<string, Feature>
@@ -80,8 +82,8 @@ function makeImageData({
       if (row === undefined) {
         throw new Error(`unknown sample encountered: ${sample}`)
       }
-      const offset = h / 4
-      const h2 = h / 2
+      const h2 = h * rowProportion
+      const offset = h2 / 2
       const t = h * row
 
       // gaps
@@ -161,7 +163,6 @@ function makeImageData({
           ctx.rect(l, offset + t, 2, h2)
           ctx.rect(l - 2, offset + t, 6, 1)
           ctx.rect(l - 2, offset + t + h2, 6, 1)
-          console.log({ ins })
         }
         o++
       }
@@ -174,6 +175,7 @@ export default class LinearMafRenderer extends FeatureRendererType {
     renderProps: RenderArgsDeserialized & {
       samples: { id: string; color?: string }[]
       rowHeight: number
+      rowProportion: number
     },
   ) {
     const { regions, bpPerPx, samples, rowHeight } = renderProps

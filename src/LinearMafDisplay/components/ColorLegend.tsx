@@ -13,8 +13,8 @@ const ColorLegend = observer(function ({
   labelWidth: number
 }) {
   const { samples, rowHeight } = model
-  const svgFontSize = Math.min(rowHeight, 12)
-  const canDisplayLabel = rowHeight > 11
+  const svgFontSize = Math.min(rowHeight, 10)
+  const canDisplayLabel = rowHeight >= 10
   const colorBoxWidth = 0
   const legendWidth = labelWidth + colorBoxWidth + 5
   const extraOffset = 0

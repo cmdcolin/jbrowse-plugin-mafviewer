@@ -5,9 +5,10 @@ import {
   ConfigurationReference,
   getConf,
 } from '@jbrowse/core/configuration'
-import { getEnv } from '@jbrowse/core/util'
+import { getEnv, getSession } from '@jbrowse/core/util'
 import PluginManager from '@jbrowse/core/PluginManager'
 import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
+import SetRowHeightDialog from './components/SetRowHeight'
 
 function isStrs(array: unknown[]): array is string[] {
   return typeof array[0] === 'string'
@@ -40,10 +41,32 @@ export default function stateModelFactory(
          * #property
          */
         configuration: ConfigurationReference(configSchema),
+        /**
+         * #property
+         */
+        rowHeight: 15,
+        /**
+         * #property
+         */
+        rowProportion: 0.8,
       }),
     )
     .volatile(() => ({
       prefersOffset: true,
+    }))
+    .actions(self => ({
+      /**
+       * #action
+       */
+      setRowHeight(n: number) {
+        self.rowHeight = n
+      },
+      /**
+       * #action
+       */
+      setRowProportion(n: number) {
+        self.rowProportion = n
+      },
     }))
     .views(self => ({
       /**
@@ -59,12 +82,7 @@ export default function stateModelFactory(
           return r
         }
       },
-      /**
-       * #getter
-       */
-      get rowHeight() {
-        return 20
-      },
+
       /**
        * #getter
        */
@@ -88,7 +106,10 @@ export default function stateModelFactory(
       },
     }))
     .views(self => {
-      const { renderProps: superRenderProps } = self
+      const {
+        trackMenuItems: superTrackMenuItems,
+        renderProps: superRenderProps,
+      } = self
       return {
         /**
          * #method
@@ -98,7 +119,25 @@ export default function stateModelFactory(
             ...superRenderProps(),
             samples: self.samples,
             rowHeight: self.rowHeight,
+            rowProportion: self.rowProportion,
           }
+        },
+        /**
+         * #method
+         */
+        trackMenuItems() {
+          return [
+            ...superTrackMenuItems(),
+            {
+              label: 'Set row height',
+              onClick: () => {
+                getSession(self).queueDialog(handleClose => [
+                  SetRowHeightDialog,
+                  { model: self, handleClose },
+                ])
+              },
+            },
+          ]
         },
       }
     })
