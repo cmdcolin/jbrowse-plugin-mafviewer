@@ -63,7 +63,7 @@ function makeImageData({
   const contrastForBase = getContrastBaseMap(theme)
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const scale = 1 / bpPerPx
-  const correctionFactor = getCorrectionFactor(bpPerPx)
+  const f = getCorrectionFactor(bpPerPx)
 
   // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
@@ -76,21 +76,25 @@ function makeImageData({
       const origAlignment = val.data
       const alignment = origAlignment.toLowerCase()
 
-      // gaps
-      ctx.beginPath()
-      ctx.fillStyle = 'black'
-      const offset = h / 4
-      const h2 = h / 2
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
         throw new Error(`unknown sample encountered: ${sample}`)
       }
+      const offset = h / 4
+      const h2 = h / 2
       const t = h * row
-      for (let i = 0; i < alignment.length; i++) {
-        const l = leftPx + scale * i
-        if (alignment[i] === '-') {
-          ctx.moveTo(l, t + h2)
-          ctx.lineTo(l + scale + correctionFactor, t + h2)
+
+      // gaps
+      ctx.beginPath()
+      ctx.fillStyle = 'black'
+      for (let i = 0, o = 0; i < alignment.length; i++) {
+        if (seq[i] !== '-') {
+          if (alignment[i] === '-') {
+            const l = leftPx + scale * o
+            ctx.moveTo(l, t + h2)
+            ctx.lineTo(l + scale + f, t + h2)
+          }
+          o++
         }
       }
       ctx.stroke()
@@ -98,39 +102,70 @@ function makeImageData({
       // matches
       ctx.beginPath()
       ctx.fillStyle = 'lightgrey'
-      for (let i = 0; i < alignment.length; i++) {
-        const c = alignment[i]
-        const l = leftPx + scale * i
-        if (seq[i] === c && c !== '-') {
-          ctx.rect(l, offset + t, scale + correctionFactor, h2)
+      for (let i = 0, o = 0; i < alignment.length; i++) {
+        if (seq[i] !== '-') {
+          const c = alignment[i]
+          const l = leftPx + scale * o
+          if (seq[i] === c && c !== '-') {
+            ctx.rect(l, offset + t, scale + f, h2)
+          }
+          o++
         }
       }
       ctx.fill()
 
       // mismatches
-      for (let i = 0; i < alignment.length; i++) {
+      for (let i = 0, o = 0; i < alignment.length; i++) {
         const c = alignment[i]
-        if (seq[i] !== c && c !== '-') {
-          const l = leftPx + scale * i
-          ctx.fillStyle =
-            colorForBase[c as keyof typeof colorForBase] ?? 'purple'
-          ctx.fillRect(l, offset + t, scale + correctionFactor, h2)
+        if (seq[i] !== '-') {
+          if (seq[i] !== c && c !== '-') {
+            const l = leftPx + scale * o
+            ctx.fillStyle =
+              colorForBase[c as keyof typeof colorForBase] ?? 'purple'
+            ctx.fillRect(l, offset + t, scale + f, h2)
+          }
+          o++
         }
       }
 
       // font
       const charSize = { w: 10 }
       if (scale >= charSize.w) {
-        for (let i = 0; i < alignment.length; i++) {
-          const l = leftPx + scale * i
-          const offset = (scale - charSize.w) / 2 + 1
-          const c = alignment[i]
-          if (seq[i] !== c && c !== '-') {
-            ctx.fillStyle = contrastForBase[c] ?? 'black'
-            ctx.fillText(origAlignment[i], l + offset, h2 + t + 3)
+        for (let i = 0, o = 0; i < alignment.length; i++) {
+          if (seq[i] !== '-') {
+            const l = leftPx + scale * o
+            const offset = (scale - charSize.w) / 2 + 1
+            const c = alignment[i]
+            if (seq[i] !== c && c !== '-') {
+              ctx.fillStyle = contrastForBase[c] ?? 'black'
+              ctx.fillText(origAlignment[i], l + offset, h2 + t + 3)
+            }
+            o++
           }
         }
       }
+
+      //insertions
+      ctx.beginPath()
+      ctx.fillStyle = 'purple'
+      for (let i = 0, o = 0; i < alignment.length; i++) {
+        let ins = ''
+        while (seq[i] === '-') {
+          if (alignment[i] !== '-') {
+            ins += alignment[i]
+          }
+          i++
+        }
+        if (ins.length) {
+          const l = leftPx + scale * o
+          ctx.rect(l, offset + t, 2, h2)
+          ctx.rect(l - 2, offset + t, 6, 1)
+          ctx.rect(l - 2, offset + t + h2, 6, 1)
+          console.log({ ins })
+        }
+        o++
+      }
+      ctx.fill()
     }
   }
 }

@@ -43,6 +43,11 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
     return adapter.getRefNames()
   }
 
+  async getHeader() {
+    const { adapter } = await this.setup()
+    return adapter.getHeader()
+  }
+
   getFeatures(query: Region) {
     return ObservableCreate<Feature>(async observer => {
       const { adapter } = await this.setup()
@@ -52,33 +57,30 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
       for (const feature of features) {
         const data = (feature.get('field5') as string).split(',')
         const alignments = {} as Record<string, OrganismRecord>
-        const main = data[0]
-        const aln = main.split(':')[5]
         const alns = data.map(elt => elt.split(':')[5])
-        const alns2 = data.map(() => '')
+        // const aln = alns[0]
+        // const alns2 = data.map(() => '')
         // remove extraneous data in other alignments
         // reason being: cannot represent missing data in main species that are in others)
-        for (let i = 0, o = 0; i < aln.length; i++, o++) {
-          if (aln[i] !== '-') {
-            for (let j = 0; j < data.length; j++) {
-              alns2[j] += alns[j][i]
-            }
-          }
-        }
+        // for (let i = 0; i < aln.length; i++) {
+        //   if (aln[i] !== '-') {
+        //     for (let j = 0; j < data.length; j++) {
+        //       alns2[j] += alns[j][i]
+        //     }
+        //   }
+        // }
         for (let j = 0; j < data.length; j++) {
           const elt = data[j]
-
           const ad = elt.split(':')
-          const org = ad[0].split('.')[0]
-          const chr = ad[0].split('.')[1]
+          const [org, chr] = ad[0].split('.')
 
           alignments[org] = {
-            chr: chr,
+            chr,
             start: +ad[1],
             srcSize: +ad[2],
             strand: ad[3] === '-' ? -1 : 1,
             unknown: +ad[4],
-            data: alns2[j],
+            data: alns[j],
           }
         }
 
@@ -91,8 +93,8 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
               refName: feature.get('refName'),
               name: feature.get('name'),
               score: feature.get('score'),
-              alignments: alignments,
-              seq: alns2[0],
+              alignments,
+              seq: alns[0],
             },
           }),
         )
