@@ -3,22 +3,11 @@ import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/rend
 import { createJBrowseTheme } from '@jbrowse/core/ui'
 import {
   Feature,
+  Region,
   featureSpanPx,
   renderToAbstractCanvas,
 } from '@jbrowse/core/util'
 import { Theme } from '@mui/material'
-
-function getCorrectionFactor(scale: number) {
-  if (scale >= 1) {
-    return 0.6
-  } else if (scale >= 0.2) {
-    return 0.05
-  } else if (scale >= 0.02) {
-    return 0.03
-  } else {
-    return 0.02
-  }
-}
 
 export function getContrastBaseMap(theme: Theme) {
   return Object.fromEntries(
@@ -65,7 +54,9 @@ function makeImageData({
   const contrastForBase = getContrastBaseMap(theme)
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const scale = 1 / bpPerPx
-  const f = getCorrectionFactor(bpPerPx)
+  const f = 0.4
+  const h2 = h * rowProportion
+  const offset = h2 / 2
 
   // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
@@ -82,8 +73,7 @@ function makeImageData({
       if (row === undefined) {
         throw new Error(`unknown sample encountered: ${sample}`)
       }
-      const h2 = h * rowProportion
-      const offset = h2 / 2
+
       const t = h * row
 
       // gaps
@@ -146,8 +136,26 @@ function makeImageData({
           }
         }
       }
+    }
+  }
 
-      //insertions
+  // second pass for insertions, has slightly improved look since the
+  // insertions are always 'on top' of the other features
+  for (const feature of features.values()) {
+    const [leftPx] = featureSpanPx(feature, region, bpPerPx)
+    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const seq = feature.get('seq').toLowerCase()
+
+    for (const [sample, val] of Object.entries(vals)) {
+      const origAlignment = val.data
+      const alignment = origAlignment.toLowerCase()
+      const row = sampleToRowMap.get(sample)
+      if (row === undefined) {
+        throw new Error(`unknown sample encountered: ${sample}`)
+      }
+
+      const t = h * row
+
       ctx.beginPath()
       ctx.fillStyle = 'purple'
       for (let i = 0, o = 0; i < alignment.length; i++) {
@@ -159,7 +167,7 @@ function makeImageData({
           i++
         }
         if (ins.length) {
-          const l = leftPx + scale * o
+          const l = leftPx + scale * o - 2
           ctx.rect(l, offset + t, 2, h2)
           ctx.rect(l - 2, offset + t, 6, 1)
           ctx.rect(l - 2, offset + t + h2, 6, 1)
@@ -171,6 +179,17 @@ function makeImageData({
   }
 }
 export default class LinearMafRenderer extends FeatureRendererType {
+  getExpandedRegion(region: Region) {
+    const { start, end } = region
+    const bpExpansion = 1
+
+    return {
+      // xref https://github.com/mobxjs/mobx-state-tree/issues/1524 for Omit
+      ...(region as Omit<typeof region, symbol>),
+      start: Math.floor(Math.max(start - bpExpansion, 0)),
+      end: Math.ceil(end + bpExpansion),
+    }
+  }
   async render(
     renderProps: RenderArgsDeserialized & {
       samples: { id: string; color?: string }[]
