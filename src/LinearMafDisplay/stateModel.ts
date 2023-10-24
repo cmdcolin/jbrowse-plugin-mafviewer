@@ -25,13 +25,12 @@ export default function stateModelFactory(
   const LinearGenomePlugin = pluginManager.getPlugin(
     'LinearGenomeViewPlugin',
   ) as import('@jbrowse/plugin-linear-genome-view').default
-  // @ts-expect-error
-  const { linearBasicDisplayModelFactory } = LinearGenomePlugin.exports
+  const { BaseLinearDisplay } = LinearGenomePlugin.exports
 
   return types
     .compose(
       'LinearMafDisplay',
-      linearBasicDisplayModelFactory(configSchema),
+      BaseLinearDisplay,
       types.model({
         /**
          * #property
@@ -117,6 +116,7 @@ export default function stateModelFactory(
         renderProps() {
           return {
             ...superRenderProps(),
+            config: self.rendererConfig,
             samples: self.samples,
             rowHeight: self.rowHeight,
             rowProportion: self.rowProportion,
@@ -149,7 +149,6 @@ export default function stateModelFactory(
          */
         async renderSvg(opts: ExportSvgDisplayOptions): Promise<any> {
           const { renderSvg } = await import('./renderSvg')
-          // @ts-expect-error
           return renderSvg(self, opts, superRenderSvg)
         },
       }

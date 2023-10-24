@@ -5,8 +5,7 @@ export default function configSchemaF(pluginManager: PluginManager) {
   const LinearGenomePlugin = pluginManager.getPlugin(
     'LinearGenomeViewPlugin',
   ) as import('@jbrowse/plugin-linear-genome-view').default
-  // @ts-expect-error
-  const { linearBasicDisplayConfigSchemaFactory } = LinearGenomePlugin.exports
+  const { baseLinearDisplayConfigSchema } = LinearGenomePlugin.exports
   return ConfigurationSchema(
     'LinearMafDisplay',
     {
@@ -16,7 +15,7 @@ export default function configSchemaF(pluginManager: PluginManager) {
       renderer: pluginManager.pluggableConfigSchemaType('renderer'),
     },
     {
-      baseConfiguration: linearBasicDisplayConfigSchemaFactory(pluginManager),
+      baseConfiguration: baseLinearDisplayConfigSchema,
       explicitlyTyped: true,
     },
   )
