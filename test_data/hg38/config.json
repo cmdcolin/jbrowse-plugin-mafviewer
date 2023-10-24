@@ -598,6 +598,18 @@
       ]
     },
     {
+      "type": "FeatureTrack",
+      "trackId": "bigMaf2",
+      "name": "bigMaf (chr22_KI270731v1_random) CF",
+      "adapter": {
+        "type": "BigBedAdapter",
+        "bigBedLocation": {
+          "uri": "bigMaf.bb"
+        }
+      },
+      "assemblyNames": ["hg38"]
+    },
+    {
       "type": "MafTrack",
       "trackId": "bigMaf",
       "name": "bigMaf (chr22_KI270731v1_random)",
