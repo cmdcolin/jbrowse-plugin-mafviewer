@@ -16,6 +16,12 @@ https://jbrowse.org/code/jb2/v2.7.1/?config=%2Fdemos%2Fmafviewer%2Fhg38%2Fconfig
 This short screenshot workflow shows how you can load your own custom MAF files
 via the GUI
 
+First install the plugin via the plugin store
+
+![](img/3.png)
+
+Then use the custom "Add track workflow"
+
 ![](img/2.png)
 
 ## Manual config entry
