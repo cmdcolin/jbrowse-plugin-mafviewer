@@ -72,7 +72,6 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
             }
           }
         }
-        const alns2 = alns.map(() => '')
 
         // eslint-disable-next-line unicorn/no-for-loop
         for (let i = 0; i < blocks2.length; i++) {
@@ -88,7 +87,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
             srcSize: +ad[2],
             strand: ad[3] === '+' ? 1 : -1,
             unknown: +ad[4],
-            data: alns2[i],
+            data: alns[i],
           }
         }
         observer.next(
@@ -98,7 +97,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
               start: feature.get('start'),
               end: feature.get('end'),
               refName: feature.get('refName'),
-              seq: alns2[0],
+              seq: alns[0],
               alignments: alignments,
             },
           }),

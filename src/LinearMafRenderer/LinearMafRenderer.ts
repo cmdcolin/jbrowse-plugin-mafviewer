@@ -168,9 +168,9 @@ function makeImageData({
         }
         if (ins.length > 0) {
           const l = leftPx + scale * o - 2
-          ctx.rect(l, offset + t, 2, h2)
-          ctx.rect(l - 2, offset + t, 6, 1)
-          ctx.rect(l - 2, offset + t + h2, 6, 1)
+          ctx.rect(l, offset + t + 1, 1, h2 - 1)
+          ctx.rect(l - 2, offset + t, 5, 1)
+          ctx.rect(l - 2, offset + t + h2 - 1, 5, 1)
         }
         o++
       }
@@ -199,7 +199,7 @@ export default class LinearMafRenderer extends FeatureRendererType {
   ) {
     const { regions, bpPerPx, samples, rowHeight } = renderProps
     const [region] = regions
-    const height = samples.length * rowHeight
+    const height = samples.length * rowHeight + 100
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
     const res = await renderToAbstractCanvas(width, height, renderProps, ctx =>
