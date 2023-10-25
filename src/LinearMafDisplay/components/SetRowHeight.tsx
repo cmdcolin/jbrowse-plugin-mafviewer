@@ -20,8 +20,8 @@ const SetRowHeightDialog = observer(function (props: {
   model: {
     rowHeight?: number
     rowProportion?: number
-    setRowHeight: Function
-    setRowProportion: Function
+    setRowHeight: (arg: number) => void
+    setRowProportion: (arg: number) => void
   }
   handleClose: () => void
 }) {

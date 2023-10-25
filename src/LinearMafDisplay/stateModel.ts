@@ -75,11 +75,9 @@ export default function stateModelFactory(
         const r = self.adapterConfig.samples as
           | string[]
           | { id: string; label: string; color?: string }[]
-        if (isStrs(r)) {
-          return r.map(elt => ({ id: elt, label: elt, color: undefined }))
-        } else {
-          return r
-        }
+        return isStrs(r)
+          ? r.map(elt => ({ id: elt, label: elt, color: undefined }))
+          : r
       },
 
       /**
@@ -114,12 +112,13 @@ export default function stateModelFactory(
          * #method
          */
         renderProps() {
+          const { rendererConfig, samples, rowHeight, rowProportion } = self
           return {
             ...superRenderProps(),
-            config: self.rendererConfig,
-            samples: self.samples,
-            rowHeight: self.rowHeight,
-            rowProportion: self.rowProportion,
+            config: rendererConfig,
+            samples: samples,
+            rowHeight: rowHeight,
+            rowProportion: rowProportion,
           }
         },
         /**
@@ -142,12 +141,13 @@ export default function stateModelFactory(
       }
     })
     .actions(self => {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       const { renderSvg: superRenderSvg } = self
       return {
         /**
          * #action
          */
-        async renderSvg(opts: ExportSvgDisplayOptions): Promise<any> {
+        async renderSvg(opts: ExportSvgDisplayOptions) {
           const { renderSvg } = await import('./renderSvg')
           return renderSvg(self, opts, superRenderSvg)
         },

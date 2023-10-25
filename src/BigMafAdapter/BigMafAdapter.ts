@@ -61,29 +61,20 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         const alignments = {} as Record<string, OrganismRecord>
         const blocks2 = [] as string[]
         for (const block of blocks) {
-          if (block[0] === 's') {
-            if (!aln) {
-              aln = block.split(/ +/)[6]
-              alns.push(aln)
+          if (block.startsWith('s')) {
+            if (aln) {
+              alns.push(block.split(/ +/)[6])
               blocks2.push(block)
             } else {
-              alns.push(block.split(/ +/)[6])
+              aln = block.split(/ +/)[6]
+              alns.push(aln)
               blocks2.push(block)
             }
           }
         }
         const alns2 = alns.map(() => '')
 
-        if (aln) {
-          for (let i = 0; i < aln?.length; i++) {
-            if (aln[i] !== '-') {
-              for (let j = 0; j < alns.length; j++) {
-                alns2[j] += alns[j][i]
-              }
-            }
-          }
-        }
-
+        // eslint-disable-next-line unicorn/no-for-loop
         for (let i = 0; i < blocks2.length; i++) {
           const elt = blocks2[i]
           const ad = elt.split(/ +/)

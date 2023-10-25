@@ -71,6 +71,8 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.8",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "eslint-plugin-unicorn": "^48.0.1",
     "mobx": "^6.0.0",
     "mobx-react": "^9.0.1",
     "mobx-state-tree": "5.2.0",

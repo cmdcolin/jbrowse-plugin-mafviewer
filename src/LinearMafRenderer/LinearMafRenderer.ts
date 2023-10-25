@@ -166,7 +166,7 @@ function makeImageData({
           }
           i++
         }
-        if (ins.length) {
+        if (ins.length > 0) {
           const l = leftPx + scale * o - 2
           ctx.rect(l, offset + t, 2, h2)
           ctx.rect(l - 2, offset + t, 6, 1)

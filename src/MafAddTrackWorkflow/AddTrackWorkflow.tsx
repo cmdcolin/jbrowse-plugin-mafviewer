@@ -43,6 +43,7 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
   const [error, setError] = useState<unknown>()
   const [trackName, setTrackName] = useState('MAF track')
   const [choice, setChoice] = useState('BigMafAdapter')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rootModel = getRoot<any>(model)
   return (
     <Paper className={classes.paper}>

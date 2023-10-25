@@ -14,9 +14,9 @@ export async function renderSvg(
   opts: ExportSvgDisplayOptions,
   superRenderSvg: (opts: ExportSvgDisplayOptions) => Promise<React.ReactNode>,
 ) {
-  const { height } = self
+  const { height, id } = self
   const { offsetPx, width } = getContainingView(self) as LinearGenomeViewModel
-  const clipid = `mafclip-${self.id}`
+  const clipid = `mafclip-${id}`
   return (
     <>
       <defs>

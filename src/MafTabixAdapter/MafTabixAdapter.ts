@@ -58,19 +58,8 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         const data = (feature.get('field5') as string).split(',')
         const alignments = {} as Record<string, OrganismRecord>
         const alns = data.map(elt => elt.split(':')[5])
-        // const aln = alns[0]
-        // const alns2 = data.map(() => '')
-        // remove extraneous data in other alignments
-        // reason being: cannot represent missing data in main species that are in others)
-        // for (let i = 0; i < aln.length; i++) {
-        //   if (aln[i] !== '-') {
-        //     for (let j = 0; j < data.length; j++) {
-        //       alns2[j] += alns[j][i]
-        //     }
-        //   }
-        // }
-        for (let j = 0; j < data.length; j++) {
-          const elt = data[j]
+
+        for (const [j, elt] of data.entries()) {
           const ad = elt.split(':')
           const [org, chr] = ad[0].split('.')
 
