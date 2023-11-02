@@ -165,31 +165,24 @@ and set the storeType of your track as MAFViewer/Store/SeqFeature/BigMaf
 
 Start by converting the MAF into a pseudo-BED format by calling bin/maf2bed.pl
 
-    bin/maf2bed.pl hg38 < file.maf > output.txt
-    bgzip output.txt
-    tabix -p bed output.txt.gz
+    cargo install maf2bed # from https://github.com/cmdcolin/maf2bed
+    cat file.maf | maf2bed hg38 | bgzip > out.bed
+    tabix -p bed out.bed.gz
 
-Note: currently assumes space separated MAF, not tab separated. If you have tab
-separated, can add a 'sed' command in pipe
-
-    cat file.maf | sed -e 's/\t/ /g | ./maf2bed.pl hg38 | bgzip > out.txt.gz
-
-The second argument to maf2bed.pl is the genome version e.g. hg38 used for the
-main species in the MAF (if your MAF comes from a pipeline like Ensembl or UCSC,
-the identifiers in the MAF file will say something like hg38.chr1, therefore,
-the argument to maf2bed.pl should just be hg38 to remove hg38 part of the
-identifier. if your MAF file does not include the species name as part of the
-identifier, you should add the species into them the those scaffold/chromosome
-e.g. create hg38.chr1 if it was just chr1 before)
+The second argument to maf2bed is the genome version e.g. hg38 used for the main
+species in the MAF (if your MAF comes from a pipeline like Ensembl or UCSC, the
+identifiers in the MAF file will say something like hg38.chr1, therefore, the
+argument to maf2bed should just be hg38 to remove hg38 part of the identifier.
+if your MAF file does not include the species name as part of the identifier,
+you should add the species into them the those scaffold/chromosome e.g. create
+hg38.chr1 if it was just chr1 before)
 
 If all is well, your BED file should have 6 columns, with
 `chr, start, end, id, score, alignment_data`, where `alignment_data` is
 separated between each species by `;` and each field in the alignment is
 separated by `:`.
 
-Note: you can also stream from a gzipped MAF to the bgzipped bed
+### Footnote
 
-    gunzip -c chr21.maf.gz | bin/maf2bed.pl hg38 | bgzip > output.txt.gz
-
-The bin/convert.sh script has a small automatic processing from maf to bgzipped,
-tabixed, bed.
+If you can't use the `cargo install maf2bed` binary, there is a `bin/maf2bed.pl`
+perl version of it in this repo
