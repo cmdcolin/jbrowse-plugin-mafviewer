@@ -163,11 +163,14 @@ and set the storeType of your track as MAFViewer/Store/SeqFeature/BigMaf
 
 ### Preparing the tabix BED format
 
-Start by converting the MAF into a pseudo-BED format by calling bin/maf2bed.pl
+Start by converting the MAF into a pseudo-BED format using the maf2bed tool
 
-    cargo install maf2bed # from https://github.com/cmdcolin/maf2bed
-    cat file.maf | maf2bed hg38 | bgzip > out.bed
-    tabix -p bed out.bed.gz
+```bash
+# from https://github.com/cmdcolin/maf2bed
+cargo install maf2bed
+cat file.maf | maf2bed hg38 | bgzip > out.bed
+tabix -p bed out.bed.gz
+```
 
 The second argument to maf2bed is the genome version e.g. hg38 used for the main
 species in the MAF (if your MAF comes from a pipeline like Ensembl or UCSC, the
