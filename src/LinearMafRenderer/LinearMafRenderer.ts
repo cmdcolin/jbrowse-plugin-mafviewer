@@ -36,27 +36,30 @@ function makeImageData({
     samples: { id: string; color?: string }[]
     rowHeight: number
     rowProportion: number
+    showAllLetters: boolean
   }
 }) {
   const {
     regions,
     bpPerPx,
     rowHeight,
+    showAllLetters,
     theme: configTheme,
     samples,
     rowProportion,
   } = renderArgs
   const [region] = regions
   const features = renderArgs.features as Map<string, Feature>
-  const h = rowHeight
+  const h = rowHeight * rowProportion
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
   const contrastForBase = getContrastBaseMap(theme)
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const scale = 1 / bpPerPx
   const f = 0.4
-  const h2 = h * rowProportion
-  const offset = h2 / 2
+  const h2 = rowHeight / 2
+  const hp2 = h / 2
+  const offset = (rowHeight - h) / 2
 
   // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
@@ -74,7 +77,7 @@ function makeImageData({
         throw new Error(`unknown sample encountered: ${sample}`)
       }
 
-      const t = h * row
+      const t = rowHeight * row
 
       // gaps
       ctx.beginPath()
@@ -91,30 +94,32 @@ function makeImageData({
       }
       ctx.stroke()
 
-      // matches
-      ctx.beginPath()
-      ctx.fillStyle = 'lightgrey'
-      for (let i = 0, o = 0; i < alignment.length; i++) {
-        if (seq[i] !== '-') {
-          const c = alignment[i]
-          const l = leftPx + scale * o
-          if (seq[i] === c && c !== '-') {
-            ctx.rect(l, offset + t, scale + f, h2)
+      if (!showAllLetters) {
+        // matches
+        ctx.beginPath()
+        ctx.fillStyle = 'lightgrey'
+        for (let i = 0, o = 0; i < alignment.length; i++) {
+          if (seq[i] !== '-') {
+            const c = alignment[i]
+            const l = leftPx + scale * o
+            if (seq[i] === c && c !== '-') {
+              ctx.rect(l, offset + t, scale + f, h)
+            }
+            o++
           }
-          o++
         }
+        ctx.fill()
       }
-      ctx.fill()
 
       // mismatches
       for (let i = 0, o = 0; i < alignment.length; i++) {
         const c = alignment[i]
         if (seq[i] !== '-') {
-          if (seq[i] !== c && c !== '-') {
+          if ((showAllLetters || seq[i] !== c) && c !== '-') {
             const l = leftPx + scale * o
             ctx.fillStyle =
-              colorForBase[c as keyof typeof colorForBase] ?? 'purple'
-            ctx.fillRect(l, offset + t, scale + f, h2)
+              colorForBase[c as keyof typeof colorForBase] ?? 'black'
+            ctx.fillRect(l, offset + t, scale + f, h)
           }
           o++
         }
@@ -128,9 +133,9 @@ function makeImageData({
             const l = leftPx + scale * o
             const offset = (scale - charSize.w) / 2 + 1
             const c = alignment[i]
-            if (seq[i] !== c && c !== '-') {
-              ctx.fillStyle = contrastForBase[c] ?? 'black'
-              ctx.fillText(origAlignment[i], l + offset, h2 + t + 3)
+            if ((showAllLetters || seq[i] !== c) && c !== '-') {
+              ctx.fillStyle = contrastForBase[c] ?? 'white'
+              ctx.fillText(origAlignment[i], l + offset, hp2 + t + 3)
             }
             o++
           }
@@ -154,7 +159,7 @@ function makeImageData({
         throw new Error(`unknown sample encountered: ${sample}`)
       }
 
-      const t = h * row
+      const t = rowHeight * row
 
       ctx.beginPath()
       ctx.fillStyle = 'purple'
@@ -167,10 +172,10 @@ function makeImageData({
           i++
         }
         if (ins.length > 0) {
-          const l = leftPx + scale * o - 2
-          ctx.rect(l, offset + t + 1, 1, h2 - 1)
+          const l = leftPx + scale * o - 1
+          ctx.rect(l, offset + t + 1, 1, h - 1)
           ctx.rect(l - 2, offset + t, 5, 1)
-          ctx.rect(l - 2, offset + t + h2 - 1, 5, 1)
+          ctx.rect(l - 2, offset + t + h - 1, 5, 1)
         }
         o++
       }

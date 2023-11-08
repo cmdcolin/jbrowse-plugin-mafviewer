@@ -48,6 +48,10 @@ export default function stateModelFactory(
          * #property
          */
         rowProportion: 0.8,
+        /**
+         * #property
+         */
+        showAllLetters: false,
       }),
     )
     .volatile(() => ({
@@ -65,6 +69,12 @@ export default function stateModelFactory(
        */
       setRowProportion(n: number) {
         self.rowProportion = n
+      },
+      /**
+       * #action
+       */
+      setShowAllLetters(f: boolean) {
+        self.showAllLetters = f
       },
     }))
     .views(self => ({
@@ -112,13 +122,20 @@ export default function stateModelFactory(
          * #method
          */
         renderProps() {
-          const { rendererConfig, samples, rowHeight, rowProportion } = self
+          const {
+            showAllLetters,
+            rendererConfig,
+            samples,
+            rowHeight,
+            rowProportion,
+          } = self
           return {
             ...superRenderProps(),
             config: rendererConfig,
-            samples: samples,
-            rowHeight: rowHeight,
-            rowProportion: rowProportion,
+            samples,
+            rowHeight,
+            rowProportion,
+            showAllLetters,
           }
         },
         /**
@@ -134,6 +151,14 @@ export default function stateModelFactory(
                   SetRowHeightDialog,
                   { model: self, handleClose },
                 ])
+              },
+            },
+            {
+              label: 'Show all letters',
+              type: 'checkbox',
+              checked: self.showAllLetters,
+              onClick: () => {
+                self.setShowAllLetters(!self.showAllLetters)
               },
             },
           ]

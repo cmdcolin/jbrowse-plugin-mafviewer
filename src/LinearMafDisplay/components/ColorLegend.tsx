@@ -8,12 +8,13 @@ import RectBg from './RectBg'
 const ColorLegend = observer(function ({
   model,
   labelWidth,
+  svgFontSize,
 }: {
   model: LinearMafDisplayModel
+  svgFontSize: number
   labelWidth: number
 }) {
   const { samples, rowHeight } = model
-  const svgFontSize = Math.min(rowHeight, 10)
   const canDisplayLabel = rowHeight >= 10
   const boxHeight = Math.min(20, rowHeight)
 
@@ -22,7 +23,7 @@ const ColorLegend = observer(function ({
       {samples.map((sample, idx) => (
         <RectBg
           key={`${sample.id}-${idx}`}
-          y={idx * rowHeight + 1}
+          y={idx * rowHeight}
           x={0}
           width={labelWidth + 5}
           height={boxHeight}
@@ -33,7 +34,8 @@ const ColorLegend = observer(function ({
         ? samples.map((sample, idx) => (
             <text
               key={`${sample.id}-${idx}`}
-              y={idx * rowHeight + 14}
+              y={idx * rowHeight + rowHeight / 2}
+              dominantBaseline="middle"
               x={2}
               fontSize={svgFontSize}
             >

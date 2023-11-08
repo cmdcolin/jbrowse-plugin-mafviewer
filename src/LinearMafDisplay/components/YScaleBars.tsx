@@ -43,7 +43,7 @@ export const YScaleBars = observer(function (props: {
 }) {
   const { model } = props
   const { rowHeight, samples } = model
-  const svgFontSize = Math.min(rowHeight, 12)
+  const svgFontSize = Math.min(Math.max(rowHeight, 10), 14)
   const canDisplayLabel = rowHeight >= 10
   const minWidth = 20
 
@@ -55,7 +55,11 @@ export const YScaleBars = observer(function (props: {
 
   return (
     <Wrapper {...props}>
-      <ColorLegend model={model} labelWidth={labelWidth} />
+      <ColorLegend
+        model={model}
+        labelWidth={labelWidth}
+        svgFontSize={svgFontSize}
+      />
     </Wrapper>
   )
 })
