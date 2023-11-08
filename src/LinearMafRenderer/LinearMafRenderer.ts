@@ -18,6 +18,13 @@ export function getContrastBaseMap(theme: Theme) {
   )
 }
 
+interface RenderArgs extends RenderArgsDeserialized {
+  samples: { id: string; color?: string }[]
+  rowHeight: number
+  rowProportion: number
+  showAllLetters: boolean
+}
+
 export function getColorBaseMap(theme: Theme) {
   const { bases } = theme.palette
   return {
@@ -32,12 +39,7 @@ function makeImageData({
   renderArgs,
 }: {
   ctx: CanvasRenderingContext2D
-  renderArgs: RenderArgsDeserialized & {
-    samples: { id: string; color?: string }[]
-    rowHeight: number
-    rowProportion: number
-    showAllLetters: boolean
-  }
+  renderArgs: RenderArgs & { features: Map<string, Feature> }
 }) {
   const {
     regions,
@@ -47,9 +49,9 @@ function makeImageData({
     theme: configTheme,
     samples,
     rowProportion,
+    features,
   } = renderArgs
   const [region] = regions
-  const features = renderArgs.features as Map<string, Feature>
   const h = rowHeight * rowProportion
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
@@ -195,13 +197,7 @@ export default class LinearMafRenderer extends FeatureRendererType {
       end: Math.ceil(end + bpExpansion),
     }
   }
-  async render(
-    renderProps: RenderArgsDeserialized & {
-      samples: { id: string; color?: string }[]
-      rowHeight: number
-      rowProportion: number
-    },
-  ) {
+  async render(renderProps: RenderArgs) {
     const { regions, bpPerPx, samples, rowHeight } = renderProps
     const [region] = regions
     const height = samples.length * rowHeight + 100
