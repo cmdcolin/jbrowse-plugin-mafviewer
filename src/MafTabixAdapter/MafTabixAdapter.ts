@@ -61,10 +61,12 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
 
         for (const [j, elt] of data.entries()) {
           const ad = elt.split(':')
-          const [org, chr] = ad[0].split('.')
+          const idx = ad[0].lastIndexOf('.')
+          const org = ad[0].slice(0, idx)
+          const last = ad[0].slice(idx + 1)
 
           alignments[org] = {
-            chr,
+            chr: last,
             start: +ad[1],
             srcSize: +ad[2],
             strand: ad[3] === '-' ? -1 : 1,
