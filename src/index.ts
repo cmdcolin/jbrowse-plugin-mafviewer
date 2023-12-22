@@ -13,7 +13,7 @@ export default class MafViewerPlugin extends Plugin {
   name = 'MafViewerPlugin'
   version = version
 
-  install(pluginManager: PluginManager) {
+  install(_pluginManager: PluginManager) {
     BigMafAdapterF(pluginManager)
     MafTrackF(pluginManager)
     LinearMafDisplayF(pluginManager)
