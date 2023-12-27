@@ -12,6 +12,7 @@ interface OrganismRecord {
   unknown: number
   data: string
 }
+
 export default class BigMafAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<{ adapter: BaseFeatureDataAdapter }>
 
@@ -54,6 +55,13 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
       const features = await firstValueFrom(
         adapter.getFeatures(query).pipe(toArray()),
       )
+      const samples = this.getConf('samples') as string[] | { id: string }[]
+      const sampleStrings =
+        typeof samples[0] === 'string'
+          ? (samples as string[])
+          : (samples as { id: string }[]).map(s => s.id)
+      const sampleSet = new Set(sampleStrings)
+      let i = 0
       for (const feature of features) {
         const data = (feature.get('field5') as string).split(',')
         const alignments = {} as Record<string, OrganismRecord>
@@ -64,14 +72,23 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
           const idx = ad[0].lastIndexOf('.')
           const org = ad[0].slice(0, idx)
           const last = ad[0].slice(idx + 1)
-
-          alignments[org] = {
-            chr: last,
-            start: +ad[1],
-            srcSize: +ad[2],
-            strand: ad[3] === '-' ? -1 : 1,
-            unknown: +ad[4],
-            data: alns[j],
+          const s = sampleSet.has(org)
+            ? org
+            : sampleStrings.find(f => ad[0].startsWith(f))
+          if (s) {
+            alignments[s] = {
+              chr: last,
+              start: +ad[1],
+              srcSize: +ad[2],
+              strand: ad[3] === '-' ? -1 : 1,
+              unknown: +ad[4],
+              data: alns[j],
+            }
+          } else if (i < 100) {
+            console.error(`line not processed ${ad[0]}`)
+            i++
+          } else if (i > 100) {
+            console.error('too many errors, not printing any more')
           }
         }
 

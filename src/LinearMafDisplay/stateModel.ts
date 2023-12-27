@@ -157,9 +157,7 @@ export default function stateModelFactory(
               label: 'Show all letters',
               type: 'checkbox',
               checked: self.showAllLetters,
-              onClick: () => {
-                self.setShowAllLetters(!self.showAllLetters)
-              },
+              onClick: () => self.setShowAllLetters(!self.showAllLetters),
             },
           ]
         },
