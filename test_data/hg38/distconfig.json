@@ -56,11 +56,11 @@
       "adapter": {
         "type": "MafTabixAdapter",
         "bedGzLocation": {
-          "uri": "out.txt.gz"
+          "uri": "out.bed.gz"
         },
         "index": {
           "location": {
-            "uri": "out.txt.gz.tbi"
+            "uri": "out.bed.gz.tbi"
           }
         },
         "samples": [
