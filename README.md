@@ -146,6 +146,7 @@ https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/progressive
 
 I recommend using "--dupeMode all" because using "--dupeMode single" can cause missing blocks of data, but you are welcome to experiment
 
+Thanks to Sam Talbot (https://github.com/SamCT) for initially creating the Cactus -> JBrowse 2 MAF example
 
 ## Prepare data
 
