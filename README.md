@@ -180,8 +180,8 @@ Start by converting the MAF into a pseudo-BED format using the maf2bed tool
 ```bash
 # from https://github.com/cmdcolin/maf2bed
 cargo install maf2bed
-cat file.maf | maf2bed hg38 | bgzip > out.bed
-tabix -p bed out.bed.gz
+cat file.maf | maf2bed hg38 | sort -k1,1 -k2,2n | bgzip > out.bed.gz
+tabix out.bed.gz
 ```
 
 The second argument to maf2bed is the genome version e.g. hg38 used for the main
