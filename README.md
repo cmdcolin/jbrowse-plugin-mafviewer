@@ -136,17 +136,19 @@ The MafTabix track is created according to
 
 The samples array is either `string[]|{id:string,label:string,color?:string}[]`
 
-## Creating MAF files
+## Creating MAF files as Cactus pangenome/HAL
 
 You can create a MAF file from a Cactus pangenome graph using ComparativeGenomeToolkit
 
 This page discusses some examples
 
-https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/progressive.md#using-the-hal-output
+https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/progressive.md#maf-export
 
-I recommend using "--dupeMode all" because using "--dupeMode single" can cause missing blocks of data, but you are welcome to experiment
+
 
 Thanks to Sam Talbot (https://github.com/SamCT) for initially creating the Cactus -> JBrowse 2 MAF example
+
+Please note that MAFViewer wants non-overlapping blocks, please check if this is the case
 
 ## Prepare data
 
