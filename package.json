@@ -1,5 +1,5 @@
 {
-  "version": "1.0.6",
+  "version": "1.0.8",
   "name": "jbrowse-plugin-mafviewer",
   "keywords": [
     "jbrowse",
@@ -12,28 +12,14 @@
     "dist",
     "src"
   ],
-  "config": {
-    "port": 9000,
-    "browse": {
-      "port": 8999
-    },
-    "jbrowse": {
-      "plugin": {
-        "name": "MafViewer"
-      }
-    }
-  },
   "scripts": {
     "clean": "rimraf dist",
     "start": "node esbuild.mjs",
     "prebuild": "npm run clean",
-    "build": "rollup --config --bundleConfigAsCjs",
-    "lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
+    "build": "tsc && NODE_ENV=production node esbuild.mjs",
+    "lint": "eslint --report-unused-disable-directives --max-warnings 0",
     "prepack": "npm run build",
     "postversion": "git push --follow-tags"
-  },
-  "jbrowse-plugin": {
-    "name": "MafViewer"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",
@@ -41,36 +27,33 @@
     "@emotion/react": "^11.10.4",
     "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
     "@jbrowse/core": "^2.6.1",
-    "@jbrowse/development-tools": "^2.1.1",
     "@jbrowse/plugin-data-management": "^2.7.1",
     "@jbrowse/plugin-linear-genome-view": "^2.7.1",
-    "@mui/material": "^5.10.5",
-    "@mui/system": "^5.10.5",
+    "@mui/material": "^6.2.0",
+    "@mui/system": "^6.2.0",
     "@mui/x-data-grid": "^7.2.0",
-    "@types/node": "^20.8.7",
-    "@types/react": "^18.2.31",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
     "chalk": "^5.3.0",
-    "esbuild": "^0.20.2",
-    "eslint": "^8.36.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-unicorn": "^52.0.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-unicorn": "^56.0.1",
     "mobx": "^6.0.0",
     "mobx-react": "^9.0.1",
     "mobx-state-tree": "5.4.1",
-    "prettier": "^3.0.0",
+    "prettier": "^3.4.2",
     "pretty-bytes": "^6.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "rimraf": "^5.0.1",
-    "rollup": "^4.9.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",
     "serve": "^14.2.0",
     "tss-react": "^4.8.6",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "typescript-eslint": "^8.18.0"
   }
 }

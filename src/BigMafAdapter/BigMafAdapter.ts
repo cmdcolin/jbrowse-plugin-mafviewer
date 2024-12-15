@@ -29,7 +29,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
   }
   async setupPre() {
     if (!this.setupP) {
-      this.setupP = this.setup().catch(e => {
+      this.setupP = this.setup().catch((e: unknown) => {
         this.setupP = undefined
         throw e
       })
@@ -73,7 +73,6 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
           }
         }
 
-        // eslint-disable-next-line unicorn/no-for-loop
         for (let i = 0; i < blocks2.length; i++) {
           const elt = blocks2[i]
           const ad = elt.split(/ +/)

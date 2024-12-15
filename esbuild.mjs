@@ -14,48 +14,86 @@ function createGlobalMap(jbrowseGlobals) {
   return globalMap
 }
 
-let ctx = await esbuild.context({
-  entryPoints: ['src/index.ts'],
-  bundle: true,
-  globalName: 'JBrowsePluginMafViewer',
-  outfile: 'dist/out.js',
-  metafile: true,
-  plugins: [
-    globalExternals(createGlobalMap(JbrowseGlobals.default)),
-    {
-      name: 'rebuild-log',
-      setup({ onStart, onEnd }) {
-        let time
-        onStart(() => {
-          time = Date.now()
-        })
-        onEnd(({ metafile, errors, warnings }) => {
-          console.log(
-            `Built in ${Date.now() - time} ms with ${
-              errors.length
-            } error(s) and ${warnings.length} warning(s)`,
-          )
-          if (!metafile) {
-            return
-          }
-          const { outputs } = metafile
-          for (const [file, metadata] of Object.entries(outputs)) {
-            const size = prettyBytes(metadata.bytes)
-            console.log(`Wrote ${size} to ${file}`)
-          }
-        })
+if (process.env.NODE_ENV === 'production') {
+  await esbuild.build({
+    entryPoints: ['src/index.ts'],
+    bundle: true,
+    globalName: 'JBrowsePluginMafViewer',
+    sourcemap: true,
+    outfile: 'dist/jbrowse-plugin-mafviewer.umd.production.min.js',
+    metafile: true,
+    minify: true,
+    plugins: [
+      globalExternals(createGlobalMap(JbrowseGlobals.default)),
+      {
+        name: 'rebuild-log',
+        setup({ onStart, onEnd }) {
+          let time
+          onStart(() => {
+            time = Date.now()
+          })
+          onEnd(({ metafile, errors, warnings }) => {
+            console.log(
+              `Built in ${Date.now() - time} ms with ${
+                errors.length
+              } error(s) and ${warnings.length} warning(s)`,
+            )
+            if (!metafile) {
+              return
+            }
+            const { outputs } = metafile
+            for (const [file, metadata] of Object.entries(outputs)) {
+              const size = prettyBytes(metadata.bytes)
+              console.log(`Wrote ${size} to ${file}`)
+            }
+          })
+        },
       },
-    },
-  ],
-})
+    ],
+  })
+} else {
+  let ctx = await esbuild.context({
+    entryPoints: ['src/index.ts'],
+    bundle: true,
+    globalName: 'JBrowsePluginMafViewer',
+    outfile: 'dist/out.js',
+    metafile: true,
+    plugins: [
+      globalExternals(createGlobalMap(JbrowseGlobals.default)),
+      {
+        name: 'rebuild-log',
+        setup({ onStart, onEnd }) {
+          let time
+          onStart(() => {
+            time = Date.now()
+          })
+          onEnd(({ metafile, errors, warnings }) => {
+            console.log(
+              `Built in ${Date.now() - time} ms with ${
+                errors.length
+              } error(s) and ${warnings.length} warning(s)`,
+            )
+            if (!metafile) {
+              return
+            }
+            const { outputs } = metafile
+            for (const [file, metadata] of Object.entries(outputs)) {
+              const size = prettyBytes(metadata.bytes)
+              console.log(`Wrote ${size} to ${file}`)
+            }
+          })
+        },
+      },
+    ],
+  })
+  let { host, port } = await ctx.serve({
+    servedir: '.',
+    port: 9001,
+    host: 'localhost',
+  })
+  const formattedHost = host === '127.0.0.1' ? 'localhost' : host
+  console.log(`Serving at http://${formattedHost}:${port}`)
 
-let { host, port } = await ctx.serve({
-  servedir: '.',
-  port: 9000,
-  host: 'localhost',
-})
-const formattedHost = host === '127.0.0.1' ? 'localhost' : host
-console.log(`Serving at http://${formattedHost}:${port}`)
-
-await ctx.watch()
-console.log('Watching files...')
+  await ctx.watch()
+  console.log('Watching files...')
+}

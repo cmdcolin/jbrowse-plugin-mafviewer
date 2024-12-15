@@ -7,33 +7,20 @@ import {
   featureSpanPx,
   renderToAbstractCanvas,
 } from '@jbrowse/core/util'
-import { Theme } from '@mui/material'
+import { getColorBaseMap, getContrastBaseMap } from './util'
 
-export function getContrastBaseMap(theme: Theme) {
-  return Object.fromEntries(
-    Object.entries(getColorBaseMap(theme)).map(([key, value]) => [
-      key,
-      theme.palette.getContrastText(value),
-    ]),
-  )
+interface Sample {
+  id: string
+  color?: string
 }
-
 interface RenderArgs extends RenderArgsDeserialized {
-  samples: { id: string; color?: string }[]
+  samples: Sample[]
   rowHeight: number
   rowProportion: number
   showAllLetters: boolean
+  mismatchRendering: boolean
 }
 
-export function getColorBaseMap(theme: Theme) {
-  const { bases } = theme.palette
-  return {
-    a: bases.A.main,
-    c: bases.C.main,
-    g: bases.G.main,
-    t: bases.T.main,
-  }
-}
 function makeImageData({
   ctx,
   renderArgs,
@@ -47,6 +34,7 @@ function makeImageData({
     rowHeight,
     showAllLetters,
     theme: configTheme,
+    mismatchRendering,
     samples,
     rowProportion,
     features,
@@ -117,23 +105,33 @@ function makeImageData({
       for (let i = 0, o = 0; i < alignment.length; i++) {
         const c = alignment[i]
         if (seq[i] !== '-') {
-          if ((showAllLetters || seq[i] !== c) && c !== '-') {
+          if (c !== '-') {
             const l = leftPx + scale * o
-            ctx.fillStyle =
-              colorForBase[c as keyof typeof colorForBase] ?? 'black'
-            ctx.fillRect(l, offset + t, scale + f, h)
+            if (seq[i] !== c) {
+              ctx.fillStyle = mismatchRendering
+                ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                  (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                : 'orange'
+              ctx.fillRect(l, offset + t, scale + f, h)
+            } else if (showAllLetters) {
+              ctx.fillStyle = mismatchRendering
+                ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                  (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                : 'lightblue'
+              ctx.fillRect(l, offset + t, scale + f, h)
+            }
           }
           o++
         }
       }
 
       // font
-      const charSize = { w: 10 }
-      if (scale >= charSize.w) {
+      const charSizeW = 10
+      if (scale >= charSizeW) {
         for (let i = 0, o = 0; i < alignment.length; i++) {
           if (seq[i] !== '-') {
             const l = leftPx + scale * o
-            const offset = (scale - charSize.w) / 2 + 1
+            const offset = (scale - charSizeW) / 2 + 1
             const c = alignment[i]
             if ((showAllLetters || seq[i] !== c) && c !== '-') {
               ctx.fillStyle = contrastForBase[c] ?? 'white'
@@ -203,14 +201,20 @@ export default class LinearMafRenderer extends FeatureRendererType {
     const height = samples.length * rowHeight + 100
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
-    const res = await renderToAbstractCanvas(width, height, renderProps, ctx =>
-      makeImageData({
-        ctx,
-        renderArgs: {
-          ...renderProps,
-          features,
-        },
-      }),
+    const res = await renderToAbstractCanvas(
+      width,
+      height,
+      renderProps,
+      ctx => {
+        makeImageData({
+          ctx,
+          renderArgs: {
+            ...renderProps,
+            features,
+          },
+        })
+        return undefined
+      },
     )
     const results = await super.render({
       ...renderProps,

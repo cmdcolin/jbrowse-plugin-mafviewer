@@ -13,7 +13,7 @@ interface OrganismRecord {
   data: string
 }
 
-export default class BigMafAdapter extends BaseFeatureDataAdapter {
+export default class MafTabixAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<{ adapter: BaseFeatureDataAdapter }>
 
   async setup() {
@@ -31,7 +31,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
   }
   async setupPre() {
     if (!this.setupP) {
-      this.setupP = this.setup().catch(e => {
+      this.setupP = this.setup().catch((e: unknown) => {
         this.setupP = undefined
         throw e
       })

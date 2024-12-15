@@ -646,6 +646,30 @@
           }
         }
       }
+    },
+    {
+      "trackId": "TAF",
+      "name": "447-way alignment TAFFY",
+      "type": "MafTrack",
+      "assemblyNames": ["hg38"],
+      "adapter": {
+        "samples": [
+          "hg38",
+          "panTro4",
+          "rheMac3",
+          "mm10",
+          "rn5",
+          "canFam3",
+          "monDom5"
+        ],
+        "type": "TaffyAdapter",
+        "tafLocation": {
+          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf"
+        },
+        "taiLocation": {
+          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.tai"
+        }
+      }
     }
   ]
 }

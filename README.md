@@ -138,17 +138,18 @@ The samples array is either `string[]|{id:string,label:string,color?:string}[]`
 
 ## Creating MAF files as Cactus pangenome/HAL
 
-You can create a MAF file from a Cactus pangenome graph using ComparativeGenomeToolkit
+You can create a MAF file from a Cactus pangenome graph using
+ComparativeGenomeToolkit
 
 This page discusses some examples
 
 https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/progressive.md#maf-export
 
+Thanks to Sam Talbot (https://github.com/SamCT) for initially creating the
+Cactus -> JBrowse 2 MAF example
 
-
-Thanks to Sam Talbot (https://github.com/SamCT) for initially creating the Cactus -> JBrowse 2 MAF example
-
-Please note that MAFViewer wants non-overlapping blocks, please check if this is the case
+Please note that MAFViewer wants non-overlapping blocks, please check if this is
+the case
 
 ## Prepare data
 

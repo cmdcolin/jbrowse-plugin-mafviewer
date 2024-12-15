@@ -36,6 +36,14 @@ const Wrapper = observer(function ({
   }
 })
 
+export function max(arr: number[], init = Number.NEGATIVE_INFINITY) {
+  let max = init
+  for (const entry of arr) {
+    max = Math.max(entry, max)
+  }
+  return max
+}
+
 export const YScaleBars = observer(function (props: {
   model: LinearMafDisplayModel
   orientation?: string
@@ -47,10 +55,10 @@ export const YScaleBars = observer(function (props: {
   const canDisplayLabel = rowHeight >= 10
   const minWidth = 20
 
-  const labelWidth = Math.max(
-    ...(samples
+  const labelWidth = max(
+    samples
       .map(s => measureText(s.label, svgFontSize))
-      .map(width => (canDisplayLabel ? width : minWidth)) || [0]),
+      .map(width => (canDisplayLabel ? width : minWidth)),
   )
 
   return (

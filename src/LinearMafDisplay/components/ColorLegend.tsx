@@ -18,7 +18,7 @@ const ColorLegend = observer(function ({
   const canDisplayLabel = rowHeight >= 10
   const boxHeight = Math.min(20, rowHeight)
 
-  return samples ? (
+  return (
     <>
       {samples.map((sample, idx) => (
         <RectBg
@@ -44,7 +44,7 @@ const ColorLegend = observer(function ({
           ))
         : null}
     </>
-  ) : null
+  )
 })
 
 export default ColorLegend

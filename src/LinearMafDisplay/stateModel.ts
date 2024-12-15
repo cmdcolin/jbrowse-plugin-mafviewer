@@ -52,9 +52,16 @@ export default function stateModelFactory(
          * #property
          */
         showAllLetters: false,
+        /**
+         * #property
+         */
+        mismatchRendering: true,
       }),
     )
     .volatile(() => ({
+      /**
+       * #volatile
+       */
       prefersOffset: true,
     }))
     .actions(self => ({
@@ -75,6 +82,12 @@ export default function stateModelFactory(
        */
       setShowAllLetters(f: boolean) {
         self.showAllLetters = f
+      },
+      /**
+       * #action
+       */
+      setMismatchRendering(f: boolean) {
+        self.mismatchRendering = f
       },
     }))
     .views(self => ({
@@ -114,7 +127,9 @@ export default function stateModelFactory(
     }))
     .views(self => {
       const {
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         trackMenuItems: superTrackMenuItems,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
         renderProps: superRenderProps,
       } = self
       return {
@@ -128,6 +143,7 @@ export default function stateModelFactory(
             samples,
             rowHeight,
             rowProportion,
+            mismatchRendering,
           } = self
           return {
             ...superRenderProps(),
@@ -136,6 +152,7 @@ export default function stateModelFactory(
             rowHeight,
             rowProportion,
             showAllLetters,
+            mismatchRendering,
           }
         },
         /**
@@ -149,7 +166,10 @@ export default function stateModelFactory(
               onClick: () => {
                 getSession(self).queueDialog(handleClose => [
                   SetRowHeightDialog,
-                  { model: self, handleClose },
+                  {
+                    model: self,
+                    handleClose,
+                  },
                 ])
               },
             },
@@ -157,7 +177,17 @@ export default function stateModelFactory(
               label: 'Show all letters',
               type: 'checkbox',
               checked: self.showAllLetters,
-              onClick: () => self.setShowAllLetters(!self.showAllLetters),
+              onClick: () => {
+                self.setShowAllLetters(!self.showAllLetters)
+              },
+            },
+            {
+              label: 'Draw mismatches as single color',
+              type: 'checkbox',
+              checked: !self.mismatchRendering,
+              onClick: () => {
+                self.setMismatchRendering(!self.mismatchRendering)
+              },
             },
           ]
         },

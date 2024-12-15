@@ -39,12 +39,16 @@ const SetRowHeightDialog = observer(function (props: {
         </Typography>
         <TextField
           value={rowHeight}
-          onChange={event => setRowHeight(event.target.value)}
+          onChange={event => {
+            setRowHeight(event.target.value)
+          }}
           placeholder="Enter row height"
         />
         <TextField
           value={rowProportion}
-          onChange={event => setRowProportion(event.target.value)}
+          onChange={event => {
+            setRowProportion(event.target.value)
+          }}
           placeholder="Enter row proportion"
         />
         <DialogActions>
@@ -64,7 +68,9 @@ const SetRowHeightDialog = observer(function (props: {
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => handleClose()}
+            onClick={() => {
+              handleClose()
+            }}
           >
             Cancel
           </Button>

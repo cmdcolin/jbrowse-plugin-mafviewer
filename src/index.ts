@@ -7,6 +7,7 @@ import MafTrackF from './MafTrack'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
 import MafTabixAdapterF from './MafTabixAdapter'
+import TaffyAdapterF from './TaffyAdapter'
 import MafAddTrackWorkflowF from './MafAddTrackWorkflow'
 
 export default class MafViewerPlugin extends Plugin {
@@ -19,6 +20,7 @@ export default class MafViewerPlugin extends Plugin {
     LinearMafDisplayF(pluginManager)
     LinearMafRendererF(pluginManager)
     MafTabixAdapterF(pluginManager)
+    TaffyAdapterF(pluginManager)
     MafAddTrackWorkflowF(pluginManager)
   }
 

@@ -42,8 +42,9 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
   const [indexLoc, setIndexLoc] = useState<FileLocation>()
   const [error, setError] = useState<unknown>()
   const [trackName, setTrackName] = useState('MAF track')
-  const [choice, setChoice] = useState('BigMafAdapter')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [fileTypeChoice, setFileTypeChoice] = useState('BigMafAdapter')
+  const [indexTypeChoice, setIndexTypeChoice] = useState('TBI')
+
   const rootModel = getRoot<any>(model)
   return (
     <Paper className={classes.paper}>
@@ -52,42 +53,72 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
         <FormControl>
           <FormLabel>File type</FormLabel>
           <RadioGroup
-            value={choice}
-            onChange={event => setChoice(event.target.value)}
+            value={fileTypeChoice}
+            onChange={event => {
+              setFileTypeChoice(event.target.value)
+            }}
           >
             <FormControlLabel
               value="BigMafAdapter"
               control={<Radio />}
-              checked={choice === 'BigMafAdapter'}
+              checked={fileTypeChoice === 'BigMafAdapter'}
               label="bigMaf"
             />
             <FormControlLabel
               value="MafTabixAdapter"
               control={<Radio />}
-              checked={choice === 'MafTabixAdapter'}
+              checked={fileTypeChoice === 'MafTabixAdapter'}
               label="mafTabix"
             />
           </RadioGroup>
         </FormControl>
-        {choice === 'BigMafAdapter' ? (
+        {fileTypeChoice === 'BigMafAdapter' ? (
           <FileSelector
             location={loc}
             name="Path to bigMaf"
-            setLocation={arg => setLoc(arg)}
             rootModel={rootModel}
+            setLocation={arg => {
+              setLoc(arg)
+            }}
           />
         ) : (
           <>
+            <FormControl>
+              <FormLabel>Index type</FormLabel>
+              <RadioGroup
+                value={fileTypeChoice}
+                onChange={event => {
+                  setIndexTypeChoice(event.target.value)
+                }}
+              >
+                <FormControlLabel
+                  value="TBI"
+                  control={<Radio />}
+                  checked={indexTypeChoice === 'TBI'}
+                  label="TBI"
+                />
+                <FormControlLabel
+                  value="CSI"
+                  control={<Radio />}
+                  checked={indexTypeChoice === 'CSI'}
+                  label="CSI"
+                />
+              </RadioGroup>
+            </FormControl>
             <FileSelector
               location={loc}
               name="Path to MAF tabix"
-              setLocation={arg => setLoc(arg)}
+              setLocation={arg => {
+                setLoc(arg)
+              }}
               rootModel={rootModel}
             />
             <FileSelector
               location={indexLoc}
               name="Path to MAF tabix index"
-              setLocation={arg => setIndexLoc(arg)}
+              setLocation={arg => {
+                setIndexLoc(arg)
+              }}
               rootModel={rootModel}
             />
           </>
@@ -97,7 +128,9 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
         multiline
         rows={10}
         value={samples}
-        onChange={event => setSamples(event.target.value)}
+        onChange={event => {
+          setSamples(event.target.value)
+        }}
         placeholder={
           'Enter sample names from the MAF file, one per line, or JSON formatted array of samples'
         }
@@ -107,8 +140,10 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
 
       <TextField
         value={trackName}
-        onChange={event => setTrackName(event.target.value)}
         helperText="Track name"
+        onChange={event => {
+          setTrackName(event.target.value)
+        }}
       />
       <Button
         variant="contained"
@@ -125,7 +160,7 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
 
             const trackId = [
               `${trackName.toLowerCase().replaceAll(' ', '_')}-${Date.now()}`,
-              `${session.adminMode ? '' : '-sessionTrack'}`,
+              session.adminMode ? '' : '-sessionTrack',
             ].join('')
 
             if (isSessionWithAddTracks(session)) {
@@ -135,18 +170,21 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
                 name: trackName,
                 assemblyNames: [model.assembly],
                 adapter:
-                  choice === 'BigMafAdapter'
+                  fileTypeChoice === 'BigMafAdapter'
                     ? {
-                        type: choice,
-                        bigBedLocation: loc,
-                        samples: sampleNames,
-                      }
+                      type: fileTypeChoice,
+                      bigBedLocation: loc,
+                      samples: sampleNames,
+                    }
                     : {
-                        type: choice,
-                        bedGzLocation: loc,
-                        index: { location: indexLoc },
-                        samples: sampleNames,
+                      type: fileTypeChoice,
+                      bedGzLocation: loc,
+                      index: {
+                        indexType: indexTypeChoice,
+                        location: indexLoc,
                       },
+                      samples: sampleNames,
+                    },
               })
 
               model.view?.showTrack(trackId)
