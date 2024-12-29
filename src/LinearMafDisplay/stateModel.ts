@@ -1,4 +1,4 @@
-import { Instance, types } from 'mobx-state-tree'
+import PluginManager from '@jbrowse/core/PluginManager'
 import {
   AnyConfigurationModel,
   AnyConfigurationSchemaType,
@@ -6,12 +6,26 @@ import {
   getConf,
 } from '@jbrowse/core/configuration'
 import { getEnv, getSession } from '@jbrowse/core/util'
-import PluginManager from '@jbrowse/core/PluginManager'
+import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
-import SetRowHeightDialog from './components/SetRowHeight'
+import { ascending } from 'd3-array'
+import { type HierarchyNode, cluster, hierarchy } from 'd3-hierarchy'
+import { autorun } from 'mobx'
+import { Instance, addDisposer, isAlive, types } from 'mobx-state-tree'
 
-function isStrs(array: unknown[]): array is string[] {
-  return typeof array[0] === 'string'
+import SetRowHeightDialog from './components/SetRowHeight'
+import {
+  NodeWithIds,
+  NodeWithIdsAndLength,
+  maxLength,
+  setBrLength,
+} from './types'
+import { normalize } from '../util'
+
+interface Sample {
+  id: string
+  label: string
+  color?: string
 }
 
 /**
@@ -56,6 +70,16 @@ export default function stateModelFactory(
          * #property
          */
         mismatchRendering: true,
+
+        /**
+         * #property
+         */
+        showBranchLen: false,
+
+        /**
+         * #property
+         */
+        treeWidth: 80,
       }),
     )
     .volatile(() => ({
@@ -63,6 +87,14 @@ export default function stateModelFactory(
        * #volatile
        */
       prefersOffset: true,
+      /**
+       * #volatile
+       */
+      volatileSamples: [] as Sample[],
+      /**
+       * #volatile
+       */
+      tree: undefined as any,
     }))
     .actions(self => ({
       /**
@@ -89,26 +121,22 @@ export default function stateModelFactory(
       setMismatchRendering(f: boolean) {
         self.mismatchRendering = f
       },
+      /**
+       * #action
+       */
+      setSamples({ samples, tree }: { samples: Sample[]; tree: unknown }) {
+        self.volatileSamples = samples
+        self.tree = tree
+      },
     }))
     .views(self => ({
-      /**
-       * #getter
-       */
-      get samples() {
-        const r = self.adapterConfig.samples as
-          | string[]
-          | { id: string; label: string; color?: string }[]
-        return isStrs(r)
-          ? r.map(elt => ({ id: elt, label: elt, color: undefined }))
-          : r
-      },
-
       /**
        * #getter
        */
       get rendererTypeName() {
         return 'LinearMafRenderer'
       },
+
       /**
        * #getter
        */
@@ -123,6 +151,61 @@ export default function stateModelFactory(
           },
           getEnv(self),
         )
+      },
+    }))
+
+    .views(self => ({
+      /**
+       * #getter
+       */
+      get root() {
+        return self.tree
+          ? hierarchy(self.tree, d => d.children)
+              // todo: investigate whether needed, typescript says children always true
+              .sum(d => (d.children ? 0 : 1))
+              .sort((a, b) => ascending(a.data.length || 1, b.data.length || 1))
+          : undefined
+      },
+    }))
+    .views(self => ({
+      /**
+       * #getter
+       * generates a new tree that is clustered with x,y positions
+       */
+      get hierarchy(): HierarchyNode<NodeWithIdsAndLength> | undefined {
+        const r = self.root
+        if (r) {
+          const width = self.treeWidth
+          const clust = cluster<NodeWithIds>()
+            .size([this.totalHeight, width])
+            .separation(() => 1)
+          clust(r)
+          setBrLength(r, (r.data.length = 0), width / maxLength(r))
+          return r as HierarchyNode<NodeWithIdsAndLength>
+        } else {
+          return undefined
+        }
+      },
+      get samples() {
+        return this.rowNames ? normalize(this.rowNames) : self.volatileSamples
+      },
+      /**
+       * #getter
+       */
+      get totalHeight() {
+        return this.samples.length * self.rowHeight
+      },
+      /**
+       * #getter
+       */
+      get leaves() {
+        return self.root?.leaves()
+      },
+      /**
+       * #getter
+       */
+      get rowNames(): string[] | undefined {
+        return this.leaves?.map(n => n.data.name)
       },
     }))
     .views(self => {
@@ -193,6 +276,37 @@ export default function stateModelFactory(
         },
       }
     })
+    .actions(self => ({
+      afterCreate() {
+        addDisposer(
+          self,
+          autorun(async () => {
+            try {
+              const { rpcManager } = getSession(self)
+              const sessionId = getRpcSessionId(self)
+
+              const results = (await rpcManager.call(
+                sessionId,
+                'MafGetSamples',
+                {
+                  sessionId,
+                  adapterConfig: self.adapterConfig,
+                  statusCallback: (message: string) => {
+                    if (isAlive(self)) {
+                      self.setMessage(message)
+                    }
+                  },
+                },
+              )) as any
+              self.setSamples(results)
+            } catch (e) {
+              console.error(e)
+              getSession(self).notifyError(`${e}`, e)
+            }
+          }),
+        )
+      },
+    }))
     .actions(self => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       const { renderSvg: superRenderSvg } = self

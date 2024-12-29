@@ -2,13 +2,14 @@ import Plugin from '@jbrowse/core/Plugin'
 import PluginManager from '@jbrowse/core/PluginManager'
 
 import { version } from '../package.json'
+import BgzipTaffyAdapterF from './BgzipTaffyAdapter'
 import BigMafAdapterF from './BigMafAdapter'
-import MafTrackF from './MafTrack'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
-import MafTabixAdapterF from './MafTabixAdapter'
-import BgzipTaffyAdapterF from './BgzipTaffyAdapter'
 import MafAddTrackWorkflowF from './MafAddTrackWorkflow'
+import MafRPCF from './MafRPC'
+import MafTabixAdapterF from './MafTabixAdapter'
+import MafTrackF from './MafTrack'
 
 export default class MafViewerPlugin extends Plugin {
   name = 'MafViewerPlugin'
@@ -22,6 +23,7 @@ export default class MafViewerPlugin extends Plugin {
     MafTabixAdapterF(pluginManager)
     BgzipTaffyAdapterF(pluginManager)
     MafAddTrackWorkflowF(pluginManager)
+    MafRPCF(pluginManager)
   }
 
   configure(_pluginManager: PluginManager) {}

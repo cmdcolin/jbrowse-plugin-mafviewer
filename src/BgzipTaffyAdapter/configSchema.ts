@@ -22,6 +22,7 @@ const configSchema = ConfigurationSchema(
      */
     tafGzLocation: {
       type: 'fileLocation',
+      description: 'bgzip taffy file',
       defaultValue: {
         uri: '/path/to/my.taf',
         locationType: 'UriLocation',
@@ -32,13 +33,27 @@ const configSchema = ConfigurationSchema(
      */
     taiLocation: {
       type: 'fileLocation',
+      description: 'taffy index',
       defaultValue: {
         uri: '/path/to/my.taf.gz.tai',
         locationType: 'UriLocation',
       },
     },
+    /**
+     * #slot
+     */
+    nhLocation: {
+      type: 'fileLocation',
+      description: 'newick tree',
+      defaultValue: {
+        uri: '/path/to/my.nh',
+        locationType: 'UriLocation',
+      },
+    },
   },
-  { explicitlyTyped: true },
+  {
+    explicitlyTyped: true,
+  },
 )
 
 export default configSchema

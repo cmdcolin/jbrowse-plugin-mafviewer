@@ -1353,6 +1353,9 @@
         },
         "taiLocation": {
           "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.gz.tai"
+        },
+        "nhLocation": {
+          "uri": "447-mammalian-2022v1.nh"
         }
       }
     }

@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { observer } from 'mobx-react'
 
 // locals
@@ -14,35 +15,71 @@ const ColorLegend = observer(function ({
   svgFontSize: number
   labelWidth: number
 }) {
-  const { samples, rowHeight } = model
-  const canDisplayLabel = rowHeight >= 10
+  const {
+    hierarchy,
+    totalHeight,
+    treeWidth,
+    showBranchLen,
+    samples,
+    rowHeight,
+  } = model
+  const canDisplayLabel = rowHeight >= 8
   const boxHeight = Math.min(20, rowHeight)
 
   return (
     <>
-      {samples.map((sample, idx) => (
-        <RectBg
-          key={`${sample.id}-${idx}`}
-          y={idx * rowHeight}
-          x={0}
-          width={labelWidth + 5}
-          height={boxHeight}
-          color={sample.color}
-        />
-      ))}
-      {canDisplayLabel
-        ? samples.map((sample, idx) => (
-            <text
-              key={`${sample.id}-${idx}`}
-              y={idx * rowHeight + rowHeight / 2}
-              dominantBaseline="middle"
-              x={2}
-              fontSize={svgFontSize}
-            >
-              {sample.label}
-            </text>
-          ))
+      <RectBg
+        y={0}
+        x={0}
+        width={labelWidth + 5 + treeWidth}
+        height={totalHeight}
+      />
+      {hierarchy
+        ? [...hierarchy.links()].map(link => {
+            const { source, target } = link
+            const sy = source.x!
+            const ty = target.x!
+            // @ts-expect-error
+            const tx = showBranchLen ? target.len : target.y
+            // @ts-expect-error
+            const sx = showBranchLen ? source.len : source.y
+
+            // 1d line intersection to check if line crosses block at all, this is
+            // an optimization that allows us to skip drawing most tree links
+            // outside the block
+            return (
+              <>
+                <line stroke="black" x1={sx} y1={sy} x2={sx} y2={ty} />
+                <line stroke="black" x1={sx} y1={ty} x2={tx} y2={ty} />
+              </>
+            )
+          })
         : null}
+      <g transform={`translate(100,0)`}>
+        {samples.map((sample, idx) => (
+          <RectBg
+            key={`${sample.id}-${idx}`}
+            y={idx * rowHeight}
+            x={0}
+            width={labelWidth + 5}
+            height={boxHeight}
+            color={sample.color}
+          />
+        ))}
+        {canDisplayLabel
+          ? samples.map((sample, idx) => (
+              <text
+                key={`${sample.id}-${idx}`}
+                y={idx * rowHeight + rowHeight / 2}
+                dominantBaseline="middle"
+                x={2}
+                fontSize={svgFontSize}
+              >
+                {sample.label}
+              </text>
+            ))
+          : null}
+      </g>
     </>
   )
 })

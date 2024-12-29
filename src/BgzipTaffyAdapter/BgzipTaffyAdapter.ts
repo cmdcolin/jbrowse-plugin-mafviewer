@@ -1,11 +1,14 @@
+import { unzip } from '@gmod/bgzf-filehandle'
 import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
-import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { openLocation } from '@jbrowse/core/util/io'
+import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { GenericFilehandle } from 'generic-filehandle2'
-import { unzip } from '@gmod/bgzf-filehandle'
-import VirtualOffset from './virtualOffset'
 import Long from 'long'
+
+import VirtualOffset from './virtualOffset'
+import parseNewick from '../parseNewick'
+import { normalize } from '../util'
 
 interface OrganismRecord {
   chr: string
@@ -20,6 +23,7 @@ interface ByteRange {
   chrStart: number
   virtualOffset: VirtualOffset
 }
+
 type IndexData = Record<string, ByteRange[]>
 
 export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
@@ -142,10 +146,21 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     })
   }
 
-  async getSamples(query: Region) {
-    const lines = await this.getLines(query)
-    const ret = await this.getRows(lines)
-    return ret.map(r => r.asm)
+  async getSamples(_query: Region) {
+    // const lines = await this.getLines(query)
+    // const ret = await this.getRows(lines)
+    const nhLoc = this.getConf('nhLocation')
+    const nh =
+      nhLoc.uri === '/path/to/my.nh'
+        ? undefined
+        : await openLocation(this.getConf('nhLocation')).readFile('utf8')
+
+    // TODO: we may need to resolve the exact set of rows in the visible region
+    // here
+    return {
+      samples: normalize(this.getConf('samples')),
+      tree: nh ? parseNewick(nh) : undefined,
+    }
   }
 
   async getLines(query: Region) {
@@ -225,5 +240,6 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     }
     return rows.sort((a, b) => a.row - b.row)
   }
+
   freeResources(): void {}
 }

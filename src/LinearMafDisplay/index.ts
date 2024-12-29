@@ -1,8 +1,9 @@
 import PluginManager from '@jbrowse/core/PluginManager'
 import { DisplayType } from '@jbrowse/core/pluggableElementTypes'
+
+import ReactComponent from './components/ReactComponent'
 import configSchemaF from './configSchema'
 import stateModelFactory from './stateModel'
-import ReactComponent from './components/ReactComponent'
 
 export default function LinearMafDisplayF(pluginManager: PluginManager) {
   pluginManager.addDisplayType(() => {

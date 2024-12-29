@@ -1,7 +1,7 @@
 import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
-import { getSnapshot } from 'mobx-state-tree'
 import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
+import { getSnapshot } from 'mobx-state-tree'
 import { firstValueFrom, toArray } from 'rxjs'
 
 interface OrganismRecord {

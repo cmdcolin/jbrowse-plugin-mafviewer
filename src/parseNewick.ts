@@ -57,7 +57,7 @@
  *   ]
  * }
  */
-export default function parse(s: string) {
+export default function parseNewick(s: string) {
   const ancestors = []
 
   let tree = {} as Record<string, any>

@@ -7,6 +7,7 @@ import {
   featureSpanPx,
   renderToAbstractCanvas,
 } from '@jbrowse/core/util'
+
 import { getColorBaseMap, getContrastBaseMap } from './util'
 
 interface Sample {

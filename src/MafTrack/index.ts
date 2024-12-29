@@ -3,6 +3,7 @@ import {
   TrackType,
   createBaseTrackModel,
 } from '@jbrowse/core/pluggableElementTypes'
+
 import configSchemaF from './configSchema'
 
 export default function MafTrackF(pluginManager: PluginManager) {

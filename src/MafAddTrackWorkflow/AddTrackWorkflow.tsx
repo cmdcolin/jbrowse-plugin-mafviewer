@@ -1,4 +1,13 @@
 import React, { useState } from 'react'
+
+import { ErrorMessage, FileSelector } from '@jbrowse/core/ui'
+import {
+  FileLocation,
+  getSession,
+  isSessionModelWithWidgets,
+  isSessionWithAddTracks,
+} from '@jbrowse/core/util'
+import { AddTrackModel } from '@jbrowse/plugin-data-management'
 import {
   Button,
   FormControl,
@@ -9,16 +18,8 @@ import {
   RadioGroup,
   TextField,
 } from '@mui/material'
-import { makeStyles } from 'tss-react/mui'
-import {
-  FileLocation,
-  getSession,
-  isSessionModelWithWidgets,
-  isSessionWithAddTracks,
-} from '@jbrowse/core/util'
-import { AddTrackModel } from '@jbrowse/plugin-data-management'
-import { ErrorMessage, FileSelector } from '@jbrowse/core/ui'
 import { getRoot } from 'mobx-state-tree'
+import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(theme => ({
   textbox: {
