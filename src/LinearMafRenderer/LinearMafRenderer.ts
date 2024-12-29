@@ -64,6 +64,7 @@ function makeImageData({
 
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
+        continue
         throw new Error(`unknown sample encountered: ${sample}`)
       }
 
@@ -156,6 +157,7 @@ function makeImageData({
       const alignment = origAlignment.toLowerCase()
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
+        continue
         throw new Error(`unknown sample encountered: ${sample}`)
       }
 
