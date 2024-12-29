@@ -97,7 +97,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
             const entry = records[i]
             if (entry.chrStart >= query.start) {
               firstEntry = records[i - 1]
-              nextEntry = records[i + 1]
+              nextEntry = records[i]
               break
             }
           }
@@ -152,7 +152,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                 })
               }
             }
-            console.log({ rows })
+            rows.sort((a, b) => a.row - b.row)
 
             const alignments = {} as Record<string, OrganismRecord>
             for (const row of rows) {
@@ -184,7 +184,6 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
             }
 
             const row0 = rows[0]
-            console.log({ row0 })
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             const a0 = row0?.asm
             // first row can be e.g. deletion  so not have asm
@@ -210,6 +209,82 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
         observer.error(e)
       }
     })
+  }
+
+  async getRows(query: Region) {
+    const byteRanges = await this.setup()
+
+    // @ts-expect-error
+    const file = openLocation(
+      this.getConf('tafGzLocation'),
+    ) as GenericFilehandle
+
+    const records = byteRanges[query.refName]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (records) {
+      let firstEntry
+      let nextEntry
+      for (let i = 0; i < records.length; i++) {
+        const entry = records[i]
+        if (entry.chrStart >= query.start) {
+          firstEntry = records[i - 1]
+          nextEntry = records[i]
+          break
+        }
+      }
+      if (firstEntry && nextEntry) {
+        const response = await file.read(
+          nextEntry.virtualOffset.blockPosition -
+            firstEntry.virtualOffset.blockPosition,
+          firstEntry.virtualOffset.blockPosition,
+        )
+        const buffer = await unzip(response)
+        const decoder = new TextDecoder('utf8')
+        const str = decoder.decode(
+          buffer.slice(firstEntry.virtualOffset.dataPosition),
+        )
+
+        const [firstLine] = str.split('\n')
+        const [, info] = firstLine.split(';').map(f => f.trim())
+        const ret = info.split(' ')
+        const rows = []
+        for (let i = 0; i < ret.length; ) {
+          const type = ret[i++]
+          if (type === 'i' || type === 's') {
+            const row = +ret[i++]
+            const [asm, ref] = ret[i++].split('.')
+            rows.push({
+              type,
+              row,
+              asm,
+              ref,
+              start: +ret[i++],
+              strand: ret[i++] === '-' ? -1 : 1,
+              length: +ret[i++],
+            })
+          } else if (type === 'd') {
+            rows.push({
+              type,
+              row: +ret[i++],
+            })
+          } else if (type === 'g') {
+            rows.push({
+              type,
+              row: +ret[i++],
+              gap_length: +ret[i++],
+            })
+          } else if (type === 'G') {
+            rows.push({
+              type,
+              row: +ret[i++],
+              gap_string: ret[i++],
+            })
+          }
+        }
+        return rows.sort((a, b) => a.row - b.row).map(r => r.asm)
+      }
+    }
+    return []
   }
   freeResources(): void {}
 }
