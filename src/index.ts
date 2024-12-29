@@ -7,7 +7,6 @@ import MafTrackF from './MafTrack'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
 import MafTabixAdapterF from './MafTabixAdapter'
-import TaffyAdapterF from './TaffyAdapter'
 import BgzipTaffyAdapterF from './BgzipTaffyAdapter'
 import MafAddTrackWorkflowF from './MafAddTrackWorkflow'
 
@@ -21,7 +20,6 @@ export default class MafViewerPlugin extends Plugin {
     LinearMafDisplayF(pluginManager)
     LinearMafRendererF(pluginManager)
     MafTabixAdapterF(pluginManager)
-    TaffyAdapterF(pluginManager)
     BgzipTaffyAdapterF(pluginManager)
     MafAddTrackWorkflowF(pluginManager)
   }

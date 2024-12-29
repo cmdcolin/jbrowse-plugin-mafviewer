@@ -63,30 +63,30 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         for (const block of blocks) {
           if (block.startsWith('s')) {
             if (aln) {
-              alns.push(block.split(/ +/)[6])
+              alns.push(block.split(/ +/)[6]!)
               blocks2.push(block)
             } else {
               aln = block.split(/ +/)[6]
-              alns.push(aln)
+              alns.push(aln!)
               blocks2.push(block)
             }
           }
         }
 
         for (let i = 0; i < blocks2.length; i++) {
-          const elt = blocks2[i]
+          const elt = blocks2[i]!
           const ad = elt.split(/ +/)
-          const y = ad[1].split('.')
-          const org = y[0]
-          const chr = y[1]
+          const y = ad[1]!.split('.')
+          const org = y[0]!
+          const chr = y[1]!
 
           alignments[org] = {
             chr: chr,
-            start: +ad[1],
-            srcSize: +ad[2],
+            start: +ad[1]!,
+            srcSize: +ad[2]!,
             strand: ad[3] === '+' ? 1 : -1,
-            unknown: +ad[4],
-            data: alns[i],
+            unknown: +ad[4]!,
+            data: alns[i]!,
           }
         }
         observer.next(

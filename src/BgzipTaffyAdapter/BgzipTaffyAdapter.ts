@@ -50,22 +50,24 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     let lastRawVirtualOffset = 0
     for (const line of text.split('\n').filter(line => line.trim())) {
       const [chr, chrStart, virtualOffset] = line.split('\t')
-      const relativizedVirtualOffset = lastRawVirtualOffset + +virtualOffset
-      const ref = chr === '*' ? lastChr : chr
+      const relativizedVirtualOffset = lastRawVirtualOffset + +virtualOffset!
+      const ref = chr === '*' ? lastChr : chr!
       const r2 = ref.split('.').at(-1)!
+      // bgzip TAF files store virtual offsets in plaintext in the TAI file
+      // these virtualoffsets are 64bit values, so the long library is needed
+      // to accurately do the bit manipulations needed
       const x = Long.fromNumber(relativizedVirtualOffset)
       const y = x.shiftRightUnsigned(16)
       const z = x.and(0xffff)
       const voff = new VirtualOffset(y.toNumber(), z.toNumber())
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!entries[r2]) {
         entries[r2] = []
         lastChr = ''
         lastChrStart = 0
         lastRawVirtualOffset = 0
       }
-      const s = +chrStart + lastChrStart
+      const s = +chrStart! + lastChrStart
 
       entries[r2].push({
         chrStart: s,
@@ -81,129 +83,58 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   getFeatures(query: Region) {
     return ObservableCreate<Feature>(async observer => {
       try {
-        const byteRanges = await this.setup()
+        const lines = await this.getLines(query)
+        const rows = await this.getRows(lines)
 
-        // @ts-expect-error
-        const file = openLocation(
-          this.getConf('tafGzLocation'),
-        ) as GenericFilehandle
-
-        const records = byteRanges[query.refName]
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (records) {
-          let firstEntry
-          let nextEntry
-          for (let i = 0; i < records.length; i++) {
-            const entry = records[i]
-            if (entry.chrStart >= query.start) {
-              firstEntry = records[i - 1]
-              nextEntry = records[i]
-              break
-            }
-          }
-          if (firstEntry && nextEntry) {
-            const response = await file.read(
-              nextEntry.virtualOffset.blockPosition -
-                firstEntry.virtualOffset.blockPosition,
-              firstEntry.virtualOffset.blockPosition,
-            )
-            const buffer = await unzip(response)
-            const decoder = new TextDecoder('utf8')
-            const str = decoder.decode(
-              buffer.slice(firstEntry.virtualOffset.dataPosition),
-            )
-
-            const [firstLine, ...rest] = str.split('\n')
-            const [firstLineAlignment, info] = firstLine
-              .split(';')
-              .map(f => f.trim())
-            const ret = info.split(' ')
-            const rows = []
-            for (let i = 0; i < ret.length; ) {
-              const type = ret[i++]
-              if (type === 'i' || type === 's') {
-                const row = +ret[i++]
-                const [asm, ref] = ret[i++].split('.')
-                rows.push({
-                  type,
-                  row,
-                  asm,
-                  ref,
-                  start: +ret[i++],
-                  strand: ret[i++] === '-' ? -1 : 1,
-                  length: +ret[i++],
-                })
-              } else if (type === 'd') {
-                rows.push({
-                  type,
-                  row: +ret[i++],
-                })
-              } else if (type === 'g') {
-                rows.push({
-                  type,
-                  row: +ret[i++],
-                  gap_length: +ret[i++],
-                })
-              } else if (type === 'G') {
-                rows.push({
-                  type,
-                  row: +ret[i++],
-                  gap_string: ret[i++],
-                })
+        const alignments = {} as Record<string, OrganismRecord>
+        for (const row of rows) {
+          if (row.asm) {
+            if (!alignments[row.asm]) {
+              alignments[row.asm] = {
+                chr: row.ref!,
+                start: row.start,
+                srcSize: 0,
+                strand: row.strand,
+                unknown: 0,
+                data: '',
               }
-            }
-            rows.sort((a, b) => a.row - b.row)
-
-            const alignments = {} as Record<string, OrganismRecord>
-            for (const row of rows) {
-              if (row.asm) {
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                if (!alignments[row.asm]) {
-                  alignments[row.asm] = {
-                    chr: row.ref,
-                    start: row.start,
-                    srcSize: 0,
-                    strand: row.strand,
-                    unknown: 0,
-                    data: '',
-                  }
-                }
-              }
-            }
-
-            const lines = [firstLineAlignment, ...rest]
-            const l = rows.length
-            const k = lines.length
-            for (let i = 0; i < l; i++) {
-              for (let j = 0; j < k; j++) {
-                const r = rows[i].asm
-                if (r) {
-                  alignments[r].data += lines[j][i]
-                }
-              }
-            }
-
-            const row0 = rows[0]
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            const a0 = row0?.asm
-            // first row can be e.g. deletion  so not have asm
-            if (a0) {
-              const aln0 = alignments[a0]
-
-              observer.next(
-                new SimpleFeature({
-                  uniqueId: `${query.refName}-${query.start}`,
-                  refName: query.refName,
-                  start: row0.start,
-                  end: row0.start + aln0.data.length,
-                  strand: row0.strand,
-                  alignments,
-                  seq: alignments[row0.asm].data,
-                }),
-              )
             }
           }
         }
+
+        const l = rows.length
+        const k = lines.length
+        for (let i = 0; i < l; i++) {
+          for (let j = 0; j < k; j++) {
+            const r = rows[i]!.asm
+            if (r) {
+              alignments[r]!.data += lines[j]![i]
+            }
+          }
+        }
+
+        // see
+        // https://github.com/ComparativeGenomicsToolkit/taffy/blob/f5a5354/docs/taffy_utilities.md#referenced-based-maftaf-and-indexing
+        // for the significance of row[0]:
+        //
+        // "An anchor line in TAF is a column from which all sequence
+        // coordinates can be deduced without scanning backwards to previous
+        // lines "
+        const row0 = rows[0]!
+        const a0 = row0.asm!
+        const aln0 = alignments[a0]!
+
+        observer.next(
+          new SimpleFeature({
+            uniqueId: `${query.refName}-${query.start}`,
+            refName: query.refName,
+            start: row0.start!,
+            end: row0.start! + aln0.data.length,
+            strand: row0.strand,
+            alignments,
+            seq: aln0.data,
+          }),
+        )
         observer.complete()
       } catch (e) {
         observer.error(e)
@@ -211,7 +142,13 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     })
   }
 
-  async getRows(query: Region) {
+  async getSamples(query: Region) {
+    const lines = await this.getLines(query)
+    const ret = await this.getRows(lines)
+    return ret.map(r => r.asm)
+  }
+
+  async getLines(query: Region) {
     const byteRanges = await this.setup()
 
     // @ts-expect-error
@@ -220,12 +157,11 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     ) as GenericFilehandle
 
     const records = byteRanges[query.refName]
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (records) {
       let firstEntry
       let nextEntry
       for (let i = 0; i < records.length; i++) {
-        const entry = records[i]
+        const entry = records[i]!
         if (entry.chrStart >= query.start) {
           firstEntry = records[i - 1]
           nextEntry = records[i]
@@ -243,48 +179,51 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
         const str = decoder.decode(
           buffer.slice(firstEntry.virtualOffset.dataPosition),
         )
-
-        const [firstLine] = str.split('\n')
-        const [, info] = firstLine.split(';').map(f => f.trim())
-        const ret = info.split(' ')
-        const rows = []
-        for (let i = 0; i < ret.length; ) {
-          const type = ret[i++]
-          if (type === 'i' || type === 's') {
-            const row = +ret[i++]
-            const [asm, ref] = ret[i++].split('.')
-            rows.push({
-              type,
-              row,
-              asm,
-              ref,
-              start: +ret[i++],
-              strand: ret[i++] === '-' ? -1 : 1,
-              length: +ret[i++],
-            })
-          } else if (type === 'd') {
-            rows.push({
-              type,
-              row: +ret[i++],
-            })
-          } else if (type === 'g') {
-            rows.push({
-              type,
-              row: +ret[i++],
-              gap_length: +ret[i++],
-            })
-          } else if (type === 'G') {
-            rows.push({
-              type,
-              row: +ret[i++],
-              gap_string: ret[i++],
-            })
-          }
-        }
-        return rows.sort((a, b) => a.row - b.row).map(r => r.asm)
+        return str.split('\n')
       }
     }
     return []
+  }
+
+  async getRows(lines: string[]) {
+    const [firstLine] = lines
+    const [, info] = firstLine!.split(';').map(f => f.trim())
+    const ret = info!.split(' ')
+    const rows = []
+    for (let i = 0; i < ret.length; ) {
+      const type = ret[i++]
+      if (type === 'i' || type === 's') {
+        const row = +ret[i++]!
+        const [asm, ref] = ret[i++]!.split('.')
+        rows.push({
+          type,
+          row,
+          asm,
+          ref,
+          start: +ret[i++]!,
+          strand: ret[i++] === '-' ? -1 : 1,
+          length: +ret[i++]!,
+        })
+      } else if (type === 'd') {
+        rows.push({
+          type,
+          row: +ret[i++]!,
+        })
+      } else if (type === 'g') {
+        rows.push({
+          type,
+          row: +ret[i++]!,
+          gap_length: +ret[i++]!,
+        })
+      } else if (type === 'G') {
+        rows.push({
+          type,
+          row: +ret[i++]!,
+          gap_string: ret[i++]!,
+        })
+      }
+    }
+    return rows.sort((a, b) => a.row - b.row)
   }
   freeResources(): void {}
 }

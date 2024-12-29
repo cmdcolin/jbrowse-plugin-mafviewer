@@ -69,20 +69,20 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
 
         for (const [j, elt] of data.entries()) {
           const ad = elt.split(':')
-          const idx = ad[0].lastIndexOf('.')
-          const org = ad[0].slice(0, idx)
-          const last = ad[0].slice(idx + 1)
+          const idx = ad[0]!.lastIndexOf('.')
+          const org = ad[0]!.slice(0, idx)
+          const last = ad[0]!.slice(idx + 1)
           const s = sampleSet.has(org)
             ? org
-            : sampleStrings.find(f => ad[0].startsWith(f))
+            : sampleStrings.find(f => ad[0]!.startsWith(f))
           if (s) {
             alignments[s] = {
               chr: last,
-              start: +ad[1],
-              srcSize: +ad[2],
+              start: +ad[1]!,
+              srcSize: +ad[2]!,
               strand: ad[3] === '-' ? -1 : 1,
-              unknown: +ad[4],
-              data: alns[j],
+              unknown: +ad[4]!,
+              data: alns[j]!,
             }
           } else if (i < 100) {
             console.error(`line not processed ${ad[0]}`)

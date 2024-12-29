@@ -39,7 +39,7 @@ function makeImageData({
     rowProportion,
     features,
   } = renderArgs
-  const [region] = regions
+  const region = regions[0]!
   const h = rowHeight * rowProportion
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
@@ -133,10 +133,10 @@ function makeImageData({
           if (seq[i] !== '-') {
             const l = leftPx + scale * o
             const offset = (scale - charSizeW) / 2 + 1
-            const c = alignment[i]
+            const c = alignment[i]!
             if ((showAllLetters || seq[i] !== c) && c !== '-') {
               ctx.fillStyle = contrastForBase[c] ?? 'white'
-              ctx.fillText(origAlignment[i], l + offset, hp2 + t + 3)
+              ctx.fillText(origAlignment[i]!, l + offset, hp2 + t + 3)
             }
             o++
           }
@@ -199,7 +199,7 @@ export default class LinearMafRenderer extends FeatureRendererType {
   }
   async render(renderProps: RenderArgs) {
     const { regions, bpPerPx, samples, rowHeight } = renderProps
-    const [region] = regions
+    const region = regions[0]!
     const height = samples.length * rowHeight + 100
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
