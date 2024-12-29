@@ -1,9 +1,11 @@
 import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
-import { getSnapshot } from 'mobx-state-tree'
-import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import { Feature, isGzip, Region, SimpleFeature } from '@jbrowse/core/util'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { openLocation } from '@jbrowse/core/util/io'
 import { GenericFilehandle } from 'generic-filehandle2'
+import { unzip, unzipChunkSlice } from '@gmod/bgzf-filehandle'
+import VirtualOffset from './virtualOffset'
+import Long from 'long'
 
 interface OrganismRecord {
   chr: string
@@ -16,11 +18,11 @@ interface OrganismRecord {
 
 interface ByteRange {
   chrStart: number
-  fileOffset: number
+  virtualOffset: VirtualOffset
 }
 type IndexData = Record<string, ByteRange[]>
 
-export default class TaffyAdapter extends BaseFeatureDataAdapter {
+export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<IndexData>
 
   async getRefNames() {
@@ -45,27 +47,43 @@ export default class TaffyAdapter extends BaseFeatureDataAdapter {
     const entries = {} as IndexData
     let lastChr = ''
     let lastChrStart = 0
-    let lastFileOffset = 0
+    let lastRawVirtualOffset = 0
     for (const line of text.split('\n').filter(line => line.trim())) {
-      const [chr, chrStart, fileOffset] = line.split('\t')
+      const [chr, chrStart, virtualOffset] = line.split('\t')
+      const relativizedVirtualOffset = lastRawVirtualOffset + +virtualOffset
+      // console.log(
+      //   { relativizedVirtualOffset },
+      //   Number.MAX_SAFE_INTEGER / relativizedVirtualOffset,
+      // )
       const ref = chr === '*' ? lastChr : chr
       const r2 = ref.split('.').at(-1)!
+      const x = Long.fromNumber(relativizedVirtualOffset)
+      const y = x.shiftRightUnsigned(16)
+      const z = x.and(0xffff)
+      const voff = new VirtualOffset(y.toNumber(), z.toNumber())
 
       if (!entries[r2]) {
         entries[r2] = []
         lastChr = ''
         lastChrStart = 0
-        lastFileOffset = 0
+        lastRawVirtualOffset = 0
       }
       const s = +chrStart + lastChrStart
-      const f = +fileOffset + lastFileOffset
+
       entries[r2].push({
         chrStart: s,
-        fileOffset: f,
+        virtualOffset: voff,
       })
       lastChr = ref
       lastChrStart = s
-      lastFileOffset = f
+      console.log({
+        lastRawVirtualOffset,
+        relativizedVirtualOffset,
+        blockPos: relativizedVirtualOffset >>> 16,
+        lastBlockPos: lastRawVirtualOffset >>> 16,
+        x: Number.isSafeInteger(relativizedVirtualOffset),
+      })
+      lastRawVirtualOffset = relativizedVirtualOffset
     }
     console.log({ entries })
     return entries
@@ -78,37 +96,44 @@ export default class TaffyAdapter extends BaseFeatureDataAdapter {
 
         // @ts-expect-error
         const file = openLocation(
-          this.getConf('tafLocation'),
+          this.getConf('tafGzLocation'),
         ) as GenericFilehandle
 
         const records = byteRanges[query.refName]
-        console.log({ query, byteRanges, records })
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (records) {
           let firstEntry
           let nextEntry
           for (let i = 0; i < records.length; i++) {
             const entry = records[i]
-            console.log({ entry: entry.chrStart, query: query.start })
             if (entry.chrStart >= query.start) {
               firstEntry = records[i - 1]
-              nextEntry = records[i]
+              nextEntry = records[i + 1]
               break
             }
           }
-          console.log({ firstEntry, nextEntry })
           if (firstEntry && nextEntry) {
             console.log(
-              firstEntry.fileOffset.toLocaleString(),
-              (nextEntry.fileOffset - firstEntry.fileOffset).toLocaleString(),
+              'fetching from: ' + firstEntry.virtualOffset.blockPosition,
+              'length: ' +
+                (nextEntry.virtualOffset.blockPosition -
+                  firstEntry.virtualOffset.blockPosition),
+              { firstEntry, nextEntry },
             )
             const response = await file.read(
-              nextEntry.fileOffset - firstEntry.fileOffset,
-              firstEntry.fileOffset,
+              nextEntry.virtualOffset.blockPosition -
+                firstEntry.virtualOffset.blockPosition,
+              firstEntry.virtualOffset.blockPosition,
             )
             const decoder = new TextDecoder('utf8')
-            console.log({ response }, response.length)
-            const data = decoder.decode(response)
+            console.log({
+              response,
+              len: response.length,
+              // @ts-expect-error
+              gzip: isGzip(response),
+            })
+            const buffer = await unzip(response)
+            const data = decoder.decode(buffer)
             console.log({ data })
             //
             // const text = await response.text()

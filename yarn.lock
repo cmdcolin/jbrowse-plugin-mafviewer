@@ -544,6 +544,14 @@
     long "^4.0.0"
     pako "^1.0.11"
 
+"@gmod/bgzf-filehandle@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@gmod/bgzf-filehandle/-/bgzf-filehandle-2.0.4.tgz#64f88ff6ad48efaf69641e796db87f24bf5da9ab"
+  integrity sha512-MV1V3X2uF0vqN93dkEhL8TUiJMTHyaJQFuLZttKAl8vH5utN2gKJf/3PTW8f7r5X+GgyftuTcfIpHHD5+3mJiQ==
+  dependencies:
+    generic-filehandle2 "^1.0.0"
+    pako "^1.0.11"
+
 "@gmod/http-range-fetcher@^3.0.4":
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/@gmod/http-range-fetcher/-/http-range-fetcher-3.0.4.tgz#7ab2fdc96703b9f977d9c517e8028fb68765e118"
@@ -1989,6 +1997,11 @@ functions-have-names@^1.2.3:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
+generic-filehandle2@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/generic-filehandle2/-/generic-filehandle2-1.0.0.tgz#d7a216072467793e1e48c925f97162eab1b82efc"
+  integrity sha512-jXfyNk1zhsR0Xf2sLm4vgeYSP1q1XbeSVG0TRSnOCKLb2CojPNJyy57nKi6QWmt83yGSHZGay8qIn7YWyl2V5w==
+
 generic-filehandle@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/generic-filehandle/-/generic-filehandle-3.2.0.tgz#f65401ce71bccadb796335495c3d9250185876d4"
@@ -2554,6 +2567,11 @@ long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
+
+long@^5.2.3:
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/long/-/long-5.2.3.tgz#a3ba97f3877cf1d778eccbcb048525ebb77499e1"
+  integrity sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==
 
 loose-envify@^1.4.0:
   version "1.4.0"

@@ -8,7 +8,9 @@
   "assemblies": [
     {
       "name": "hg38",
-      "aliases": ["GRCh38"],
+      "aliases": [
+        "GRCh38"
+      ],
       "sequence": {
         "type": "ReferenceSequenceTrack",
         "trackId": "P6R5xbRqRr",
@@ -52,7 +54,9 @@
       "trackId": "MAF",
       "name": "100-way alignment (chr21:5010000)",
       "type": "MafTrack",
-      "assemblyNames": ["hg38"],
+      "assemblyNames": [
+        "hg38"
+      ],
       "adapter": {
         "type": "MafTabixAdapter",
         "bedGzLocation": {
@@ -571,7 +575,9 @@
       "type": "FeatureTrack",
       "trackId": "gencode.v44.annotation.sorted.gff3",
       "name": "GENCODE v44",
-      "category": ["Annotation"],
+      "category": [
+        "Annotation"
+      ],
       "adapter": {
         "type": "Gff3TabixAdapter",
         "gffGzLocation": {
@@ -583,7 +589,9 @@
           }
         }
       },
-      "assemblyNames": ["hg38"],
+      "assemblyNames": [
+        "hg38"
+      ],
       "displays": [
         {
           "type": "LinearBasicDisplay",
@@ -607,7 +615,9 @@
           "uri": "bigMaf.bb"
         }
       },
-      "assemblyNames": ["hg38"]
+      "assemblyNames": [
+        "hg38"
+      ]
     },
     {
       "type": "MafTrack",
@@ -628,13 +638,17 @@
           "uri": "bigMaf.bb"
         }
       },
-      "assemblyNames": ["hg38"]
+      "assemblyNames": [
+        "hg38"
+      ]
     },
     {
       "trackId": "MAF2",
       "name": "100-way alignment CF",
       "type": "FeatureTrack",
-      "assemblyNames": ["hg38"],
+      "assemblyNames": [
+        "hg38"
+      ],
       "adapter": {
         "type": "BedTabixAdapter",
         "bedGzLocation": {
@@ -651,7 +665,9 @@
       "trackId": "TAF",
       "name": "447-way alignment TAFFY",
       "type": "MafTrack",
-      "assemblyNames": ["hg38"],
+      "assemblyNames": [
+        "hg38"
+      ],
       "adapter": {
         "samples": [
           "hg38",
@@ -662,12 +678,12 @@
           "canFam3",
           "monDom5"
         ],
-        "type": "TaffyAdapter",
-        "tafLocation": {
-          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf"
+        "type": "BgzipTaffyAdapter",
+        "tafGzLocation": {
+          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.gz"
         },
         "taiLocation": {
-          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.tai"
+          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.gz.tai"
         }
       }
     }

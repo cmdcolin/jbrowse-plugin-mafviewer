@@ -88,7 +88,7 @@ if (process.env.NODE_ENV === 'production') {
   })
   let { host, port } = await ctx.serve({
     servedir: '.',
-    port: 9001,
+    port: 9000,
     host: 'localhost',
   })
   const formattedHost = host === '127.0.0.1' ? 'localhost' : host
