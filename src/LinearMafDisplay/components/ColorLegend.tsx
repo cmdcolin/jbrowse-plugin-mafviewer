@@ -48,14 +48,14 @@ const ColorLegend = observer(function ({
             // an optimization that allows us to skip drawing most tree links
             // outside the block
             return (
-              <>
+              <React.Fragment key={[sy, ty, tx, sx].join('-')}>
                 <line stroke="black" x1={sx} y1={sy} x2={sx} y2={ty} />
                 <line stroke="black" x1={sx} y1={ty} x2={tx} y2={ty} />
-              </>
+              </React.Fragment>
             )
           })
         : null}
-      <g transform={`translate(100,0)`}>
+      <g transform={`translate(${treeWidth + 5},0)`}>
         {samples.map((sample, idx) => (
           <RectBg
             key={`${sample.id}-${idx}`}

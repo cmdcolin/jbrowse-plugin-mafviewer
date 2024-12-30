@@ -48,11 +48,15 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     const text = await openLocation(this.getConf('taiLocation')).readFile(
       'utf8',
     )
+    const lines = text
+      .split('\n')
+      .map(f => f.trim())
+      .filter(line => !!line)
     const entries = {} as IndexData
     let lastChr = ''
     let lastChrStart = 0
     let lastRawVirtualOffset = 0
-    for (const line of text.split('\n').filter(line => line.trim())) {
+    for (const line of lines) {
       const [chr, chrStart, virtualOffset] = line.split('\t')
       const relativizedVirtualOffset = lastRawVirtualOffset + +virtualOffset!
       const ref = chr === '*' ? lastChr : chr!
@@ -124,21 +128,22 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
         // "An anchor line in TAF is a column from which all sequence
         // coordinates can be deduced without scanning backwards to previous
         // lines "
-        const row0 = rows[0]!
-        const a0 = row0.asm!
-        const aln0 = alignments[a0]!
-
-        observer.next(
-          new SimpleFeature({
-            uniqueId: `${query.refName}-${query.start}`,
-            refName: query.refName,
-            start: row0.start!,
-            end: row0.start! + aln0.data.length,
-            strand: row0.strand,
-            alignments,
-            seq: aln0.data,
-          }),
-        )
+        const row0 = rows[0]
+        if (row0) {
+          const a0 = row0.asm!
+          const aln0 = alignments[a0]!
+          observer.next(
+            new SimpleFeature({
+              uniqueId: `${query.refName}-${query.start}`,
+              refName: query.refName,
+              start: row0.start!,
+              end: row0.start! + aln0.data.length,
+              strand: row0.strand,
+              alignments,
+              seq: aln0.data,
+            }),
+          )
+        }
         observer.complete()
       } catch (e) {
         observer.error(e)
@@ -201,41 +206,43 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   }
 
   async getRows(lines: string[]) {
-    const [firstLine] = lines
-    const [, info] = firstLine!.split(';').map(f => f.trim())
-    const ret = info!.split(' ')
+    const firstLine = lines[0]
+    const data = firstLine?.split(';').map(f => f.trim())
+    const ret = data?.[1]?.split(' ')
     const rows = []
-    for (let i = 0; i < ret.length; ) {
-      const type = ret[i++]
-      if (type === 'i' || type === 's') {
-        const row = +ret[i++]!
-        const [asm, ref] = ret[i++]!.split('.')
-        rows.push({
-          type,
-          row,
-          asm,
-          ref,
-          start: +ret[i++]!,
-          strand: ret[i++] === '-' ? -1 : 1,
-          length: +ret[i++]!,
-        })
-      } else if (type === 'd') {
-        rows.push({
-          type,
-          row: +ret[i++]!,
-        })
-      } else if (type === 'g') {
-        rows.push({
-          type,
-          row: +ret[i++]!,
-          gap_length: +ret[i++]!,
-        })
-      } else if (type === 'G') {
-        rows.push({
-          type,
-          row: +ret[i++]!,
-          gap_string: ret[i++]!,
-        })
+    if (ret) {
+      for (let i = 0; i < ret.length; ) {
+        const type = ret[i++]
+        if (type === 'i' || type === 's') {
+          const row = +ret[i++]!
+          const [asm, ref] = ret[i++]!.split('.')
+          rows.push({
+            type,
+            row,
+            asm,
+            ref,
+            start: +ret[i++]!,
+            strand: ret[i++] === '-' ? -1 : 1,
+            length: +ret[i++]!,
+          })
+        } else if (type === 'd') {
+          rows.push({
+            type,
+            row: +ret[i++]!,
+          })
+        } else if (type === 'g') {
+          rows.push({
+            type,
+            row: +ret[i++]!,
+            gap_length: +ret[i++]!,
+          })
+        } else if (type === 'G') {
+          rows.push({
+            type,
+            row: +ret[i++]!,
+            gap_string: ret[i++]!,
+          })
+        }
       }
     }
     return rows.sort((a, b) => a.row - b.row)
