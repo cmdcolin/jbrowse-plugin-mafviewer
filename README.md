@@ -41,7 +41,7 @@ Then use the custom "Add track workflow"
 
 ### Example MafTabixAdapter config
 
-The MafTabix track is created according to
+can use nhLocation or samples array on adapter
 
 ```json
 {
@@ -66,6 +66,8 @@ The MafTabix track is created according to
 
 ### Example BigMafAdapter config
 
+can use nhLocation or samples array on adapter
+
 ```json
 {
   "type": "MafTrack",
@@ -84,6 +86,31 @@ The MafTabix track is created according to
     ],
     "bigBedLocation": {
       "uri": "bigMaf.bb"
+    }
+  },
+  "assemblyNames": ["hg38"]
+}
+```
+
+### Example BgzipTaffyAdapter config
+
+can use nhLocation or samples array on adapter
+
+```json
+{
+  "type": "MafTrack",
+  "trackId": "bigMaf",
+  "name": "taffy",
+  "adapter": {
+    "type": "BgzipTaffyAdapter",
+    "nhLocation": {
+      "uri": "hg38.30way.nh"
+    },
+    "tafGzLocation": {
+      "uri": "30way.taf.gz"
+    },
+    "taiGzLocation": {
+      "uri": "30way.taf.gz.tai"
     }
   },
   "assemblyNames": ["hg38"]

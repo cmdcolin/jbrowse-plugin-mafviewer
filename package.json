@@ -1,5 +1,6 @@
 {
   "version": "1.0.8",
+  "license": "MIT",
   "name": "jbrowse-plugin-mafviewer",
   "keywords": [
     "jbrowse",
