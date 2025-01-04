@@ -2,7 +2,6 @@ import { ConfigurationSchema } from '@jbrowse/core/configuration'
 
 /**
  * #config MafTabixAdapter
- * used to configure MafTabix adapter
  */
 function x() {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
@@ -28,17 +27,34 @@ const configSchema = ConfigurationSchema(
       },
     },
     index: ConfigurationSchema('Index', {
+      /**
+       * #slot index.location
+       */
       location: {
         type: 'fileLocation',
         defaultValue: {
           uri: '/path/to/my.bed.gz.tbi',
         },
       },
+      /**
+       * #slot index.indexType
+       */
       indexType: {
         type: 'string',
         defaultValue: 'TBI',
       },
     }),
+    /**
+     * #slot
+     */
+    nhLocation: {
+      type: 'fileLocation',
+      description: 'newick tree',
+      defaultValue: {
+        uri: '/path/to/my.nh',
+        locationType: 'UriLocation',
+      },
+    },
   },
   { explicitlyTyped: true },
 )

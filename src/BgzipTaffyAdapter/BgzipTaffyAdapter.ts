@@ -10,21 +10,7 @@ import VirtualOffset from './virtualOffset'
 import parseNewick from '../parseNewick'
 import { normalize } from '../util'
 
-interface OrganismRecord {
-  chr: string
-  start: number
-  srcSize: number
-  strand: number
-  unknown: number
-  data: string
-}
-
-interface ByteRange {
-  chrStart: number
-  virtualOffset: VirtualOffset
-}
-
-type IndexData = Record<string, ByteRange[]>
+import type { IndexData, OrganismRecord } from './types'
 
 export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<IndexData>
@@ -112,11 +98,16 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
 
         const l = rows.length
         const k = lines.length
+        let ll = 0
         for (let i = 0; i < l; i++) {
           for (let j = 0; j < k; j++) {
             const r = rows[i]!.asm
+            const t = rows[i]!.row
             if (r) {
-              alignments[r]!.data += lines[j]![i]
+              if (!lines[j]![t] && ll++ < 100) {
+                console.log(lines[j]![t], j, t, lines[j], lines[j]?.length)
+              }
+              alignments[r]!.data += lines[j]![t] || ''
             }
           }
         }
@@ -152,13 +143,11 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   }
 
   async getSamples(_query: Region) {
-    // const lines = await this.getLines(query)
-    // const ret = await this.getRows(lines)
     const nhLoc = this.getConf('nhLocation')
     const nh =
       nhLoc.uri === '/path/to/my.nh'
         ? undefined
-        : await openLocation(this.getConf('nhLocation')).readFile('utf8')
+        : await openLocation(nhLoc).readFile('utf8')
 
     // TODO: we may need to resolve the exact set of rows in the visible region
     // here

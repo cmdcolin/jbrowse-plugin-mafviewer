@@ -669,6 +669,44 @@
           "uri": "447-mammalian-2022v1.nh"
         }
       }
+    },
+    {
+      "trackId": "30way",
+      "name": "30-way alignment TAFFY",
+      "type": "MafTrack",
+      "assemblyNames": ["hg38"],
+      "adapter": {
+        "type": "BgzipTaffyAdapter",
+        "tafGzLocation": {
+          "uri": "chr22.taf.gz"
+        },
+        "taiLocation": {
+          "uri": "chr22.taf.gz.tai"
+        },
+        "nhLocation": {
+          "uri": "hg38.30way.nh"
+        }
+      }
+    },
+    {
+      "trackId": "30wayMAF",
+      "name": "30-way alignment (chr22)",
+      "type": "MafTrack",
+      "assemblyNames": ["hg38"],
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "bedGzLocation": {
+          "uri": "chr22.bed.gz"
+        },
+        "index": {
+          "location": {
+            "uri": "chr22.bed.gz.tbi"
+          }
+        },
+        "nhLocation": {
+          "uri": "hg38.30way.nh"
+        }
+      }
     }
   ]
 }

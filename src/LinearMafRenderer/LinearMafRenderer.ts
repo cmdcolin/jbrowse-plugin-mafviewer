@@ -29,6 +29,7 @@ function makeImageData({
   ctx: CanvasRenderingContext2D
   renderArgs: RenderArgs & { features: Map<string, Feature> }
 }) {
+  console.log('makeImageData')
   const {
     regions,
     bpPerPx,
@@ -54,6 +55,7 @@ function makeImageData({
 
   // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
+  console.log({ features })
 
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
@@ -137,7 +139,7 @@ function makeImageData({
             const c = alignment[i]!
             if ((showAllLetters || seq[i] !== c) && c !== '-') {
               ctx.fillStyle = contrastForBase[c] ?? 'white'
-              ctx.fillText(origAlignment[i]!, l + offset, hp2 + t + 3)
+              ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
             }
             o++
           }
