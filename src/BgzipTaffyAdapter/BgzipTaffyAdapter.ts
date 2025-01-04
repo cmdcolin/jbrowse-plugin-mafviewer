@@ -45,8 +45,8 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     for (const line of lines) {
       const [chr, chrStart, virtualOffset] = line.split('\t')
       const relativizedVirtualOffset = lastRawVirtualOffset + +virtualOffset!
-      const ref = chr === '*' ? lastChr : chr!
-      const r2 = ref.split('.').at(-1)!
+      const currChr = chr === '*' ? lastChr : chr!.split('.').at(-1)!
+
       // bgzip TAF files store virtual offsets in plaintext in the TAI file
       // these virtualoffsets are 64bit values, so the long library is needed
       // to accurately do the bit manipulations needed
@@ -55,20 +55,19 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
       const z = x.and(0xffff)
       const voff = new VirtualOffset(y.toNumber(), z.toNumber())
 
-      if (!entries[r2]) {
-        entries[r2] = []
+      if (!entries[currChr]) {
+        entries[currChr] = []
         lastChr = ''
         lastChrStart = 0
         lastRawVirtualOffset = 0
       }
-      const s = +chrStart! + lastChrStart
-
-      entries[r2].push({
-        chrStart: s,
+      const currStart = +chrStart! + lastChrStart
+      entries[currChr].push({
+        chrStart: currStart,
         virtualOffset: voff,
       })
-      lastChr = ref
-      lastChrStart = s
+      lastChr = currChr
+      lastChrStart = currStart
       lastRawVirtualOffset = relativizedVirtualOffset
     }
     return entries
@@ -165,15 +164,19 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
       this.getConf('tafGzLocation'),
     ) as GenericFilehandle
 
+    const decoder = new TextDecoder('utf8')
     const records = byteRanges[query.refName]
     if (records) {
-      let firstEntry
+      let firstEntry = records[0]
       let nextEntry
       for (let i = 0; i < records.length; i++) {
-        const entry = records[i]!
-        if (entry.chrStart >= query.start) {
-          firstEntry = records[i - 1]
-          nextEntry = records[i]
+        if (records[i]!.chrStart >= query.start) {
+          // we use i-1 for firstEntry because the current record is "greater
+          // than the query start", we go backwards one record to make sure to
+          // cover up until the query start. we use i+1 to ensure we get at
+          // least one block in the case that i=0
+          firstEntry = records[Math.max(i - 1, 0)]
+          nextEntry = records[i + 1]
           break
         }
       }
@@ -184,11 +187,9 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
           firstEntry.virtualOffset.blockPosition,
         )
         const buffer = await unzip(response)
-        const decoder = new TextDecoder('utf8')
-        const str = decoder.decode(
-          buffer.slice(firstEntry.virtualOffset.dataPosition),
-        )
-        return str.split('\n')
+        return decoder
+          .decode(buffer.slice(firstEntry.virtualOffset.dataPosition))
+          .split('\n')
       }
     }
     return []
