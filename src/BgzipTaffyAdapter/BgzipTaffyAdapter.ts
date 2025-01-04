@@ -11,7 +11,16 @@ import parseNewick from '../parseNewick'
 import { normalize } from '../util'
 
 import type { IndexData, OrganismRecord } from './types'
-
+import { parseRowInstructions } from './rowInstructions'
+interface Entry {
+  type: string
+  row: number
+  asm: string
+  ref: string
+  start: number
+  strand: number
+  length: number
+}
 export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<IndexData>
 
@@ -77,60 +86,65 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     return ObservableCreate<Feature>(async observer => {
       try {
         const lines = await this.getLines(query)
-        const rows = await this.getRows(lines)
-
         const alignments = {} as Record<string, OrganismRecord>
-        for (const row of rows) {
-          if (row.asm) {
-            if (!alignments[row.asm]) {
-              alignments[row.asm] = {
-                chr: row.ref!,
-                start: row.start,
-                srcSize: 0,
-                strand: row.strand,
-                unknown: 0,
-                data: '',
-              }
-            }
-          }
-        }
 
-        const l = rows.length
         const k = lines.length
-        let ll = 0
-        for (let i = 0; i < l; i++) {
-          for (let j = 0; j < k; j++) {
-            const r = rows[i]!.asm
-            const t = rows[i]!.row
-            if (r) {
-              if (!lines[j]![t] && ll++ < 100) {
-                console.log(lines[j]![t], j, t, lines[j], lines[j]?.length)
+        const data = [] as Entry[]
+        let a0: any
+        for (let j = 0; j < k; j++) {
+          const line = lines[j]!
+          if (line) {
+            const [r0, r1] = line.split(' ; ')
+            if (r1) {
+              for (const ins of parseRowInstructions(r1)) {
+                if (ins.type === 'i') {
+                  data.splice(ins.row, 0, ins)
+                } else if (ins.type === 's') {
+                  data[ins.row] = ins
+                } else if (ins.type === 'd') {
+                  data.splice(ins.row, 1)
+                }
               }
-              alignments[r]!.data += lines[j]![t] || ''
+              if (!a0) {
+                a0 = data[0]
+              }
+            }
+            for (let i = 0; i < r0!.length; i++) {
+              const letter = r0![i]
+              const r = data[i]!
+              if (!alignments[r.asm]) {
+                alignments[r.asm] = {
+                  start: r.start,
+                  strand: r.strand,
+                  srcSize: r.length,
+                  data: '',
+                }
+              }
+              alignments[r.asm]!.data += letter
             }
           }
         }
+        console.log(alignments)
+        if (a0) {
+          const row0 = alignments[a0.asm]!
 
-        // see
-        // https://github.com/ComparativeGenomicsToolkit/taffy/blob/f5a5354/docs/taffy_utilities.md#referenced-based-maftaf-and-indexing
-        // for the significance of row[0]:
-        //
-        // "An anchor line in TAF is a column from which all sequence
-        // coordinates can be deduced without scanning backwards to previous
-        // lines "
-        const row0 = rows[0]
-        if (row0) {
-          const a0 = row0.asm!
-          const aln0 = alignments[a0]!
+          // see
+          // https://github.com/ComparativeGenomicsToolkit/taffy/blob/f5a5354/docs/taffy_utilities.md#referenced-based-maftaf-and-indexing
+          // for the significance of row[0]:
+          //
+          // "An anchor line in TAF is a column from which all sequence
+          // coordinates can be deduced without scanning backwards to previous
+          // lines "
+          // const aln0 = alignments[a0]!
           observer.next(
             new SimpleFeature({
               uniqueId: `${query.refName}-${query.start}`,
               refName: query.refName,
-              start: row0.start!,
-              end: row0.start! + aln0.data.length,
+              start: row0.start,
+              end: row0.start + row0.data.length,
               strand: row0.strand,
               alignments,
-              seq: aln0.data,
+              seq: row0.data,
             }),
           )
         }
@@ -193,49 +207,6 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
       }
     }
     return []
-  }
-
-  async getRows(lines: string[]) {
-    const firstLine = lines[0]
-    const data = firstLine?.split(';').map(f => f.trim())
-    const ret = data?.[1]?.split(' ')
-    const rows = []
-    if (ret) {
-      for (let i = 0; i < ret.length; ) {
-        const type = ret[i++]
-        if (type === 'i' || type === 's') {
-          const row = +ret[i++]!
-          const [asm, ref] = ret[i++]!.split('.')
-          rows.push({
-            type,
-            row,
-            asm,
-            ref,
-            start: +ret[i++]!,
-            strand: ret[i++] === '-' ? -1 : 1,
-            length: +ret[i++]!,
-          })
-        } else if (type === 'd') {
-          rows.push({
-            type,
-            row: +ret[i++]!,
-          })
-        } else if (type === 'g') {
-          rows.push({
-            type,
-            row: +ret[i++]!,
-            gap_length: +ret[i++]!,
-          })
-        } else if (type === 'G') {
-          rows.push({
-            type,
-            row: +ret[i++]!,
-            gap_string: ret[i++]!,
-          })
-        }
-      }
-    }
-    return rows.sort((a, b) => a.row - b.row)
   }
 
   freeResources(): void {}
