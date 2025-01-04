@@ -9,9 +9,9 @@ import Long from 'long'
 import VirtualOffset from './virtualOffset'
 import parseNewick from '../parseNewick'
 import { normalize } from '../util'
+import { parseRowInstructions } from './rowInstructions'
 
 import type { IndexData, OrganismRecord } from './types'
-import { parseRowInstructions } from './rowInstructions'
 interface Entry {
   type: string
   row: number
@@ -94,37 +94,56 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
         for (let j = 0; j < k; j++) {
           const line = lines[j]!
           if (line) {
-            const [r0, r1] = line.split(' ; ')
-            if (r1) {
-              for (const ins of parseRowInstructions(r1)) {
+            const [lineData, rowInstructions] = line.split(' ; ')
+            if (rowInstructions) {
+              for (const ins of parseRowInstructions(rowInstructions)) {
                 if (ins.type === 'i') {
                   data.splice(ins.row, 0, ins)
+                  if (!alignments[ins.asm]) {
+                    alignments[ins.asm] = {
+                      start: ins.start,
+                      strand: ins.strand,
+                      srcSize: ins.length,
+                      chr: ins.ref,
+                      data: '',
+                    }
+                  }
+                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(j)
                 } else if (ins.type === 's') {
+                  if (!alignments[ins.asm]) {
+                    alignments[ins.asm] = {
+                      start: ins.start,
+                      strand: ins.strand,
+                      srcSize: ins.length,
+                      chr: ins.ref,
+                      data: '',
+                    }
+                  }
                   data[ins.row] = ins
                 } else if (ins.type === 'd') {
                   data.splice(ins.row, 1)
+                } else if (ins.type === 'g') {
+                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(ins.gapLen)
+                }
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                else if (ins.type === 'G') {
+                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(
+                    ins.gapSubstring.length,
+                  )
                 }
               }
               if (!a0) {
                 a0 = data[0]
               }
             }
-            for (let i = 0; i < r0!.length; i++) {
-              const letter = r0![i]
+            const lineLen = lineData!.length
+            for (let i = 0; i < lineLen; i++) {
+              const letter = lineData![i]
               const r = data[i]!
-              if (!alignments[r.asm]) {
-                alignments[r.asm] = {
-                  start: r.start,
-                  strand: r.strand,
-                  srcSize: r.length,
-                  data: '',
-                }
-              }
               alignments[r.asm]!.data += letter
             }
           }
         }
-        console.log(alignments)
         if (a0) {
           const row0 = alignments[a0.asm]!
 

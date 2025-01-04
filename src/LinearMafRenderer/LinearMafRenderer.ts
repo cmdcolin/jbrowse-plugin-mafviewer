@@ -29,7 +29,6 @@ function makeImageData({
   ctx: CanvasRenderingContext2D
   renderArgs: RenderArgs & { features: Map<string, Feature> }
 }) {
-  console.log('makeImageData')
   const {
     regions,
     bpPerPx,
@@ -55,7 +54,6 @@ function makeImageData({
 
   // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
-  console.log({ features })
 
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
@@ -111,7 +109,7 @@ function makeImageData({
         if (seq[i] !== '-') {
           if (c !== '-') {
             const l = leftPx + scale * o
-            if (seq[i] !== c) {
+            if (seq[i] !== c && c !== ' ') {
               ctx.fillStyle = mismatchRendering
                 ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                   (colorForBase[c as keyof typeof colorForBase] ?? 'black')

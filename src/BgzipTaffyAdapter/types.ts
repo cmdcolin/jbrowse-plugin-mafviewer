@@ -5,7 +5,6 @@ export interface OrganismRecord {
   start: number
   srcSize: number
   strand: number
-  unknown: number
   data: string
 }
 
