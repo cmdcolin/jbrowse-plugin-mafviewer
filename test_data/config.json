@@ -670,9 +670,10 @@
         }
       }
     },
+
     {
-      "trackId": "30way",
-      "name": "30-way alignment TAFFY",
+      "trackId": "30waytaf",
+      "name": "30-way alignment (chr22, TAF)",
       "type": "MafTrack",
       "assemblyNames": ["hg38"],
       "adapter": {
@@ -688,9 +689,10 @@
         }
       }
     },
+
     {
       "trackId": "30wayMAF",
-      "name": "30-way alignment (chr22)",
+      "name": "30-way alignment (chr22, MAF)",
       "type": "MafTrack",
       "assemblyNames": ["hg38"],
       "adapter": {

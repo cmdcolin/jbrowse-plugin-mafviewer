@@ -159,7 +159,6 @@ function makeImageData({
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
         continue
-        throw new Error(`unknown sample encountered: ${sample}`)
       }
 
       const t = rowHeight * row
@@ -169,7 +168,7 @@ function makeImageData({
       for (let i = 0, o = 0; i < alignment.length; i++) {
         let ins = ''
         while (seq[i] === '-') {
-          if (alignment[i] !== '-') {
+          if (alignment[i] !== '-' && alignment[i] !== ' ') {
             ins += alignment[i]
           }
           i++

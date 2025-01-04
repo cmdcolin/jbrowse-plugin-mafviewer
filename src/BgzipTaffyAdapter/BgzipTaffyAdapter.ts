@@ -108,7 +108,8 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                       data: '',
                     }
                   }
-                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(j)
+                  const e = alignments[ins.asm]!
+                  e.data += ' '.repeat(j - e.data.length) // catch it up
                 } else if (ins.type === 's') {
                   if (!alignments[ins.asm]) {
                     alignments[ins.asm] = {
@@ -119,18 +120,18 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                       data: '',
                     }
                   }
+                  const e = alignments[ins.asm]!
+                  e.data += ' '.repeat(j - e.data.length) // catch it up
                   data[ins.row] = ins
                 } else if (ins.type === 'd') {
                   data.splice(ins.row, 1)
-                } else if (ins.type === 'g') {
-                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(ins.gapLen)
                 }
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                else if (ins.type === 'G') {
-                  alignments[data[ins.row]!.asm]!.data += ' '.repeat(
-                    ins.gapSubstring.length,
-                  )
-                }
+
+                // no gaps for now(?)
+                // else if (ins.type === 'g') {
+                // }
+                // else if (ins.type === 'G') {
+                // }
               }
               if (!a0) {
                 a0 = data[0]
@@ -154,10 +155,9 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
           // "An anchor line in TAF is a column from which all sequence
           // coordinates can be deduced without scanning backwards to previous
           // lines "
-          // const aln0 = alignments[a0]!
           observer.next(
             new SimpleFeature({
-              uniqueId: `${query.refName}-${query.start}`,
+              uniqueId: `${row0.start}-${row0.data.length}`,
               refName: query.refName,
               start: row0.start,
               end: row0.start + row0.data.length,
