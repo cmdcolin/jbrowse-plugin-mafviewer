@@ -153,30 +153,24 @@ the case
 
 ## Prepare data
 
-This is the same as the jbrowse 1 mafviewer plugin (currently the similar to
-the). This plugin supports two formats
-
 1. BigMaf format, which can be created following UCSC guidelines
+   (https://genome.ucsc.edu/FAQ/FAQformat.html#format9.3)
 
 2. MAF tabix based format, based on a custom BED created via conversion tools in
-   this repo.
+   this repo (see maf2bed)
 
-The choice between the two is your convenience. BigMaf is a "standard" UCSC
-format, basically just a specialized BigBed, so it requires JBrowse 1.14.0 or
-newer for it's BigBed support. The custom BED format only requires JBrowse
-1.12.3 or newer, so therefore some slightly older JBrowse versions can support
-it.
+3. TAF format (new!). Currently only supports bgzip'd TAF. This is pioneered by
+   https://github.com/ComparativeGenomicsToolkit/taffy
 
-_Note: Both formats start with a MAF as input, and note that your MAF file
-should contain the species name and chromosome name e.g. hg38.chr1 in the
+_Note: All these formats generally start with a MAF as input. Note that your MAF
+file should contain the species name and chromosome name e.g. hg38.chr1 in the
 sequence identifiers._
 
-### Preparing BigMaf
+### Option 1. Preparing BigMaf
 
 Follow instructions from https://genome.ucsc.edu/FAQ/FAQformat.html#format9.3
-and set the storeType of your track as MAFViewer/Store/SeqFeature/BigMaf
 
-### Preparing the tabix BED format
+### Option 2. Preparing MAF tabix
 
 Start by converting the MAF into a pseudo-BED format using the maf2bed tool
 
@@ -191,7 +185,8 @@ The second argument to maf2bed is the genome version e.g. hg38 used for the main
 species in the MAF (if your MAF comes from a pipeline like Ensembl or UCSC, the
 identifiers in the MAF file will say something like hg38.chr1, therefore, the
 argument to maf2bed should just be hg38 to remove hg38 part of the identifier.
-if your MAF file does not include the species name as part of the identifier,
+
+If your MAF file does not include the species name as part of the identifier,
 you should add the species into them the those scaffold/chromosome e.g. create
 hg38.chr1 if it was just chr1 before)
 
@@ -200,7 +195,19 @@ If all is well, your BED file should have 6 columns, with
 separated between each species by `;` and each field in the alignment is
 separated by `:`.
 
-### Footnote
+Note: If you can't use the `cargo install maf2bed` binary, there is a
+`bin/maf2bed.pl` perl version of it in this repo
 
-If you can't use the `cargo install maf2bed` binary, there is a `bin/maf2bed.pl`
-perl version of it in this repo
+### Option 3. Preparing TAF
+
+Follow steps from https://github.com/ComparativeGenomicsToolkit/taffy
+
+```
+taffy view -i chr22.maf -o chr22.taf
+bgzip chr22.taf
+taffy index -i chr22.taf.gz
+```
+
+The above workflow requires that taffy is built with "htslib support"
+
+Note that the TAF support is beta, let me know if you run into any issues

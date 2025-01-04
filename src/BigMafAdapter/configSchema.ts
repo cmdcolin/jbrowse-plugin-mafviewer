@@ -27,6 +27,17 @@ const configSchema = ConfigurationSchema(
         locationType: 'UriLocation',
       },
     },
+    /**
+     * #slot
+     */
+    nhLocation: {
+      type: 'fileLocation',
+      description: 'newick tree',
+      defaultValue: {
+        uri: '/path/to/my.nh',
+        locationType: 'UriLocation',
+      },
+    },
   },
   { explicitlyTyped: true },
 )

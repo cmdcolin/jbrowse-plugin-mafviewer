@@ -36,15 +36,24 @@ const useStyles = makeStyles()(theme => ({
   },
 }))
 
+type AdapterTypeOptions =
+  | 'BigMafAdapter'
+  | 'MafTabixAdapter'
+  | 'BgzipTaffyAdapter'
+type IndexTypeOptions = 'TBI' | 'CSI'
+
 export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
   const { classes } = useStyles()
   const [samples, setSamples] = useState('')
   const [loc, setLoc] = useState<FileLocation>()
   const [indexLoc, setIndexLoc] = useState<FileLocation>()
+  const [nhLoc, setNhLoc] = useState<FileLocation>()
   const [error, setError] = useState<unknown>()
   const [trackName, setTrackName] = useState('MAF track')
-  const [fileTypeChoice, setFileTypeChoice] = useState('BigMafAdapter')
-  const [indexTypeChoice, setIndexTypeChoice] = useState('TBI')
+  const [fileTypeChoice, setFileTypeChoice] =
+    useState<AdapterTypeOptions>('BigMafAdapter')
+  const [indexTypeChoice, setIndexTypeChoice] =
+    useState<IndexTypeOptions>('TBI')
 
   const rootModel = getRoot<any>(model)
   return (
@@ -56,21 +65,19 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
           <RadioGroup
             value={fileTypeChoice}
             onChange={event => {
-              setFileTypeChoice(event.target.value)
+              setFileTypeChoice(event.target.value as AdapterTypeOptions)
             }}
           >
-            <FormControlLabel
-              value="BigMafAdapter"
-              control={<Radio />}
-              checked={fileTypeChoice === 'BigMafAdapter'}
-              label="bigMaf"
-            />
-            <FormControlLabel
-              value="MafTabixAdapter"
-              control={<Radio />}
-              checked={fileTypeChoice === 'MafTabixAdapter'}
-              label="mafTabix"
-            />
+            {['BigMafAdapter', 'MafTabixAdapter', 'BgzipTaffyAdapter'].map(
+              r => (
+                <FormControlLabel
+                  value={r}
+                  control={<Radio />}
+                  checked={fileTypeChoice === r}
+                  label={r}
+                />
+              ),
+            )}
           </RadioGroup>
         </FormControl>
         {fileTypeChoice === 'BigMafAdapter' ? (
@@ -82,62 +89,88 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
               setLoc(arg)
             }}
           />
-        ) : (
+        ) : fileTypeChoice === 'MafTabixAdapter' ? (
           <>
             <FormControl>
               <FormLabel>Index type</FormLabel>
               <RadioGroup
                 value={fileTypeChoice}
                 onChange={event => {
-                  setIndexTypeChoice(event.target.value)
+                  setIndexTypeChoice(event.target.value as IndexTypeOptions)
                 }}
               >
-                <FormControlLabel
-                  value="TBI"
-                  control={<Radio />}
-                  checked={indexTypeChoice === 'TBI'}
-                  label="TBI"
-                />
-                <FormControlLabel
-                  value="CSI"
-                  control={<Radio />}
-                  checked={indexTypeChoice === 'CSI'}
-                  label="CSI"
-                />
+                {['TBI', 'CSI'].map(r => (
+                  <FormControlLabel
+                    value={r}
+                    control={<Radio />}
+                    checked={fileTypeChoice === r}
+                    label={r}
+                  />
+                ))}
               </RadioGroup>
             </FormControl>
             <FileSelector
               location={loc}
               name="Path to MAF tabix"
+              rootModel={rootModel}
               setLocation={arg => {
                 setLoc(arg)
               }}
-              rootModel={rootModel}
             />
             <FileSelector
               location={indexLoc}
               name="Path to MAF tabix index"
+              rootModel={rootModel}
               setLocation={arg => {
                 setIndexLoc(arg)
               }}
+            />
+          </>
+        ) : (
+          <>
+            <FileSelector
+              location={loc}
+              name="Path to TAF.gz (Bgzipped TAF)"
               rootModel={rootModel}
+              setLocation={arg => {
+                setLoc(arg)
+              }}
+            />
+            <FileSelector
+              location={indexLoc}
+              name="Path to TAF.gz.tai (TAF index)"
+              rootModel={rootModel}
+              setLocation={arg => {
+                setIndexLoc(arg)
+              }}
             />
           </>
         )}
       </Paper>
-      <TextField
-        multiline
-        rows={10}
-        value={samples}
-        onChange={event => {
-          setSamples(event.target.value)
-        }}
-        placeholder={
-          'Enter sample names from the MAF file, one per line, or JSON formatted array of samples'
-        }
-        variant="outlined"
-        fullWidth
-      />
+      <div>
+        <FileSelector
+          location={nhLoc}
+          name="Path to newick tree (.nh)"
+          rootModel={rootModel}
+          setLocation={arg => {
+            setNhLoc(arg)
+          }}
+        />
+        <TextField
+          multiline
+          rows={10}
+          value={samples}
+          onChange={event => {
+            setSamples(event.target.value)
+          }}
+          helperText="Sample names (optional if .nh supplied, required if not)"
+          placeholder={
+            'Enter sample names from the MAF file, one per line, or JSON formatted array of samples'
+          }
+          variant="outlined"
+          fullWidth
+        />
+      </div>
 
       <TextField
         value={trackName}
@@ -173,19 +206,29 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
                 adapter:
                   fileTypeChoice === 'BigMafAdapter'
                     ? {
-                      type: fileTypeChoice,
-                      bigBedLocation: loc,
-                      samples: sampleNames,
-                    }
-                    : {
-                      type: fileTypeChoice,
-                      bedGzLocation: loc,
-                      index: {
-                        indexType: indexTypeChoice,
-                        location: indexLoc,
-                      },
-                      samples: sampleNames,
-                    },
+                        type: fileTypeChoice,
+                        bigBedLocation: loc,
+                        samples: sampleNames,
+                        nhLocation: nhLoc,
+                      }
+                    : fileTypeChoice === 'MafTabixAdapter'
+                      ? {
+                          type: fileTypeChoice,
+                          bedGzLocation: loc,
+                          nhLocation: nhLoc,
+                          index: {
+                            indexType: indexTypeChoice,
+                            location: indexLoc,
+                          },
+                          samples: sampleNames,
+                        }
+                      : {
+                          type: fileTypeChoice,
+                          tafGzLocation: loc,
+                          taiLocation: indexLoc,
+                          nhLocation: nhLoc,
+                          samples: sampleNames,
+                        },
               })
 
               model.view?.showTrack(trackId)
