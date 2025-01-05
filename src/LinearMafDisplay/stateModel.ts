@@ -79,7 +79,7 @@ export default function stateModelFactory(
         /**
          * #property
          */
-        treeWidth: 80,
+        treeAreaWidth: 80,
       }),
     )
     .volatile(() => ({
@@ -175,7 +175,7 @@ export default function stateModelFactory(
       get hierarchy(): HierarchyNode<NodeWithIdsAndLength> | undefined {
         const r = self.root
         if (r) {
-          const width = self.treeWidth
+          const width = self.treeAreaWidth
           const clust = cluster<NodeWithIds>()
             .size([this.totalHeight, width])
             .separation(() => 1)
@@ -186,6 +186,9 @@ export default function stateModelFactory(
           return undefined
         }
       },
+      /**
+       * #getter
+       */
       get samples() {
         return this.rowNames ? normalize(this.rowNames) : self.volatileSamples
       },
@@ -216,6 +219,12 @@ export default function stateModelFactory(
         renderProps: superRenderProps,
       } = self
       return {
+        /**
+         * #getter
+         */
+        get treeWidth() {
+          return self.hierarchy ? self.treeAreaWidth : 0
+        },
         /**
          * #method
          */

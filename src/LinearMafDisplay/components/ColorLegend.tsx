@@ -5,6 +5,7 @@ import { observer } from 'mobx-react'
 // locals
 import { LinearMafDisplayModel } from '../stateModel'
 import RectBg from './RectBg'
+import Tree from './Tree'
 
 const ColorLegend = observer(function ({
   model,
@@ -15,14 +16,7 @@ const ColorLegend = observer(function ({
   svgFontSize: number
   labelWidth: number
 }) {
-  const {
-    hierarchy,
-    totalHeight,
-    treeWidth,
-    showBranchLen,
-    samples,
-    rowHeight,
-  } = model
+  const { totalHeight, treeWidth, samples, rowHeight } = model
   const canDisplayLabel = rowHeight >= 8
   const boxHeight = Math.min(20, rowHeight)
 
@@ -34,27 +28,7 @@ const ColorLegend = observer(function ({
         width={labelWidth + 5 + treeWidth}
         height={totalHeight}
       />
-      {hierarchy
-        ? [...hierarchy.links()].map(link => {
-            const { source, target } = link
-            const sy = source.x!
-            const ty = target.x!
-            // @ts-expect-error
-            const tx = showBranchLen ? target.len : target.y
-            // @ts-expect-error
-            const sx = showBranchLen ? source.len : source.y
-
-            // 1d line intersection to check if line crosses block at all, this is
-            // an optimization that allows us to skip drawing most tree links
-            // outside the block
-            return (
-              <React.Fragment key={[sy, ty, tx, sx].join('-')}>
-                <line stroke="black" x1={sx} y1={sy} x2={sx} y2={ty} />
-                <line stroke="black" x1={sx} y1={ty} x2={tx} y2={ty} />
-              </React.Fragment>
-            )
-          })
-        : null}
+      <Tree model={model} />
       <g transform={`translate(${treeWidth + 5},0)`}>
         {samples.map((sample, idx) => (
           <RectBg
