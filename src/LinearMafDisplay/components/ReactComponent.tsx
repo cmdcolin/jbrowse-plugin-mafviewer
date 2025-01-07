@@ -58,7 +58,10 @@ const LinearMafDisplay = observer(function (props: {
             className={classes.cursor}
             width={width}
             height={height}
-            style={{ position: 'absolute', top: scrollTop }}
+            style={{
+              position: 'absolute',
+              top: scrollTop,
+            }}
           >
             <line
               x1={0}
@@ -74,7 +77,7 @@ const LinearMafDisplay = observer(function (props: {
               html={Object.entries(
                 sources[Math.floor(mouseY / rowHeight)] || {},
               )
-                .filter(([key]) => key !== 'color')
+                .filter(([key]) => key !== 'color' && key !== 'id')
                 .map(([key, value]) => `${key}:${value}`)
                 .join('\n')}
             />

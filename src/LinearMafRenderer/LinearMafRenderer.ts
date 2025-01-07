@@ -66,7 +66,6 @@ function makeImageData({
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
         continue
-        throw new Error(`unknown sample encountered: ${sample}`)
       }
 
       const t = rowHeight * row
@@ -136,7 +135,9 @@ function makeImageData({
             const offset = (scale - charSizeW) / 2 + 1
             const c = alignment[i]!
             if ((showAllLetters || seq[i] !== c) && c !== '-') {
-              ctx.fillStyle = contrastForBase[c] ?? 'white'
+              ctx.fillStyle = mismatchRendering
+                ? (contrastForBase[c] ?? 'white')
+                : 'black'
               ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
             }
             o++
