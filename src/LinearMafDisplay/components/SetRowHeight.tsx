@@ -32,7 +32,7 @@ const SetRowHeightDialog = observer(function (props: {
   const [rowProportion, setRowProportion] = useState(`${model.rowProportion}`)
 
   return (
-    <Dialog open onClose={handleClose} title="Filter options">
+    <Dialog open onClose={handleClose} title="Set row height">
       <DialogContent className={classes.root}>
         <Typography>
           Set row height and the proportion of the row height to use for drawing
