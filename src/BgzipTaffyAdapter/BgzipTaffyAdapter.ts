@@ -109,7 +109,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                     }
                   }
                   const e = alignments[ins.asm]!
-                  e.data += ' '.repeat(j - e.data.length) // catch it up
+                  e.data += ' '.repeat(Math.max(0, j - e.data.length)) // catch it up
                 } else if (ins.type === 's') {
                   if (!alignments[ins.asm]) {
                     alignments[ins.asm] = {
@@ -121,7 +121,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                     }
                   }
                   const e = alignments[ins.asm]!
-                  e.data += ' '.repeat(j - e.data.length) // catch it up
+                  e.data += ' '.repeat(Math.max(0, j - e.data.length)) // catch it up
                   data[ins.row] = ins
                 } else if (ins.type === 'd') {
                   data.splice(ins.row, 1)
