@@ -2882,12 +2882,7 @@ mobx-react@^9.0.0, mobx-react@^9.0.1:
   dependencies:
     mobx-react-lite "^4.1.0"
 
-mobx-state-tree@5.4.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-5.4.1.tgz#97182a1e2587db5ff7a2b5f11ac6971e50498aed"
-  integrity sha512-eEBmfeYzbNSbNsdM+T1pchuOykZXT50B7eCXgf0E0O/jad/cigu4heBB9RwxzzyD/QGrXBPVctKYLypVXNHt3Q==
-
-mobx-state-tree@^5.0.0:
+mobx-state-tree@^5.0.0, mobx-state-tree@^5.4.1:
   version "5.4.2"
   resolved "https://registry.yarnpkg.com/mobx-state-tree/-/mobx-state-tree-5.4.2.tgz#351bb49c9d08d2482688357cccc59ce51d773615"
   integrity sha512-SGXAh2KCBQbWVcxeQbZEr5pchTgcfNZmGVRL2a2Me+pSMH98bZWXD6EOuuijbTGbc0hOoOsbab3JdwJyr+fW7Q==

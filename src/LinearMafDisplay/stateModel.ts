@@ -213,9 +213,8 @@ export default function stateModelFactory(
     }))
     .views(self => {
       const {
-        // eslint-disable-next-line @typescript-eslint/unbound-method
         trackMenuItems: superTrackMenuItems,
-        // eslint-disable-next-line @typescript-eslint/unbound-method
+
         renderProps: superRenderProps,
       } = self
       return {
@@ -317,7 +316,6 @@ export default function stateModelFactory(
       },
     }))
     .actions(self => {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       const { renderSvg: superRenderSvg } = self
       return {
         /**

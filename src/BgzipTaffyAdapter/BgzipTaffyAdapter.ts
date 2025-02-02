@@ -3,7 +3,6 @@ import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
-import { GenericFilehandle } from 'generic-filehandle2'
 import Long from 'long'
 
 import VirtualOffset from './virtualOffset'
@@ -191,11 +190,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
 
   async getLines(query: Region) {
     const byteRanges = await this.setup()
-
-    // @ts-expect-error
-    const file = openLocation(
-      this.getConf('tafGzLocation'),
-    ) as GenericFilehandle
+    const file = openLocation(this.getConf('tafGzLocation'))
 
     const decoder = new TextDecoder('utf8')
     const records = byteRanges[query.refName]
