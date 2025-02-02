@@ -56,6 +56,7 @@ if (process.env.NODE_ENV === 'production') {
     entryPoints: ['src/index.ts'],
     bundle: true,
     globalName: 'JBrowsePluginMafViewer',
+    sourcemap: true,
     outfile: 'dist/out.js',
     metafile: true,
     plugins: [

@@ -197,17 +197,25 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     if (records) {
       let firstEntry = records[0]
       let nextEntry
+      // two pass:
+      // first pass: find first block greater than query start, then -1 from
+      // that
       for (let i = 0; i < records.length; i++) {
         if (records[i]!.chrStart >= query.start) {
-          // we use i-1 for firstEntry because the current record is "greater
-          // than the query start", we go backwards one record to make sure to
-          // cover up until the query start. we use i+1 to ensure we get at
-          // least one block in the case that i=0
           firstEntry = records[Math.max(i - 1, 0)]
+          break
+        }
+      }
+      // second pass: find first block where query end less than record start,
+      // and +1 from that
+      for (let i = 0; i < records.length; i++) {
+        if (query.end <= records[i]!.chrStart) {
           nextEntry = records[i + 1]
           break
         }
       }
+
+      nextEntry = nextEntry ?? records.at(-1)
       if (firstEntry && nextEntry) {
         const response = await file.read(
           nextEntry.virtualOffset.blockPosition -
