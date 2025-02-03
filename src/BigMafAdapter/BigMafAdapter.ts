@@ -1,8 +1,12 @@
 import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { getSnapshot } from 'mobx-state-tree'
 import { firstValueFrom, toArray } from 'rxjs'
+
+import parseNewick from '../parseNewick'
+import { normalize } from '../util'
 
 interface OrganismRecord {
   chr: string
@@ -105,5 +109,21 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
       observer.complete()
     })
   }
+
+  async getSamples(_query: Region) {
+    const nhLoc = this.getConf('nhLocation')
+    const nh =
+      nhLoc.uri === '/path/to/my.nh'
+        ? undefined
+        : await openLocation(nhLoc).readFile('utf8')
+
+    // TODO: we may need to resolve the exact set of rows in the visible region
+    // here
+    return {
+      samples: normalize(this.getConf('samples')),
+      tree: nh ? parseNewick(nh) : undefined,
+    }
+  }
+
   freeResources(): void {}
 }

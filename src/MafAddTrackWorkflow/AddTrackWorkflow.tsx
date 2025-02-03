@@ -71,6 +71,7 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
             {['BigMafAdapter', 'MafTabixAdapter', 'BgzipTaffyAdapter'].map(
               r => (
                 <FormControlLabel
+                  key={r}
                   value={r}
                   control={<Radio />}
                   checked={fileTypeChoice === r}
@@ -101,9 +102,10 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
               >
                 {['TBI', 'CSI'].map(r => (
                   <FormControlLabel
+                    key={r}
                     value={r}
                     control={<Radio />}
-                    checked={fileTypeChoice === r}
+                    checked={indexTypeChoice === r}
                     label={r}
                   />
                 ))}
