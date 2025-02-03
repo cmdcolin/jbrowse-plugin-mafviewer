@@ -3,7 +3,15 @@ import React from 'react'
 import { observer } from 'mobx-react'
 
 const Tree = observer(function ({ model }: { model: any }) {
-  const { hierarchy, showBranchLen } = model
+  const {
+    // this is needed for redrawing after zoom change, similar to react-msaview
+    // renderTreeCanvas
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    rowHeight: _rowHeight,
+
+    hierarchy,
+    showBranchLen,
+  } = model
 
   return (
     <>
