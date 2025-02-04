@@ -67,9 +67,20 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
 
         for (const [j, elt] of data.entries()) {
           const ad = elt.split(':')
-          const idx = ad[0]!.lastIndexOf('.')
-          const org = ad[0]!.slice(0, idx)
-          const last = ad[0]!.slice(idx + 1)
+          const ag = ad[0]!.split('.')
+          const [n1, n2 = '', ...rest] = ag
+          let org
+          let last = ''
+          if (ag.length === 2) {
+            org = n1
+            last = n2!
+          } else if (!Number.isNaN(+n2!)) {
+            org = `${n1}.${n2}`
+            last = rest.join('.')
+          } else {
+            org = n1
+            last = [n2, ...rest].join('.')
+          }
           if (org) {
             alignments[org] = {
               chr: last,
