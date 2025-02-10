@@ -1,26 +1,24 @@
-import PluginManager from '@jbrowse/core/PluginManager'
-import {
-  AnyConfigurationModel,
-  AnyConfigurationSchemaType,
-  ConfigurationReference,
-  getConf,
-} from '@jbrowse/core/configuration'
+import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
 import { getEnv, getSession } from '@jbrowse/core/util'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
-import { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
 import { ascending } from 'd3-array'
-import { type HierarchyNode, cluster, hierarchy } from 'd3-hierarchy'
+import { cluster, hierarchy } from 'd3-hierarchy'
 import { autorun } from 'mobx'
-import { Instance, addDisposer, isAlive, types } from 'mobx-state-tree'
+import { addDisposer, isAlive, types } from 'mobx-state-tree'
 
 import SetRowHeightDialog from './components/SetRowHeight'
-import {
-  NodeWithIds,
-  NodeWithIdsAndLength,
-  maxLength,
-  setBrLength,
-} from './types'
+import { maxLength, setBrLength } from './types'
 import { normalize } from '../util'
+
+import type { NodeWithIds, NodeWithIdsAndLength } from './types'
+import type PluginManager from '@jbrowse/core/PluginManager'
+import type {
+  AnyConfigurationModel,
+  AnyConfigurationSchemaType,
+} from '@jbrowse/core/configuration'
+import type { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view'
+import type { HierarchyNode } from 'd3-hierarchy'
+import type { Instance } from 'mobx-state-tree'
 
 interface Sample {
   id: string

@@ -7,7 +7,6 @@ import {
   isSessionModelWithWidgets,
   isSessionWithAddTracks,
 } from '@jbrowse/core/util'
-import { AddTrackModel } from '@jbrowse/plugin-data-management'
 import {
   Button,
   FormControl,
@@ -20,6 +19,8 @@ import {
 } from '@mui/material'
 import { getRoot } from 'mobx-state-tree'
 import { makeStyles } from 'tss-react/mui'
+
+import type { AddTrackModel } from '@jbrowse/plugin-data-management'
 
 const useStyles = makeStyles()(theme => ({
   textbox: {

@@ -1,10 +1,5 @@
 import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
-import {
-  Feature,
-  Region,
-  SimpleFeature,
-  updateStatus,
-} from '@jbrowse/core/util'
+import { SimpleFeature, updateStatus } from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { getSnapshot } from 'mobx-state-tree'
@@ -12,6 +7,9 @@ import { firstValueFrom, toArray } from 'rxjs'
 
 import parseNewick from '../parseNewick'
 import { normalize } from '../util'
+
+import type { BaseOptions } from '@jbrowse/core/data_adapters/BaseAdapter'
+import type { Feature, Region } from '@jbrowse/core/util'
 
 interface OrganismRecord {
   chr: string
@@ -56,7 +54,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
     return adapter.getHeader()
   }
 
-  getFeatures(query: Region) {
+  getFeatures(query: Region, opts?: BaseOptions) {
     const { statusCallback = () => {} } = opts || {}
     return ObservableCreate<Feature>(async observer => {
       const { adapter } = await this.setup()

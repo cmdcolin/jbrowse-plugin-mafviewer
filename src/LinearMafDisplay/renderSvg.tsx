@@ -1,14 +1,14 @@
 import React from 'react'
 
 import { getContainingView } from '@jbrowse/core/util'
-import {
+
+import YScaleBars from './components/YScaleBars'
+
+import type { LinearMafDisplayModel } from './stateModel'
+import type {
   ExportSvgDisplayOptions,
   LinearGenomeViewModel,
 } from '@jbrowse/plugin-linear-genome-view'
-
-// locals
-import YScaleBars from './components/YScaleBars'
-import { LinearMafDisplayModel } from './stateModel'
 
 export async function renderSvg(
   self: LinearMafDisplayModel,

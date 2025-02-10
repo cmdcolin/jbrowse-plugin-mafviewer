@@ -41,7 +41,6 @@ export default tseslint.config(
       ],
 
       'import/no-unresolved': 'off',
-      'import/named': 'off',
       'import/order': [
         'error',
         {
@@ -72,6 +71,7 @@ export default tseslint.config(
           pathGroupsExcludedImportTypes: ['react'],
         },
       ],
+
       'no-console': [
         'warn',
         {
