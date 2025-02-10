@@ -1,6 +1,14 @@
 import { unzip } from '@gmod/bgzf-filehandle'
-import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
-import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import {
+  BaseFeatureDataAdapter,
+  BaseOptions,
+} from '@jbrowse/core/data_adapters/BaseAdapter'
+import {
+  Feature,
+  Region,
+  SimpleFeature,
+  updateStatus,
+} from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import Long from 'long'
@@ -81,10 +89,15 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     return entries
   }
 
-  getFeatures(query: Region) {
+  getFeatures(query: Region, opts?: BaseOptions) {
+    const { statusCallback = () => {} } = opts || {}
     return ObservableCreate<Feature>(async observer => {
       try {
-        const lines = await this.getLines(query)
+        const lines = await updateStatus(
+          'Downloading alignment',
+          statusCallback,
+          () => this.getLines(query),
+        )
         const alignments = {} as Record<string, OrganismRecord>
 
         const k = lines.length

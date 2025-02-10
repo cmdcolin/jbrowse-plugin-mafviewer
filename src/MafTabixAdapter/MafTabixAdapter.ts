@@ -1,5 +1,13 @@
-import { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
-import { Feature, Region, SimpleFeature } from '@jbrowse/core/util'
+import {
+  BaseFeatureDataAdapter,
+  BaseOptions,
+} from '@jbrowse/core/data_adapters/BaseAdapter'
+import {
+  Feature,
+  Region,
+  SimpleFeature,
+  updateStatus,
+} from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { getSnapshot } from 'mobx-state-tree'
@@ -53,11 +61,14 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
     return adapter.getHeader()
   }
 
-  getFeatures(query: Region) {
+  getFeatures(query: Region, opts?: BaseOptions) {
+    const { statusCallback = () => {} } = opts || {}
     return ObservableCreate<Feature>(async observer => {
       const { adapter } = await this.setup()
-      const features = await firstValueFrom(
-        adapter.getFeatures(query).pipe(toArray()),
+      const features = await updateStatus(
+        'Downloading alignment',
+        statusCallback,
+        () => firstValueFrom(adapter.getFeatures(query).pipe(toArray())),
       )
 
       for (const feature of features) {
@@ -74,7 +85,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
           if (ag.length === 2) {
             org = n1
             last = n2!
-          } else if (!Number.isNaN(+n2!)) {
+          } else if (!Number.isNaN(+n2)) {
             org = `${n1}.${n2}`
             last = rest.join('.')
           } else {

@@ -2,7 +2,6 @@ import React from 'react'
 
 import { observer } from 'mobx-react'
 
-// locals
 import { LinearMafDisplayModel } from '../stateModel'
 import RectBg from './RectBg'
 import Tree from './Tree'
