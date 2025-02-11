@@ -1,6 +1,6 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
-import { Feature, featureSpanPx, updateStatus } from '@jbrowse/core/util'
+import { Feature, featureSpanPx } from '@jbrowse/core/util'
 
 import {
   fillRect,
@@ -20,6 +20,7 @@ interface RenderArgs extends RenderArgsDeserialized {
   showAllLetters: boolean
   mismatchRendering: boolean
   features: Map<string, Feature>
+  statusCallback?: (arg: string) => void
 }
 
 export function makeImageData({
@@ -64,9 +65,7 @@ export function makeImageData({
     const vals = feature.get('alignments') as Record<string, { data: string }>
     const seq = feature.get('seq').toLowerCase()
     const r = Object.entries(vals)
-    let i = 0
     for (const [sample, val] of r) {
-      statusCallback?.(`Rendering row ${i++}/${r.length}`)
       const origAlignment = val.data
       const alignment = origAlignment.toLowerCase()
 

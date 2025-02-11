@@ -52,7 +52,7 @@ const LinearMafDisplay = observer(function (props: {
     >
       <BaseLinearDisplayComponent {...props} />
       <YScaleBars model={model} />
-      {mouseY ? (
+      {mouseY && sources ? (
         <div style={{ position: 'relative' }}>
           <svg
             className={classes.cursor}

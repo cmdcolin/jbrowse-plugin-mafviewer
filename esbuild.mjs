@@ -119,7 +119,7 @@ if (process.env.NODE_ENV === 'production') {
       req.pipe(proxyReq, { end: true })
     })
     .listen(9000)
-  console.log(`Serving at http://${hosts[0]}:${port}`)
+  console.log(`Serving at http://${hosts[0]}:9000`)
 
   await ctx.watch()
   console.log('Watching files...')
