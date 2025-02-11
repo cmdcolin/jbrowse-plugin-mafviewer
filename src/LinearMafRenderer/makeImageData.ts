@@ -1,6 +1,6 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
-import { Feature, featureSpanPx } from '@jbrowse/core/util'
+import { Feature, featureSpanPx, measureText } from '@jbrowse/core/util'
 
 import { getColorBaseMap, getContrastBaseMap } from './util'
 
@@ -15,6 +15,14 @@ interface RenderArgs extends RenderArgsDeserialized {
   showAllLetters: boolean
   mismatchRendering: boolean
   features: Map<string, Feature>
+}
+
+// get width and height of chars the height is an approximation: width letter M
+// is approximately the height
+function getCharWidthHeight() {
+  const charWidth = measureText('A')
+  const charHeight = measureText('M') - 2
+  return { charWidth, charHeight }
 }
 
 export function makeImageData({
@@ -40,6 +48,8 @@ export function makeImageData({
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
   const contrastForBase = getContrastBaseMap(theme)
+
+  const { charHeight } = getCharWidthHeight()
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const scale = 1 / bpPerPx
   const f = 0.4
@@ -133,7 +143,9 @@ export function makeImageData({
               ctx.fillStyle = mismatchRendering
                 ? (contrastForBase[c] ?? 'white')
                 : 'black'
-              ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
+              if (rowHeight > charHeight) {
+                ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
+              }
             }
             o++
           }

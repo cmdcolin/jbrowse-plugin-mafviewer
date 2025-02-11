@@ -26,6 +26,13 @@ const configSchema = ConfigurationSchema(
         locationType: 'UriLocation',
       },
     },
+    /**
+     * #slot
+     */
+    refAssemblyName: {
+      type: 'string',
+      defaultValue: '',
+    },
     index: ConfigurationSchema('Index', {
       /**
        * #slot index.location

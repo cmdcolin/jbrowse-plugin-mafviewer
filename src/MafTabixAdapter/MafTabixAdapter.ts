@@ -28,7 +28,7 @@ interface OrganismRecord {
 export default class MafTabixAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<{ adapter: BaseFeatureDataAdapter }>
 
-  async setup() {
+  async setupPre() {
     const config = this.config
     if (!this.getSubAdapter) {
       throw new Error('no getSubAdapter available')
@@ -41,9 +41,9 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
       adapter: adapter.dataAdapter as BaseFeatureDataAdapter,
     }
   }
-  async setupPre() {
+  async setupPre2() {
     if (!this.setupP) {
-      this.setupP = this.setup().catch((e: unknown) => {
+      this.setupP = this.setupPre().catch((e: unknown) => {
         this.setupP = undefined
         throw e
       })
@@ -51,74 +51,100 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
     return this.setupP
   }
 
-  async getRefNames() {
-    const { adapter } = await this.setup()
+  async setup(opts?: BaseOptions) {
+    const { statusCallback = () => {} } = opts || {}
+    return updateStatus('Downloading index', statusCallback, () =>
+      this.setupPre2(),
+    )
+  }
+
+  async getRefNames(opts?: BaseOptions) {
+    const { adapter } = await this.setup(opts)
     return adapter.getRefNames()
   }
 
-  async getHeader() {
-    const { adapter } = await this.setup()
+  async getHeader(opts?: BaseOptions) {
+    const { adapter } = await this.setup(opts)
     return adapter.getHeader()
   }
 
   getFeatures(query: Region, opts?: BaseOptions) {
     const { statusCallback = () => {} } = opts || {}
     return ObservableCreate<Feature>(async observer => {
-      const { adapter } = await this.setup()
+      const { adapter } = await this.setup(opts)
       const features = await updateStatus(
-        'Downloading alignment',
+        'Downloading alignments',
         statusCallback,
         () => firstValueFrom(adapter.getFeatures(query).pipe(toArray())),
       )
 
-      for (const feature of features) {
-        const data = (feature.get('field5') as string).split(',')
-        const alignments = {} as Record<string, OrganismRecord>
-        const alns = data.map(elt => elt.split(':')[5])
+      await updateStatus('Processing alignments', statusCallback, () => {
+        let firstAssemblyNameFound = ''
+        const refAssemblyName = this.getConf('refAssemblyName')
+        for (const feature of features) {
+          const data = (feature.get('field5') as string).split(',')
+          const alignments = {} as Record<string, OrganismRecord>
 
-        for (const [j, elt] of data.entries()) {
-          const ad = elt.split(':')
-          const ag = ad[0]!.split('.')
-          const [n1, n2 = '', ...rest] = ag
-          let org
-          let last = ''
-          if (ag.length === 2) {
-            org = n1
-            last = n2!
-          } else if (!Number.isNaN(+n2)) {
-            org = `${n1}.${n2}`
-            last = rest.join('.')
-          } else {
-            org = n1
-            last = [n2, ...rest].join('.')
-          }
-          if (org) {
-            alignments[org] = {
-              chr: last,
-              start: +ad[1]!,
-              srcSize: +ad[2]!,
-              strand: ad[3] === '-' ? -1 : 1,
-              unknown: +ad[4]!,
-              data: alns[j]!,
+          for (let j = 0; j < data.length; j++) {
+            const elt = data[j]!
+            const seq = elt.split(':')[5]!
+            const ad = elt.split(':')
+            const ag = ad[0]!.split('.')
+            const [n1, n2 = '', ...rest] = ag
+            let assemblyName
+            let last = ''
+            if (ag.length === 2) {
+              assemblyName = n1
+              last = n2!
+            } else if (!Number.isNaN(+n2)) {
+              assemblyName = `${n1}.${n2}`
+              last = rest.join('.')
+            } else {
+              assemblyName = n1
+              last = [n2, ...rest].join('.')
+            }
+            if (assemblyName) {
+              firstAssemblyNameFound = firstAssemblyNameFound || assemblyName
+              alignments[assemblyName] = {
+                chr: last,
+                start: +ad[1]!,
+                srcSize: +ad[2]!,
+                strand: ad[3] === '-' ? -1 : 1,
+                unknown: +ad[4]!,
+                data: seq,
+              }
             }
           }
-        }
 
-        observer.next(
-          new SimpleFeature({
-            id: feature.id(),
-            data: {
-              start: feature.get('start'),
-              end: feature.get('end'),
-              refName: feature.get('refName'),
-              name: feature.get('name'),
-              score: feature.get('score'),
+          console.log(
+            {
               alignments,
-              seq: alns[0],
+              firstAssemblyNameFound,
+              refAssemblyName,
+              q: query.assemblyName,
             },
-          }),
-        )
-      }
+            alignments[refAssemblyName],
+            alignments[query.assemblyName],
+            alignments[firstAssemblyNameFound],
+          )
+          observer.next(
+            new SimpleFeature({
+              id: feature.id(),
+              data: {
+                start: feature.get('start'),
+                end: feature.get('end'),
+                refName: feature.get('refName'),
+                name: feature.get('name'),
+                score: feature.get('score'),
+                alignments,
+                seq:
+                  alignments[refAssemblyName || query.assemblyName]?.data ||
+                  alignments[firstAssemblyNameFound]?.data,
+              },
+            }),
+          )
+        }
+      })
       observer.complete()
     })
   }
