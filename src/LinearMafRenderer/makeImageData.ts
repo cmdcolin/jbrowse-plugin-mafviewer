@@ -40,7 +40,6 @@ export function makeImageData({
     samples,
     rowProportion,
     features,
-    statusCallback,
   } = renderArgs
   const region = regions[0]!
   const canvasWidth = (region.end - region.start) / bpPerPx

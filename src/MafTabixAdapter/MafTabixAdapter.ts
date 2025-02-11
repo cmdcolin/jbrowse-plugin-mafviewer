@@ -85,6 +85,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
 
+          // eslint-disable-next-line @typescript-eslint/prefer-for-of
           for (let j = 0; j < data.length; j++) {
             const elt = data[j]!
             const seq = elt.split(':')[5]!
@@ -116,17 +117,6 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
             }
           }
 
-          console.log(
-            {
-              alignments,
-              firstAssemblyNameFound,
-              refAssemblyName,
-              q: query.assemblyName,
-            },
-            alignments[refAssemblyName],
-            alignments[query.assemblyName],
-            alignments[firstAssemblyNameFound],
-          )
           observer.next(
             new SimpleFeature({
               id: feature.id(),

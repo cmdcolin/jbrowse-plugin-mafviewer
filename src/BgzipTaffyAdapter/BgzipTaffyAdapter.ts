@@ -17,9 +17,9 @@ import VirtualOffset from './virtualOffset'
 import parseNewick from '../parseNewick'
 import { normalize } from '../util'
 import { parseRowInstructions } from './rowInstructions'
+import { parseLineByLine } from './util'
 
 import type { IndexData, OrganismRecord } from './types'
-import { parseLineByLine } from './util'
 interface Entry {
   type: string
   row: number
@@ -101,7 +101,6 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
 
   getFeatures(query: Region, opts?: BaseOptions) {
     const { statusCallback = () => {} } = opts || {}
-    console.log(query.start, query.end, 'wtf')
     return ObservableCreate<Feature>(async observer => {
       try {
         const byteRanges = await this.setup()
