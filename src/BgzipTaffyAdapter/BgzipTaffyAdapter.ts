@@ -148,7 +148,6 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
                         srcSize: ins.length,
                         chr: ins.ref,
                         data: '',
-                        asm: ins.asm,
                       }
                     }
                     const e = alignments[ins.asm]!
@@ -231,8 +230,9 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     const file = openLocation(this.getConf('tafGzLocation'))
     const records = byteRanges[query.refName]
     if (records) {
-      let firstEntry = records[0]
+      let firstEntry
       let nextEntry
+
       // two pass:
       // first pass: find first block greater than query start, then -1 from
       // that
@@ -252,6 +252,9 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
       }
 
       nextEntry = nextEntry ?? records.at(-1)
+      // we NEED at least a firstEntry (validate behavior?) because othrwise it fetches whole
+      // file whn you request e.g. out of range region (e.g. taf in chr22:1-100
+      // and you are at chr22:200-300)
       if (firstEntry && nextEntry) {
         const response = await file.read(
           nextEntry.virtualOffset.blockPosition -
