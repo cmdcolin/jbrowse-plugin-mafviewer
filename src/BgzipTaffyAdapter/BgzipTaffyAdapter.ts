@@ -36,7 +36,7 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     return Object.keys(data)
   }
 
-  setup() {
+  setupPre() {
     if (!this.setupP) {
       this.setupP = this.readTaiFile().catch((e: unknown) => {
         this.setupP = undefined
@@ -44,6 +44,12 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
       })
     }
     return this.setupP
+  }
+  setup(opts?: BaseOptions) {
+    const { statusCallback = () => {} } = opts || {}
+    return updateStatus('Downloading index', statusCallback, () =>
+      this.setupPre(),
+    )
   }
 
   async readTaiFile() {
@@ -93,10 +99,11 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     const { statusCallback = () => {} } = opts || {}
     return ObservableCreate<Feature>(async observer => {
       try {
+        const byteRanges = await this.setup()
         const lines = await updateStatus(
-          'Downloading alignment',
+          'Downloading alignments',
           statusCallback,
-          () => this.getLines(query),
+          () => this.getLines(query, byteRanges),
         )
         const alignments = {} as Record<string, OrganismRecord>
 
@@ -201,10 +208,8 @@ export default class BgzipTaffyAdapter extends BaseFeatureDataAdapter {
     }
   }
 
-  async getLines(query: Region) {
-    const byteRanges = await this.setup()
+  async getLines(query: Region, byteRanges: IndexData) {
     const file = openLocation(this.getConf('tafGzLocation'))
-
     const decoder = new TextDecoder('utf8')
     const records = byteRanges[query.refName]
     if (records) {
