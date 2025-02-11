@@ -5,6 +5,7 @@ import { ascending } from 'd3-array'
 import { cluster, hierarchy } from 'd3-hierarchy'
 import { autorun } from 'mobx'
 import { addDisposer, isAlive, types } from 'mobx-state-tree'
+import deepEqual from 'fast-deep-equal'
 
 import SetRowHeightDialog from './components/SetRowHeight'
 import { maxLength, setBrLength } from './types'
@@ -88,11 +89,11 @@ export default function stateModelFactory(
       /**
        * #volatile
        */
-      volatileSamples: [] as Sample[],
+      volatileSamples: undefined as Sample[] | undefined,
       /**
        * #volatile
        */
-      tree: undefined as any,
+      volatileTree: undefined as any,
     }))
     .actions(self => ({
       /**
@@ -123,8 +124,12 @@ export default function stateModelFactory(
        * #action
        */
       setSamples({ samples, tree }: { samples: Sample[]; tree: unknown }) {
-        self.volatileSamples = samples
-        self.tree = tree
+        if (!deepEqual(samples, self.volatileSamples)) {
+          self.volatileSamples = samples
+        }
+        if (!deepEqual(tree, self.volatileTree)) {
+          self.volatileTree = tree
+        }
       },
     }))
     .views(self => ({
@@ -157,8 +162,8 @@ export default function stateModelFactory(
        * #getter
        */
       get root() {
-        return self.tree
-          ? hierarchy(self.tree, d => d.children)
+        return self.volatileTree
+          ? hierarchy(self.volatileTree, d => d.children)
               // todo: investigate whether needed, typescript says children always true
               .sum(d => (d.children ? 0 : 1))
               .sort((a, b) => ascending(a.data.length || 1, b.data.length || 1))
@@ -194,7 +199,7 @@ export default function stateModelFactory(
        * #getter
        */
       get totalHeight() {
-        return this.samples.length * self.rowHeight
+        return this.samples ? this.samples.length * self.rowHeight : 1
       },
       /**
        * #getter
@@ -235,8 +240,11 @@ export default function stateModelFactory(
             rowProportion,
             mismatchRendering,
           } = self
+          const s = superRenderProps()
           return {
-            ...superRenderProps(),
+            ...s,
+            notReady:
+              !self.volatileSamples || !self.volatileTree || super.notReady,
             config: rendererConfig,
             samples,
             rowHeight,

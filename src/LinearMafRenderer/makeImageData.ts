@@ -1,8 +1,13 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
-import { Feature, featureSpanPx, measureText } from '@jbrowse/core/util'
+import { Feature, featureSpanPx, updateStatus } from '@jbrowse/core/util'
 
-import { getColorBaseMap, getContrastBaseMap } from './util'
+import {
+  fillRect,
+  getCharWidthHeight,
+  getColorBaseMap,
+  getContrastBaseMap,
+} from './util'
 
 interface Sample {
   id: string
@@ -15,14 +20,6 @@ interface RenderArgs extends RenderArgsDeserialized {
   showAllLetters: boolean
   mismatchRendering: boolean
   features: Map<string, Feature>
-}
-
-// get width and height of chars the height is an approximation: width letter M
-// is approximately the height
-function getCharWidthHeight() {
-  const charWidth = measureText('A')
-  const charHeight = measureText('M') - 2
-  return { charWidth, charHeight }
 }
 
 export function makeImageData({
@@ -42,8 +39,10 @@ export function makeImageData({
     samples,
     rowProportion,
     features,
+    statusCallback,
   } = renderArgs
   const region = regions[0]!
+  const canvasWidth = (region.end - region.start) / bpPerPx
   const h = rowHeight * rowProportion
   const theme = createJBrowseTheme(configTheme)
   const colorForBase = getColorBaseMap(theme)
@@ -64,7 +63,10 @@ export function makeImageData({
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
     const vals = feature.get('alignments') as Record<string, { data: string }>
     const seq = feature.get('seq').toLowerCase()
-    for (const [sample, val] of Object.entries(vals)) {
+    const r = Object.entries(vals)
+    let i = 0
+    for (const [sample, val] of r) {
+      statusCallback?.(`Rendering row ${i++}/${r.length}`)
       const origAlignment = val.data
       const alignment = origAlignment.toLowerCase()
 
@@ -92,19 +94,17 @@ export function makeImageData({
 
       if (!showAllLetters) {
         // matches
-        ctx.beginPath()
         ctx.fillStyle = 'lightgrey'
         for (let i = 0, o = 0; i < alignment.length; i++) {
           if (seq[i] !== '-') {
             const c = alignment[i]
             const l = leftPx + scale * o
             if (seq[i] === c && c !== '-') {
-              ctx.rect(l, offset + t, scale + f, h)
+              fillRect(ctx, l, offset + t, scale + f, h, canvasWidth)
             }
             o++
           }
         }
-        ctx.fill()
       }
 
       // mismatches
@@ -114,17 +114,31 @@ export function makeImageData({
           if (c !== '-') {
             const l = leftPx + scale * o
             if (seq[i] !== c && c !== ' ') {
-              ctx.fillStyle = mismatchRendering
-                ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                  (colorForBase[c as keyof typeof colorForBase] ?? 'black')
-                : 'orange'
-              ctx.fillRect(l, offset + t, scale + f, h)
+              fillRect(
+                ctx,
+                l,
+                offset + t,
+                scale + f,
+                h,
+                canvasWidth,
+                mismatchRendering
+                  ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                  : 'orange',
+              )
             } else if (showAllLetters) {
-              ctx.fillStyle = mismatchRendering
-                ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                  (colorForBase[c as keyof typeof colorForBase] ?? 'black')
-                : 'lightblue'
-              ctx.fillRect(l, offset + t, scale + f, h)
+              fillRect(
+                ctx,
+                l,
+                offset + t,
+                scale + f,
+                h,
+                canvasWidth,
+                mismatchRendering
+                  ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                  : 'lightblue',
+              )
             }
           }
           o++

@@ -7,7 +7,12 @@ function x() {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const configSchema = ConfigurationSchema(
   'LinearMafRenderer',
-  {},
+  {
+    baseColor: {
+      type: 'color',
+      defaultValue: 'lightgrey',
+    },
+  },
   {
     /**
      * #baseConfiguration

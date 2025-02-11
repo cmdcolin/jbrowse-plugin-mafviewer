@@ -15,7 +15,7 @@ const ColorLegend = observer(function ({
   svgFontSize: number
   labelWidth: number
 }) {
-  const { totalHeight, treeWidth, samples, rowHeight } = model
+  const { totalHeight, treeWidth, samples = [], rowHeight } = model
   const canDisplayLabel = rowHeight >= 8
   const boxHeight = Math.min(20, rowHeight)
 

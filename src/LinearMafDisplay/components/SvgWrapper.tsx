@@ -18,7 +18,7 @@ const SvgWrapper = observer(function ({
   if (exportSVG) {
     return <>{children}</>
   } else {
-    const { rowHeight, samples } = model
+    const { totalHeight } = model
     return (
       <svg
         style={{
@@ -26,7 +26,7 @@ const SvgWrapper = observer(function ({
           top: 0,
           left: 0,
           pointerEvents: 'none',
-          height: samples.length * rowHeight,
+          height: totalHeight,
           width: getContainingView(model).width,
         }}
       >

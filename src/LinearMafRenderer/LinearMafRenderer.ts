@@ -71,8 +71,10 @@ export default class LinearMafRenderer extends FeatureRendererType {
     return {
       ...results,
       ...res,
+      features: new Map(),
       width,
       height,
+      containsNoTransferables: true,
     }
   }
 }
