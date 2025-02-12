@@ -97,7 +97,7 @@ export function makeImageData({
           if (seq[i] !== '-') {
             const c = alignment[i]
             const l = leftPx + scale * o
-            if (seq[i] === c && c !== '-') {
+            if (seq[i] === c && c !== '-' && c !== ' ') {
               fillRect(ctx, l, offset + t, scale + f, h, canvasWidth)
             }
             o++
@@ -183,8 +183,6 @@ export function makeImageData({
 
       const t = rowHeight * row
 
-      ctx.beginPath()
-      ctx.fillStyle = 'purple'
       for (let i = 0, o = 0; i < alignment.length; i++) {
         let ins = ''
         while (seq[i] === '-') {
@@ -227,16 +225,15 @@ export function makeImageData({
               )
             }
           } else {
-            ctx.rect(l, offset + t, 1, h)
+            fillRect(ctx, l, offset + t, 1, h, canvasWidth, 'purple')
             if (bpPerPx < 0.2 && rowHeight > 5) {
-              ctx.rect(l - 2, offset + t, 5, 1)
-              ctx.rect(l - 2, offset + t + h - 1, 5, 1)
+              fillRect(ctx, l - 2, offset + t, 5, 1, canvasWidth)
+              fillRect(ctx, l - 2, offset + t + h - 1, 5, 1, canvasWidth)
             }
           }
         }
         o++
       }
-      ctx.fill()
     }
   }
 }

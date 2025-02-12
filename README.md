@@ -94,7 +94,12 @@ can use nhLocation or samples array on adapter
 
 ### Example BgzipTaffyAdapter config
 
-can use nhLocation or samples array on adapter
+Note: TAF files are actually significantly slower in practice to use, because of
+how it is encoded
+
+This notice will be removed it it is improved
+
+As with other adapters, you can use nhLocation or samples array on adapter
 
 ```json
 {
