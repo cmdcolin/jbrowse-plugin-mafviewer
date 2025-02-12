@@ -94,8 +94,8 @@ can use nhLocation or samples array on adapter
 
 ### Example BgzipTaffyAdapter config
 
-Note: TAF files are actually significantly slower in practice to use, because of
-how it is encoded
+Note: TAF files are actually significantly slower and has known bugs...will
+update once fixed
 
 This notice will be removed it it is improved
 

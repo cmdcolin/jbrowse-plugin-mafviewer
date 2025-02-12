@@ -69,17 +69,15 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
               setFileTypeChoice(event.target.value as AdapterTypeOptions)
             }}
           >
-            {['BigMafAdapter', 'MafTabixAdapter', 'BgzipTaffyAdapter'].map(
-              r => (
-                <FormControlLabel
-                  key={r}
-                  value={r}
-                  control={<Radio />}
-                  checked={fileTypeChoice === r}
-                  label={r}
-                />
-              ),
-            )}
+            {['BigMafAdapter', 'MafTabixAdapter'].map(r => (
+              <FormControlLabel
+                key={r}
+                value={r}
+                control={<Radio />}
+                checked={fileTypeChoice === r}
+                label={r}
+              />
+            ))}
           </RadioGroup>
         </FormControl>
         {fileTypeChoice === 'BigMafAdapter' ? (
