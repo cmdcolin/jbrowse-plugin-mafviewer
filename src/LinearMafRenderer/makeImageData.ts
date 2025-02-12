@@ -197,7 +197,7 @@ export function makeImageData({
           const l = leftPx + scale * o - 1
 
           ctx.rect(l, offset + t, 1, h)
-          if (bpPerPx < 1) {
+          if (bpPerPx < 0.2 && rowHeight > 5) {
             ctx.rect(l - 2, offset + t, 5, 1)
             ctx.rect(l - 2, offset + t + h - 1, 5, 1)
           }
