@@ -7,7 +7,7 @@ const RectBg = (props: {
   height: number
   color?: string
 }) => {
-  const { color = 'rgb(255,255,255,0.8)' } = props
+  const { color = 'rgb(255,255,255,0.5)' } = props
   return <rect {...props} fill={color} />
 }
 

@@ -43,10 +43,10 @@ const ColorLegend = observer(function ({
           ? samples.map((sample, idx) => (
               <text
                 key={`${sample.id}-${idx}`}
-                y={idx * rowHeight + rowHeight / 2}
                 dominantBaseline="middle"
-                x={2}
                 fontSize={svgFontSize}
+                x={2}
+                y={idx * rowHeight + rowHeight / 2}
               >
                 {sample.label}
               </text>

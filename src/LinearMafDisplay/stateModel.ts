@@ -244,7 +244,7 @@ export default function stateModelFactory(
           return {
             ...s,
             notReady:
-              !self.volatileSamples || !self.volatileTree || super.notReady,
+              (!self.volatileSamples && !self.volatileTree) || super.notReady,
             config: rendererConfig,
             samples,
             rowHeight,
@@ -260,16 +260,36 @@ export default function stateModelFactory(
           return [
             ...superTrackMenuItems(),
             {
-              label: 'Set row height',
-              onClick: () => {
-                getSession(self).queueDialog(handleClose => [
-                  SetRowHeightDialog,
-                  {
-                    model: self,
-                    handleClose,
+              label: 'Set feature height',
+              type: 'subMenu',
+              subMenu: [
+                {
+                  label: 'Normal',
+                  onClick: () => {
+                    self.setRowHeight(15)
+                    self.setRowProportion(0.8)
                   },
-                ])
-              },
+                },
+                {
+                  label: 'Compact',
+                  onClick: () => {
+                    self.setRowHeight(8)
+                    self.setRowProportion(0.9)
+                  },
+                },
+                {
+                  label: 'Manually set height',
+                  onClick: () => {
+                    getSession(self).queueDialog(handleClose => [
+                      SetRowHeightDialog,
+                      {
+                        model: self,
+                        handleClose,
+                      },
+                    ])
+                  },
+                },
+              ],
             },
             {
               label: 'Show all letters',
