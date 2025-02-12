@@ -1,6 +1,6 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
-import { Feature, featureSpanPx } from '@jbrowse/core/util'
+import { Feature, featureSpanPx, measureText } from '@jbrowse/core/util'
 
 import {
   fillRect,
@@ -196,10 +196,42 @@ export function makeImageData({
         if (ins.length > 0) {
           const l = leftPx + scale * o - 1
 
-          ctx.rect(l, offset + t, 1, h)
-          if (bpPerPx < 0.2 && rowHeight > 5) {
-            ctx.rect(l - 2, offset + t, 5, 1)
-            ctx.rect(l - 2, offset + t + h - 1, 5, 1)
+          if (ins.length > 10) {
+            const txt = `${ins.length}`
+            if (bpPerPx > 10) {
+              fillRect(ctx, l - 1, t, 2, h, canvasWidth, 'purple')
+            } else if (h > charHeight) {
+              const rwidth = measureText(txt)
+              const padding = 5
+              fillRect(
+                ctx,
+                l - rwidth / 2 - padding,
+                t,
+                rwidth + 2 * padding,
+                h,
+                canvasWidth,
+                'purple',
+              )
+              ctx.fillStyle = 'white'
+              ctx.fillText(txt, l - rwidth / 2, t + h)
+            } else {
+              const padding = 2
+              fillRect(
+                ctx,
+                l - padding,
+                t,
+                2 * padding,
+                h,
+                canvasWidth,
+                'purple',
+              )
+            }
+          } else {
+            ctx.rect(l, offset + t, 1, h)
+            if (bpPerPx < 0.2 && rowHeight > 5) {
+              ctx.rect(l - 2, offset + t, 5, 1)
+              ctx.rect(l - 2, offset + t + h - 1, 5, 1)
+            }
           }
         }
         o++
