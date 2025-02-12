@@ -42,7 +42,7 @@ export default class LinearMafRenderer extends FeatureRendererType {
       rowHeight,
     } = renderProps
     const region = regions[0]!
-    const height = samples.length * (rowHeight + 1) + 100
+    const height = samples.length * rowHeight + 100
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
     const res = await renderToAbstractCanvas(
