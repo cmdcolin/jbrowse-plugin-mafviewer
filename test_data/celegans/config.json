@@ -47,6 +47,31 @@
         }
       },
       "assemblyNames": ["ce10"]
+    },
+    {
+      "type": "MafTrack",
+      "trackId": "chrI.bed2",
+      "name": "chrI.bed2",
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "samples": [
+          { "id": "ce10", "label": "Ce10", "color": "green" },
+          { "id": "cb4", "label": "Cb4", "color": "red" },
+          { "id": "caeSp111", "label": "CaeSp111", "color": "pink" },
+          { "id": "caeRem4", "label": "CaeRem4", "color": "blue" },
+          { "id": "caeJap4", "label": "CaeJap4", "color": "purple" },
+          { "id": "caePb3", "label": "CaePb3", "color": "orange" }
+        ],
+        "bedGzLocation": {
+          "uri": "chrI.bed.gz"
+        },
+        "index": {
+          "location": {
+            "uri": "chrI.bed.gz.tbi"
+          }
+        }
+      },
+      "assemblyNames": ["ce10"]
     }
   ]
 }
