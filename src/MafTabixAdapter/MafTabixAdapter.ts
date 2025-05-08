@@ -81,11 +81,12 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
       await updateStatus('Processing alignments', statusCallback, () => {
         let firstAssemblyNameFound = ''
         const refAssemblyName = this.getConf('refAssemblyName')
+        let i = 0
         for (const feature of features) {
+          i++
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
 
-          // eslint-disable-next-line @typescript-eslint/prefer-for-of
           for (let j = 0; j < data.length; j++) {
             const elt = data[j]!
             const seq = elt.split(':')[5]!
@@ -106,6 +107,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
             }
             if (assemblyName) {
               firstAssemblyNameFound = firstAssemblyNameFound || assemblyName
+
               alignments[assemblyName] = {
                 chr: last,
                 start: +ad[1]!,
@@ -116,6 +118,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
               }
             }
           }
+          console.log({ alignments })
 
           observer.next(
             new SimpleFeature({

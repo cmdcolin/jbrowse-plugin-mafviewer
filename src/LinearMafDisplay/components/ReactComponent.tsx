@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 
-import BaseTooltip from '@jbrowse/core/ui/BaseTooltip'
-import SanitizedHTML from '@jbrowse/core/ui/SanitizedHTML'
+import BaseTooltip from '../../BaseTooltip'
+import { SanitizedHTML } from '@jbrowse/core/ui'
 import { getContainingView, getEnv } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 import { makeStyles } from 'tss-react/mui'

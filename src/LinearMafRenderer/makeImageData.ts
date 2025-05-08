@@ -120,8 +120,7 @@ export function makeImageData({
                 h,
                 canvasWidth,
                 mismatchRendering
-                  ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                    (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                  ? (colorForBase[c as keyof typeof colorForBase] ?? 'black')
                   : 'orange',
               )
             } else if (showAllLetters) {
@@ -133,8 +132,7 @@ export function makeImageData({
                 h,
                 canvasWidth,
                 mismatchRendering
-                  ? // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                    (colorForBase[c as keyof typeof colorForBase] ?? 'black')
+                  ? (colorForBase[c as keyof typeof colorForBase] ?? 'black')
                   : 'lightblue',
               )
             }

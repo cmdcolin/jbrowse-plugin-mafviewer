@@ -7,10 +7,10 @@
   ],
   "assemblies": [
     {
-      "name": "c_elegans",
+      "name": "ce10",
       "sequence": {
         "type": "ReferenceSequenceTrack",
-        "trackId": "c_elegans-ReferenceSequenceTrack",
+        "trackId": "ce10-ReferenceSequenceTrack",
         "adapter": {
           "type": "BgzipFastaAdapter",
           "fastaLocation": {
@@ -46,7 +46,7 @@
           }
         }
       },
-      "assemblyNames": ["c_elegans"]
+      "assemblyNames": ["ce10"]
     }
   ]
 }
