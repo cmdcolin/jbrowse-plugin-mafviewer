@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react'
 
-import BaseTooltip from '../../BaseTooltip'
 import { SanitizedHTML } from '@jbrowse/core/ui'
 import { getContainingView, getEnv } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 import { makeStyles } from 'tss-react/mui'
 
 import YScaleBars from './YScaleBars'
+import BaseTooltip from '../../BaseTooltip'
 import { LinearMafDisplayModel } from '../stateModel'
 
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
