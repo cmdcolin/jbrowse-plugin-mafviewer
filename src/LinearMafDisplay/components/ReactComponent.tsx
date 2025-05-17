@@ -6,7 +6,7 @@ import { observer } from 'mobx-react'
 import { makeStyles } from 'tss-react/mui'
 
 import YScaleBars from './YScaleBars'
-import BaseTooltip from '../../BaseTooltip'
+import BaseTooltip from '@jbrowse/core/ui/BaseTooltip'
 import { LinearMafDisplayModel } from '../stateModel'
 
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
