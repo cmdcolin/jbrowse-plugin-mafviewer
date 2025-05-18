@@ -26,12 +26,13 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
     if (!this.getSubAdapter) {
       throw new Error('no getSubAdapter available')
     }
-    const adapter = await this.getSubAdapter({
-      ...getSnapshot(this.config),
-      type: 'BigBedAdapter',
-    })
     return {
-      adapter: adapter.dataAdapter as BaseFeatureDataAdapter,
+      adapter: (
+        await this.getSubAdapter({
+          ...getSnapshot(this.config),
+          type: 'BigBedAdapter',
+        })
+      ).dataAdapter as BaseFeatureDataAdapter,
     }
   }
   async setupPre() {
