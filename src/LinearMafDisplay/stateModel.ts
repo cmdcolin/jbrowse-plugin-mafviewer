@@ -22,7 +22,7 @@ import type { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view
 import type { HierarchyNode } from 'd3-hierarchy'
 import type { Instance } from 'mobx-state-tree'
 
-const SetRowHeightDialog = lazy(() => import('./components/SetRowHeight'))
+const SetRowHeightDialog = lazy(() => import('./components/SetRowHeightDialog'))
 
 /**
  * #stateModel LinearMafDisplay
@@ -190,8 +190,20 @@ export default function stateModelFactory(
        * #getter
        */
       get samples() {
-        return this.rowNames ? normalize(this.rowNames) : self.volatileSamples
+        if (this.rowNames) {
+          const volatileSamplesMap = self.volatileSamples
+            ? Object.fromEntries(self.volatileSamples.map(e => [e.id, e]))
+            : undefined
+          return normalize(this.rowNames).map(r => ({
+            ...r,
+            label: volatileSamplesMap?.[r.id]?.label || r.label,
+            color: volatileSamplesMap?.[r.id]?.color || r.color,
+          }))
+        } else {
+          return self.volatileSamples
+        }
       },
+
       /**
        * #getter
        */
@@ -309,12 +321,21 @@ export default function stateModelFactory(
       }
     })
     .views(self => ({
+      /**
+       * #getter
+       */
       get svgFontSize() {
         return Math.min(Math.max(self.rowHeight, 8), 14)
       },
+      /**
+       * #getter
+       */
       get canDisplayLabel() {
         return self.rowHeight >= 7
       },
+      /**
+       * #getter
+       */
       get labelWidth() {
         const minWidth = 20
         return max(
@@ -333,11 +354,8 @@ export default function stateModelFactory(
             try {
               const { rpcManager } = getSession(self)
               const sessionId = getRpcSessionId(self)
-
-              const results = (await rpcManager.call(
-                sessionId,
-                'MafGetSamples',
-                {
+              self.setSamples(
+                (await rpcManager.call(sessionId, 'MafGetSamples', {
                   sessionId,
                   adapterConfig: self.adapterConfig,
                   statusCallback: (message: string) => {
@@ -345,9 +363,8 @@ export default function stateModelFactory(
                       self.setMessage(message)
                     }
                   },
-                },
-              )) as any
-              self.setSamples(results)
+                })) as { samples: Sample[]; tree: unknown },
+              )
             } catch (e) {
               console.error(e)
               getSession(self).notifyError(`${e}`, e)
