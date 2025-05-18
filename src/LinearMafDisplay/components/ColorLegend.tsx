@@ -2,21 +2,25 @@ import React from 'react'
 
 import { observer } from 'mobx-react'
 
-import { LinearMafDisplayModel } from '../stateModel'
 import RectBg from './RectBg'
 import Tree from './Tree'
 
+import type { LinearMafDisplayModel } from '../stateModel'
+
 const ColorLegend = observer(function ({
   model,
-  labelWidth,
-  svgFontSize,
 }: {
   model: LinearMafDisplayModel
-  svgFontSize: number
-  labelWidth: number
 }) {
-  const { totalHeight, treeWidth, samples = [], rowHeight } = model
-  const canDisplayLabel = rowHeight >= 8
+  const {
+    labelWidth,
+    canDisplayLabel,
+    totalHeight,
+    treeWidth,
+    samples = [],
+    rowHeight,
+    svgFontSize,
+  } = model
   const boxHeight = Math.min(20, rowHeight)
 
   return (

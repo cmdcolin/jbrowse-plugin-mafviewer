@@ -2,7 +2,9 @@ import React from 'react'
 
 import { observer } from 'mobx-react'
 
-const Tree = observer(function ({ model }: { model: any }) {
+import type { LinearMafDisplayModel } from '../stateModel'
+
+const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
   const {
     // this is needed for redrawing after zoom change, similar to react-msaview
     // renderTreeCanvas
@@ -20,7 +22,9 @@ const Tree = observer(function ({ model }: { model: any }) {
             const { source, target } = link
             const sy = source.x!
             const ty = target.x!
+            // @ts-expect-error
             const tx = showBranchLen ? target.len : target.y
+            // @ts-expect-error
             const sx = showBranchLen ? source.len : source.y
 
             // 1d line intersection to check if line crosses block at all, this is

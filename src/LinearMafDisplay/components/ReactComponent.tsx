@@ -7,8 +7,8 @@ import { observer } from 'mobx-react'
 import { makeStyles } from 'tss-react/mui'
 
 import YScaleBars from './YScaleBars'
-import { LinearMafDisplayModel } from '../stateModel'
 
+import type { LinearMafDisplayModel } from '../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const useStyles = makeStyles()({

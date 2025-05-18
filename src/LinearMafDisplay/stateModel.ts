@@ -1,5 +1,7 @@
+import { lazy } from 'react'
+
 import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
-import { getEnv, getSession } from '@jbrowse/core/util'
+import { getEnv, getSession, max, measureText } from '@jbrowse/core/util'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { ascending } from 'd3-array'
 import { cluster, hierarchy } from 'd3-hierarchy'
@@ -7,11 +9,10 @@ import deepEqual from 'fast-deep-equal'
 import { autorun } from 'mobx'
 import { addDisposer, isAlive, types } from 'mobx-state-tree'
 
-import SetRowHeightDialog from './components/SetRowHeight'
-import { maxLength, setBrLength } from './types'
+import { maxLength, setBrLength } from './util'
 import { normalize } from '../util'
 
-import type { NodeWithIds, NodeWithIdsAndLength } from './types'
+import type { NodeWithIds, NodeWithIdsAndLength, Sample } from './types'
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type {
   AnyConfigurationModel,
@@ -21,11 +22,7 @@ import type { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view
 import type { HierarchyNode } from 'd3-hierarchy'
 import type { Instance } from 'mobx-state-tree'
 
-interface Sample {
-  id: string
-  label: string
-  color?: string
-}
+const SetRowHeightDialog = lazy(() => import('./components/SetRowHeight'))
 
 /**
  * #stateModel LinearMafDisplay
@@ -311,6 +308,23 @@ export default function stateModelFactory(
         },
       }
     })
+    .views(self => ({
+      get svgFontSize() {
+        return Math.min(Math.max(self.rowHeight, 8), 14)
+      },
+      get canDisplayLabel() {
+        return self.rowHeight >= 7
+      },
+      get labelWidth() {
+        const minWidth = 20
+        return max(
+          self.samples
+            ?.map(s => measureText(s.label, this.svgFontSize))
+            .map(width => (this.canDisplayLabel ? width : minWidth)) || [],
+          0,
+        )
+      },
+    }))
     .actions(self => ({
       afterCreate() {
         addDisposer(
