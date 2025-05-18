@@ -13,15 +13,7 @@
         "trackId": "ce10-ReferenceSequenceTrack",
         "adapter": {
           "type": "BgzipFastaAdapter",
-          "fastaLocation": {
-            "uri": "chrI.fa.gz"
-          },
-          "faiLocation": {
-            "uri": "chrI.fa.gz.fai"
-          },
-          "gziLocation": {
-            "uri": "chrI.fa.gz.gzi"
-          }
+          "uri": "chrI.fa.gz"
         }
       }
     }
@@ -37,23 +29,17 @@
       "adapter": {
         "type": "MafTabixAdapter",
         "samples": ["ce10", "cb4", "caeSp111", "caeRem4", "caeJap4", "caePb3"],
-        "bedGzLocation": {
-          "uri": "chrI.bed.gz"
-        },
-        "index": {
-          "location": {
-            "uri": "chrI.bed.gz.tbi"
-          }
-        }
+        "uri": "chrI.bed.gz"
       },
       "assemblyNames": ["ce10"]
     },
     {
       "type": "MafTrack",
-      "trackId": "chrI.bed2",
-      "name": "chrI.bed2",
+      "trackId": "chrI_newick_color",
+      "name": "chrI w/ newick and color",
       "adapter": {
         "type": "MafTabixAdapter",
+        "nhUri": "ce10.7way.nh",
         "samples": [
           { "id": "ce10", "label": "Ce10", "color": "green" },
           { "id": "cb4", "label": "Cb4", "color": "red" },
@@ -62,14 +48,18 @@
           { "id": "caeJap4", "label": "CaeJap4", "color": "purple" },
           { "id": "caePb3", "label": "CaePb3", "color": "orange" }
         ],
-        "bedGzLocation": {
-          "uri": "chrI.bed.gz"
-        },
-        "index": {
-          "location": {
-            "uri": "chrI.bed.gz.tbi"
-          }
-        }
+        "uri": "chrI.bed.gz"
+      },
+      "assemblyNames": ["ce10"]
+    },
+    {
+      "type": "MafTrack",
+      "trackId": "chrI_newick",
+      "name": "chrI w/ newick",
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "nhUri": "ce10.7way.nh",
+        "uri": "chrI.bed.gz"
       },
       "assemblyNames": ["ce10"]
     }

@@ -63,7 +63,35 @@ const configSchema = ConfigurationSchema(
       },
     },
   },
-  { explicitlyTyped: true },
+  {
+    explicitlyTyped: true,
+    preProcessSnapshot: snap => {
+      // populate from just snap.uri
+      return snap.uri
+        ? {
+            ...snap,
+            ...(snap.nhUri
+              ? {
+                  nhLocation: {
+                    uri: snap.nhUri,
+                    baseUri: snap.baseUri,
+                  },
+                }
+              : {}),
+            bedGzLocation: {
+              uri: snap.uri,
+              baseUri: snap.baseUri,
+            },
+            index: {
+              location: {
+                uri: `${snap.uri}.tbi`,
+                baseUri: snap.baseUri,
+              },
+            },
+          }
+        : snap
+    },
+  },
 )
 
 export default configSchema

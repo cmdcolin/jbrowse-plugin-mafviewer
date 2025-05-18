@@ -29,16 +29,16 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<{ adapter: BaseFeatureDataAdapter }>
 
   async setupPre() {
-    const config = this.config
     if (!this.getSubAdapter) {
       throw new Error('no getSubAdapter available')
     }
-    const adapter = await this.getSubAdapter({
-      ...getSnapshot(config),
-      type: 'BedTabixAdapter',
-    })
     return {
-      adapter: adapter.dataAdapter as BaseFeatureDataAdapter,
+      adapter: (
+        await this.getSubAdapter({
+          ...getSnapshot(this.config),
+          type: 'BedTabixAdapter',
+        })
+      ).dataAdapter as BaseFeatureDataAdapter,
     }
   }
   async setupPre2() {
@@ -86,7 +86,8 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
           const alignments = {} as Record<string, OrganismRecord>
 
           // eslint-disable-next-line @typescript-eslint/prefer-for-of
-          for (let j = 0; j < data.length; j++) {
+          const len = data.length
+          for (let j = 0; j < len; j++) {
             const elt = data[j]!
             const seq = elt.split(':')[5]!
             const ad = elt.split(':')

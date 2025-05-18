@@ -45,22 +45,17 @@ export default class LinearMafRenderer extends FeatureRendererType {
     const height = samples.length * rowHeight + 100
     const width = (region.end - region.start) / bpPerPx
     const features = await this.getFeatures(renderProps)
-    const res = await renderToAbstractCanvas(
-      width,
-      height,
-      renderProps,
-      async ctx => {
-        await updateStatus('Rendering alignment', statusCallback, () => {
-          makeImageData({
-            ctx,
-            renderArgs: {
-              ...renderProps,
-              features,
-            },
-          })
+    const res = await updateStatus('Rendering alignment', statusCallback, () =>
+      renderToAbstractCanvas(width, height, renderProps, ctx => {
+        makeImageData({
+          ctx,
+          renderArgs: {
+            ...renderProps,
+            features,
+          },
         })
         return undefined
-      },
+      }),
     )
     const results = await super.render({
       ...renderProps,

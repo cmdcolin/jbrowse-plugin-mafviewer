@@ -74,11 +74,12 @@ export function makeImageData({
       }
 
       const t = rowHeight * row
+      const t2 = offset + t
 
       // gaps
       ctx.beginPath()
       ctx.fillStyle = 'black'
-      for (let i = 0, o = 0; i < alignment.length; i++) {
+      for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
         if (seq[i] !== '-') {
           if (alignment[i] === '-') {
             const l = leftPx + scale * o
@@ -93,12 +94,12 @@ export function makeImageData({
       if (!showAllLetters) {
         // matches
         ctx.fillStyle = 'lightgrey'
-        for (let i = 0, o = 0; i < alignment.length; i++) {
+        for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
           if (seq[i] !== '-') {
             const c = alignment[i]
             const l = leftPx + scale * o
             if (seq[i] === c && c !== '-' && c !== ' ') {
-              fillRect(ctx, l, offset + t, scale + f, h, canvasWidth)
+              fillRect(ctx, l, t2, scale + f, h, canvasWidth)
             }
             o++
           }
@@ -106,7 +107,7 @@ export function makeImageData({
       }
 
       // mismatches
-      for (let i = 0, o = 0; i < alignment.length; i++) {
+      for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
         const c = alignment[i]
         if (seq[i] !== '-') {
           if (c !== '-') {
@@ -115,7 +116,7 @@ export function makeImageData({
               fillRect(
                 ctx,
                 l,
-                offset + t,
+                t2,
                 scale + f,
                 h,
                 canvasWidth,
@@ -128,7 +129,7 @@ export function makeImageData({
               fillRect(
                 ctx,
                 l,
-                offset + t,
+                t2,
                 scale + f,
                 h,
                 canvasWidth,
@@ -146,7 +147,7 @@ export function makeImageData({
       // font
       const charSizeW = 10
       if (scale >= charSizeW) {
-        for (let i = 0, o = 0; i < alignment.length; i++) {
+        for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
           if (seq[i] !== '-') {
             const l = leftPx + scale * o
             const offset = (scale - charSizeW) / 2 + 1
@@ -182,8 +183,8 @@ export function makeImageData({
       }
 
       const t = rowHeight * row
-
-      for (let i = 0, o = 0; i < alignment.length; i++) {
+      const t2 = offset + t
+      for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
         let ins = ''
         while (seq[i] === '-') {
           if (alignment[i] !== '-' && alignment[i] !== ' ') {
@@ -197,14 +198,14 @@ export function makeImageData({
           if (ins.length > 10) {
             const txt = `${ins.length}`
             if (bpPerPx > 10) {
-              fillRect(ctx, l - 1, t, 2, h, canvasWidth, 'purple')
+              fillRect(ctx, l - 1, t2, 2, h, canvasWidth, 'purple')
             } else if (h > charHeight) {
-              const rwidth = measureText(txt)
-              const padding = 5
+              const rwidth = measureText(txt, 10)
+              const padding = 2
               fillRect(
                 ctx,
                 l - rwidth / 2 - padding,
-                t,
+                t2,
                 rwidth + 2 * padding,
                 h,
                 canvasWidth,
@@ -217,7 +218,7 @@ export function makeImageData({
               fillRect(
                 ctx,
                 l - padding,
-                t,
+                t2,
                 2 * padding,
                 h,
                 canvasWidth,
@@ -225,10 +226,10 @@ export function makeImageData({
               )
             }
           } else {
-            fillRect(ctx, l, offset + t, 1, h, canvasWidth, 'purple')
+            fillRect(ctx, l, t2, 1, h, canvasWidth, 'purple')
             if (bpPerPx < 0.2 && rowHeight > 5) {
-              fillRect(ctx, l - 2, offset + t, 5, 1, canvasWidth)
-              fillRect(ctx, l - 2, offset + t + h - 1, 5, 1, canvasWidth)
+              fillRect(ctx, l - 2, t2, 5, 1, canvasWidth)
+              fillRect(ctx, l - 2, t2 + h - 1, 5, 1, canvasWidth)
             }
           }
         }
