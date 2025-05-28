@@ -85,7 +85,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
 
-          // eslint-disable-next-line @typescript-eslint/prefer-for-of
+           
           const len = data.length
           for (let j = 0; j < len; j++) {
             const elt = data[j]!
