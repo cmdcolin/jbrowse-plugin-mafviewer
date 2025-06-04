@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { Menu } from '@jbrowse/core/ui'
-import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
-import { getRpcSessionId } from '@jbrowse/core/util/tracks'
+import { getContainingView, getEnv } from '@jbrowse/core/util'
 import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
 
@@ -42,7 +41,13 @@ const LinearMafDisplay = observer(function (props: {
     dragEndX: number
   }>()
   const [showSequenceDialog, setShowSequenceDialog] = useState(false)
-  const [sequenceData, setSequenceData] = useState('')
+  const [selectionCoords, setSelectionCoords] = useState<
+    | {
+        dragStartX: number
+        dragEndX: number
+      }
+    | undefined
+  >()
   const { width } = getContainingView(model) as LinearGenomeViewModel
 
   const handleMouseDown = (event: React.MouseEvent) => {
@@ -227,51 +232,21 @@ const LinearMafDisplay = observer(function (props: {
           {
             label: 'View subsequence',
             onClick: () => {
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              ;(async () => {
-                try {
-                  if (!contextCoord) {
-                    return
-                  }
-                  const { rpcManager } = getSession(model)
-                  const sessionId = getRpcSessionId(model)
-                  const view = getContainingView(model) as LinearGenomeViewModel
-                  const { refName, assemblyName } = view.displayedRegions[0]!
-                  const { dragStartX, dragEndX } = contextCoord
-                  const [s, e] = [
-                    Math.min(dragStartX, dragEndX),
-                    Math.max(dragStartX, dragEndX),
-                  ]
+              if (!contextCoord) {
+                return
+              }
 
-                  const fastaSequence = await rpcManager.call(
-                    sessionId,
-                    'MafGetSequences',
-                    {
-                      sessionId,
-                      adapterConfig: model.adapterConfig,
-                      regions: [
-                        {
-                          refName,
-                          start: view.pxToBp(s).coord,
-                          end: view.pxToBp(e).coord,
-                          assemblyName,
-                        },
-                      ],
-                      bpPerPx: view.bpPerPx,
-                    },
-                  )
+              // Store the selection coordinates for the SequenceDialog to use
+              setSelectionCoords({
+                dragStartX: contextCoord.dragStartX,
+                dragEndX: contextCoord.dragEndX,
+              })
 
-                  // Set the sequence data and show the dialog
-                  setSequenceData(fastaSequence as string)
-                  setShowSequenceDialog(true)
-                } catch (e) {
-                  console.error(e)
-                  getSession(model).notifyError(`${e}`, e)
-                }
+              // Show the dialog
+              setShowSequenceDialog(true)
 
-                // Close the context menu
-                setContextCoord(undefined)
-              })()
+              // Close the context menu
+              setContextCoord(undefined)
             },
           },
         ]}
@@ -279,10 +254,11 @@ const LinearMafDisplay = observer(function (props: {
 
       {showSequenceDialog ? (
         <SequenceDialog
-          sequenceData={sequenceData}
           model={model}
+          selectionCoords={selectionCoords}
           onClose={() => {
             setShowSequenceDialog(false)
+            setSelectionCoords(undefined)
           }}
         />
       ) : null}
