@@ -3,31 +3,61 @@ import { expect, test } from 'vitest'
 
 import { processFeaturesToFasta } from './fastaUtils'
 
-import type { Region } from '@jbrowse/core/util'
-
 test('processes a feature with no selected region', () => {
   const mockFeature = new SimpleFeature({
     uniqueId: '123',
-    refName: 'abc',
-    start: 100,
-    end: 110,
+    start: 4095950,
+    end: 4096616,
+    refName: 'chrI',
+    name: 'ce10_16654',
+    score: 1,
     alignments: {
-      assembly1: {
-        chr: 'chr1',
-        start: 100,
-        data: 'ACGTACGTAC',
+      ce10: {
+        chr: 'chrI',
+        start: 4095950,
+        srcSize: 666,
         strand: 1,
+        unknown: 15072423,
+        data: 'AAGAA---AAAT---ATAAT--TAAACGGCAAAAAAAGTCTTCAAAT------CTTTCAGCTCATGACGAAGCGGAAACATATTTCCAAAATCACACCGACTTCCAAATTATCAAATTTCTACGGACGGCAGGATACGATTGTGGGGAAATGTTCATGACATGTTACTTTGGAGGAAGAAGGTACTTTTTTCAAAAACAAAAAACAACATGGTCTTTCAGTTTCAAATTTTCAGTTTGAACCAAATTTTGCAAAACTCTACTAACTTTCGGGTATTTCAATGTTGATATTGGAAAATTTA-------GTTTTTGAAGAATTTTTTAAATTTCCATTAATTCCAGATTCGATTGTTGCAAGTACATGAAGCAAAAAGTGACGTCACTTGGAAAATGTTGGGAGCTTGATCTCCGAAACTTGGCGCCCGAATGGATGAGAAAACAAATATCGCCGGGAAGTGAAGCAGGACTTCAAATAGTTGTAGACGCTCAATTAGAAGAGGAATTAAAAGGAGAAAATGATGATGCAAAAGCTATCTTCTCAGATATCTATGAAAATGGATTTCGTTACTTTATTCATCCACCTGGGACCAATGCTCAACTGACTTCCGAGGGAATAAGTGTTTCGCCATCTCGAACTGTATACTCTGCTATCAAGACCGTTACTGTAAG----TGTT--------------GTTTTCA--AACTG',
       },
-      assembly2: {
-        chr: 'chr2',
-        start: 200,
-        data: 'ACGT-CGTAC',
+      cb4: {
+        chr: 'chrI',
+        start: 7760171,
+        srcSize: 565,
         strand: -1,
+        unknown: 15455979,
+        data: 'gagat---catt----tggg--aaaaaattgaaagaca-----AAAGTGTGGAATTTCAGCACATGACGAAGCGGAAACATACTTTCAAAACCATACAGACTTTCAAATCATTAATTTTCTGAGGACCGCTGGATACGATTGTGGAGAAATGTTTCTGACATGTTATTTCGGAGGAAGAAggttt-----------------------------------------------------------------------------------ggattactgtaa----------gatcACTGCA-------GTCTAGTCACCTT------------------TTTAAGATTTGATTGCTGTAAATACATGAAACCAAAAGTCACATCACTAGGAAAATGTTGGGAACTGGATCTTCAAAATCTGGCGCCTGAATGGATGCGAAAACAAATATCTCCTGGAAGTGAAGCAGGGCTTCAAATGATTGTTGATGCACAATTGGAAGAAGAATTAAGAGGAGAAAATGGAGATGCAAAAGCGATTTTCTCAGATATCTATGAAAATGGATTCAGATATTACATTCATCCGCCAGGAGCAAATGCTGAGTTGTCATCAGAAGGTATTAGTGTTTCCCCTTCAAGAACTGTTTACTCTGCTATCAAAACTGTCTCGGTGAG----TGGTTGAATCATA----CTTTTTCA--TACGG',
+      },
+      caeRem4: {
+        chr: 'Crem_Contig36',
+        start: 394777,
+        srcSize: 575,
+        strand: -1,
+        unknown: 636794,
+        data: 'gagaa---aattaaaatggg----gaaattgaatgaaa-----aaaa-ggaaaattgcaGCGCACGATGAGGCGGAGacgtattttcaaaatcacacagattttcaaatcattaaGTTTCTGCGGACTGCTGGATACGATTGCGGAGAAATGTTCTTGACTTGTTATTTTGGAGGAAGAAGGTACAT-----AAAAACAGAG------------------------------------------------------------------gaattattacaa----------aaagaaaatatatgaatatttatttgaatta-----------------tttcagattcgattGCTGCAAATatatgaaacaaaaagtgacaTCTCTCGGGAAGTGTTGGGAGCTTGATCTACAGAATCTTGCTCCAGAATGGATGAGGAAGCAAATATCACCGGGAAGTGAATCAGGACTTCAGATGATTGTTGACGCTCAATTAGAAGAAGAACTGAGAGGAGAAGATGGAGATGCAAACGCAATATTCTCTGATATCTATGAAAATGGATTCAGATATTATATTCATCCACCAGGTGCGAATGCTGAATTAACTTCCGAAGGAATCAGTGTTTCTCCGTCGAGAACTGTTTATTCTGCTATCAAAACGATTTCGGTGAG----TAG---------------TTTGTCa--caaaa',
+      },
+      caeSp111: {
+        chr: 'Scaffold627',
+        start: 194453,
+        srcSize: 573,
+        strand: 1,
+        unknown: 908941,
+        data: 'aaggA---AATT---AGAGAATGAAAGggggaaaaagg-----aaga------attaCAGCTCATGATGAAGCAGAAACATACTTTCAAAATCACaccgattttcaaattattaaatttcTGAGAACTGCTGGTTATGATTGTggagaaatgtttttgactTGTTATTTCGGTGGAAGAaggt-------------------------------------------------------------------------------------ttttttattcaa----------gagACAACTG-------CTTTTCGAACATTA---------------ATTCTCAGATTTGATTGCTGTAAATacatgaaacaaaaagtgacgTCACTCGGAAAATGTTGGGAATTGGATCTTCAGAATCTCGCTCCAGAATGGATGAGAAAACAGATTTCACCGGGAAGCGAATCAGGACTTCAAATGATTGTTGACGCtcaattagaagaagaattaaGAGGAGAAGATGGCGATGCAAATGCTATTTTCTCTgatatttatgaaaatggaTTCCGTTATTACATTCATCCACCGGGTGCAAATGCTGAATTATCATCTGAAGGAATCAGTGTTTCGCCTTCAAGAACTGTTTATTCTGCTATCAAAACTGTTTCGGTTCGTTTCTTTTAACATTACAGTATCCTTCCCAATCAGAG',
+      },
+      caePb3: {
+        chr: 'Scfld02_110',
+        start: 185268,
+        srcSize: 578,
+        strand: -1,
+        unknown: 521291,
+        data: 'GAGGATCGAATG---ATAGA--GAAGCACTGAAGAATC-----AAAG------ATTTCAGCTCATGATGAAGCAGAAACGTACTTTCAAAACCAcacagattttcaaattatcaagtttttgagaactgCCGGATATGACTGTGGAGAGATGTTCCTGACTTGCTACTTCGGGGGGCGAAGGTAA-----------------------------------------------------------------------------------TAATTAACTGAAT-TCGGT-TTGAAGTATCCG-------ATTCAACAACAGCA--------------CAATTATAGATTCGACTGCTGTAAAtacatgaaacaaaaagtaacaTCACTCGGAAAGTGTTGGGAACTGGATCTCCAAACATTGGCTCCAGAATGGATGAGAAAACAGATTTCCCCTGGAAGTGAATCTGGACTTCAATTGATTGTTGATGCTCAGTTAGAAGAAGAACTACGAGGAGAAAATGGTGATGCGAATGCAATATTCTCGGATATTTATGAAAATGGATTCCGATATTATATCCATCCACCAGGTGCAAATGCAGAGTTATCATCCGAAGGAATCAGTGTATCACCCTCAAGGACCGTTTACTCTGCTATCAAAACTGTGTCGGTTAG----TTTTCGAGTTACCTTATACATCCAA--TAGA-',
       },
     },
+    seq: 'AAGAA---AAAT---ATAAT--TAAACGGCAAAAAAAGTCTTCAAAT------CTTTCAGCTCATGACGAAGCGGAAACATATTTCCAAAATCACACCGACTTCCAAATTATCAAATTTCTACGGACGGCAGGATACGATTGTGGGGAAATGTTCATGACATGTTACTTTGGAGGAAGAAGGTACTTTTTTCAAAAACAAAAAACAACATGGTCTTTCAGTTTCAAATTTTCAGTTTGAACCAAATTTTGCAAAACTCTACTAACTTTCGGGTATTTCAATGTTGATATTGGAAAATTTA-------GTTTTTGAAGAATTTTTTAAATTTCCATTAATTCCAGATTCGATTGTTGCAAGTACATGAAGCAAAAAGTGACGTCACTTGGAAAATGTTGGGAGCTTGATCTCCGAAACTTGGCGCCCGAATGGATGAGAAAACAAATATCGCCGGGAAGTGAAGCAGGACTTCAAATAGTTGTAGACGCTCAATTAGAAGAGGAATTAAAAGGAGAAAATGATGATGCAAAAGCTATCTTCTCAGATATCTATGAAAATGGATTTCGTTACTTTATTCATCCACCTGGGACCAATGCTCAACTGACTTCCGAGGGAATAAGTGTTTCGCCATCTCGAACTGTATACTCTGCTATCAAGACCGTTACTGTAAG----TGTT--------------GTTTTCA--AACTG',
   })
 
-  const result = processFeaturesToFasta([mockFeature])
+  const reg = { refName: 'chrI', start: 4095951, end: 4095960 }
+  const result = processFeaturesToFasta([mockFeature], reg)
 
   expect(result).toContain('>assembly1.chr1:100:+')
   expect(result).toContain('ACGTACGTAC')
@@ -57,17 +87,15 @@ test('processes a feature with a selected region', () => {
     },
   })
 
-  const selectedRegion: Region = {
+  const result = processFeaturesToFasta([mockFeature], {
     refName: 'chr1',
     start: 102,
     end: 106,
     assemblyName: 'assembly1',
-  }
-
-  const result = processFeaturesToFasta([mockFeature], selectedRegion)
+  })
 
   // For assembly1, positions 102-106 correspond to indices 2-6 in the sequence
-  expect(result).toContain('>assembly1.chr1:102:+ (selected region 102-106)')
+  expect(result).toContain('>assembly1.chr1:102:+')
   expect(result).toContain('GTAC')
 
   // For assembly2, the calculation is more complex due to the gap and negative strand
@@ -130,17 +158,15 @@ test('handles a selected region that overlaps partially with the feature', () =>
     },
   })
 
-  const selectedRegion: Region = {
+  const result = processFeaturesToFasta([mockFeature], {
     refName: 'chr1',
     start: 95,
     end: 105,
     assemblyName: 'assembly1',
-  }
-
-  const result = processFeaturesToFasta([mockFeature], selectedRegion)
+  })
 
   // The selected region starts before the feature, so we should get from position 0
-  expect(result).toContain('>assembly1.chr1:100:+ (selected region 95-105)')
+  expect(result).toContain('>assembly1.chr1:100:+')
   expect(result).toContain('ACGTAC')
 })
 
@@ -160,16 +186,14 @@ test('handles a selected region that extends beyond the feature', () => {
     },
   })
 
-  const selectedRegion: Region = {
+  const result = processFeaturesToFasta([mockFeature], {
     refName: 'chr1',
     start: 105,
     end: 115,
     assemblyName: 'assembly1',
-  }
-
-  const result = processFeaturesToFasta([mockFeature], selectedRegion)
+  })
 
   // The selected region extends beyond the feature, so we should get up to the end
-  expect(result).toContain('>assembly1.chr1:105:+ (selected region 105-115)')
+  expect(result).toContain('>assembly1.chr1:105:+')
   expect(result).toContain('CGTAC')
 })

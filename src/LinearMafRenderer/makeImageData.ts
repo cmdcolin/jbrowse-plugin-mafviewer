@@ -21,6 +21,11 @@ interface RenderArgs extends RenderArgsDeserialized {
   mismatchRendering: boolean
   features: Map<string, Feature>
   statusCallback?: (arg: string) => void
+  showAsUpperCase: boolean
+}
+
+function getLetter(a: string, showAsUpperCase: boolean) {
+  return showAsUpperCase ? a.toUpperCase() : a
 }
 
 export function makeImageData({
@@ -40,6 +45,7 @@ export function makeImageData({
     samples,
     rowProportion,
     features,
+    showAsUpperCase,
   } = renderArgs
   const region = regions[0]!
   const canvasWidth = (region.end - region.start) / bpPerPx
@@ -157,7 +163,11 @@ export function makeImageData({
                 ? (contrastForBase[c] ?? 'white')
                 : 'black'
               if (rowHeight > charHeight) {
-                ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
+                ctx.fillText(
+                  getLetter(origAlignment[i] || '', showAsUpperCase),
+                  l + offset,
+                  hp2 + t + 3,
+                )
               }
             }
             o++

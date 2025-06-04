@@ -2,8 +2,6 @@ import React from 'react'
 
 import { Dialog } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import DownloadIcon from '@mui/icons-material/Download'
 import { Button, DialogActions, DialogContent, TextField } from '@mui/material'
 import { makeStyles } from 'tss-react/mui'
 
@@ -67,6 +65,7 @@ function SequenceDialog({
           variant="contained"
           color="primary"
           onClick={() => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             ;(async () => {
               try {
                 await navigator.clipboard.writeText(sequence)
@@ -77,7 +76,6 @@ function SequenceDialog({
               }
             })()
           }}
-          startIcon={<ContentCopyIcon />}
         >
           Copy to Clipboard
         </Button>
@@ -107,7 +105,6 @@ function SequenceDialog({
               getSession(model).notifyError(`${e}`, e)
             }
           }}
-          startIcon={<DownloadIcon />}
         >
           Download
         </Button>

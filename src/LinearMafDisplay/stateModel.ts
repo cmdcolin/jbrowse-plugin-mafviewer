@@ -76,6 +76,10 @@ export default function stateModelFactory(
          * #property
          */
         treeAreaWidth: 80,
+        /**
+         * #property
+         */
+        showAsUpperCase: true,
       }),
     )
     .volatile(() => ({
@@ -127,6 +131,12 @@ export default function stateModelFactory(
         if (!deepEqual(tree, self.volatileTree)) {
           self.volatileTree = tree
         }
+      },
+      /**
+       * #action
+       */
+      setShowAsUpperCase(arg: boolean) {
+        self.showAsUpperCase = arg
       },
     }))
     .views(self => ({
@@ -248,6 +258,7 @@ export default function stateModelFactory(
             rowHeight,
             rowProportion,
             mismatchRendering,
+            showAsUpperCase,
           } = self
           const s = superRenderProps()
           return {
@@ -260,6 +271,7 @@ export default function stateModelFactory(
             rowProportion,
             showAllLetters,
             mismatchRendering,
+            showAsUpperCase,
           }
         },
         /**
@@ -299,6 +311,14 @@ export default function stateModelFactory(
                   },
                 },
               ],
+            },
+            {
+              label: 'Use upper-case',
+              type: 'checkbox',
+              checked: self.showAsUpperCase,
+              onClick: () => {
+                self.setShowAsUpperCase(!self.showAsUpperCase)
+              },
             },
             {
               label: 'Show all letters',

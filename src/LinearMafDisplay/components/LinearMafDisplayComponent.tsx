@@ -80,11 +80,6 @@ const LinearMafDisplay = observer(function (props: {
 
   const handleMouseUp = (event: React.MouseEvent) => {
     if (isDragging && dragStartX !== undefined && dragEndX !== undefined) {
-      const containingView = getContainingView(model) as LinearGenomeViewModel
-      // Convert drag start and end positions to base pairs
-      const startBp = containingView.pxToBp(dragStartX)
-      const endBp = containingView.pxToBp(dragEndX)
-
       // Calculate the drag distance
       const dragDistanceX = Math.abs(dragEndX - dragStartX)
       const dragDistanceY = Math.abs(dragEndY! - dragStartY!)
@@ -231,6 +226,7 @@ const LinearMafDisplay = observer(function (props: {
           {
             label: 'View subsequence',
             onClick: () => {
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
               ;(async () => {
                 try {
                   if (!contextCoord) {
