@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`gap in assembly1 1`] = `
+[
+  ">assembly1.chr1:100:+",
+  "AC-TAC",
+  ">assembly2.chr2:200:+",
+  "ACTTC",
+  "",
+]
+`;
+
+exports[`processes a feature with a selected region 1`] = `
+[
+  ">assembly1.chr1:100:+",
+  "ACGTA",
+  ">assembly2.chr2:200:+",
+  "AC-TT",
+  "",
+]
+`;
