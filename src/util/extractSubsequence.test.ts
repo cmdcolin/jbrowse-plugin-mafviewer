@@ -1,4 +1,5 @@
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
+
 import { extractSubsequence } from './extractSubsequence'
 
 test('extracts a simple subsequence without gaps', () => {

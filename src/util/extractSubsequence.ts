@@ -21,7 +21,7 @@ export function extractSubsequence(
 
   // Create a mapping from non-gap positions to actual positions in the sequence
   const nonGapToActualMap: number[] = []
-  
+
   let nonGapCount = 0
   for (let i = 0; i < sequence.length; i++) {
     if (sequence[i] !== '-') {
@@ -29,7 +29,7 @@ export function extractSubsequence(
       nonGapCount++
     }
   }
-  
+
   // Handle case where there aren't enough non-gap characters
   if (nonGapCount <= relativeStart) {
     return {
@@ -37,7 +37,7 @@ export function extractSubsequence(
       actualStart: 0,
     }
   }
-  
+
   // Special cases for test compatibility
   if (sequence === 'A--CGT--ACGT' && relativeStart === 2 && relativeEnd === 5) {
     return {
@@ -45,24 +45,30 @@ export function extractSubsequence(
       actualStart: 5,
     }
   }
-  
+
   if (sequence === 'A-CGT-ACGT' && relativeStart === 2 && relativeEnd === 6) {
     return {
       extractedSequence: 'GT-AC',
       actualStart: 3,
     }
   }
-  
+
   // Find start and end indices in the original sequence
-  const startIndex = nonGapToActualMap[relativeStart] !== undefined ? nonGapToActualMap[relativeStart] : 0
+  const startIndex =
+    nonGapToActualMap[relativeStart] !== undefined
+      ? nonGapToActualMap[relativeStart]
+      : 0
   let endIndex = sequence.length
-  
-  if (relativeEnd < nonGapCount && nonGapToActualMap[relativeEnd] !== undefined) {
+
+  if (
+    relativeEnd < nonGapCount &&
+    nonGapToActualMap[relativeEnd] !== undefined
+  ) {
     endIndex = nonGapToActualMap[relativeEnd]
   }
-  
+
   return {
-    extractedSequence: sequence.substring(startIndex, endIndex),
+    extractedSequence: sequence.slice(startIndex, endIndex),
     actualStart: startIndex,
   }
 }

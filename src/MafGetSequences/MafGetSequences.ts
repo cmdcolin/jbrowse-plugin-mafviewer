@@ -1,10 +1,14 @@
-import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
-import type { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import { getAdapter } from '@jbrowse/core/data_adapters/dataAdapterCache'
 import RpcMethodTypeWithFiltersAndRenameRegions from '@jbrowse/core/pluggableElementTypes/RpcMethodTypeWithFiltersAndRenameRegions'
-import type { Region } from '@jbrowse/core/util'
-import { processFeaturesToFasta } from '../util/fastaUtils'
 import { firstValueFrom, toArray } from 'rxjs'
+
+import { processFeaturesToFasta } from '../util/fastaUtils'
+
+import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
+import type { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
+import type { Region } from '@jbrowse/core/util'
+
+
 
 export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRegions {
   name = 'MafGetSequences'

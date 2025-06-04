@@ -1,5 +1,6 @@
-import type { Feature, Region } from '@jbrowse/core/util'
 import { extractSubsequence } from './extractSubsequence'
+
+import type { Feature, Region } from '@jbrowse/core/util'
 
 /**
  * Process features into FASTA format
@@ -55,7 +56,7 @@ export function processFeaturesToFasta(
               extractedSequence.replaceAll('-', '').length
             : alignment.start + actualStart
 
-        fastaText += `${`>${assemblyName}.${alignment.chr}:${startCoord}:${alignment.strand === -1 ? '-' : '+'}`}\n${extractedSequence}\n`
+        fastaText += `>${assemblyName}.${alignment.chr}:${startCoord}:${alignment.strand === -1 ? '-' : '+'}\n${extractedSequence}\n`
       }
     }
   }

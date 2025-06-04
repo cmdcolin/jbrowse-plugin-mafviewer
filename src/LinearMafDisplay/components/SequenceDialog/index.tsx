@@ -1,11 +1,13 @@
 import React from 'react'
+
 import { Dialog } from '@jbrowse/core/ui'
-import { Button, DialogActions, DialogContent, TextField } from '@mui/material'
+import { getSession } from '@jbrowse/core/util'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DownloadIcon from '@mui/icons-material/Download'
+import { Button, DialogActions, DialogContent, TextField } from '@mui/material'
 import { makeStyles } from 'tss-react/mui'
+
 import type { LinearMafDisplayModel } from '../../stateModel'
-import { getSession } from '@jbrowse/core/util'
 
 interface SequenceDialogProps {
   onClose: () => void
@@ -62,14 +64,16 @@ function SequenceDialog({
         <Button
           variant="contained"
           color="primary"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(sequence)
-              getSession(model).notify('Sequence copied to clipboard')
-            } catch (e) {
-              console.error(e)
-              getSession(model).notifyError(`${e}`, e)
-            }
+          onClick={() => {
+            ;(async () => {
+              try {
+                await navigator.clipboard.writeText(sequence)
+                getSession(model).notify('Sequence copied to clipboard')
+              } catch (e) {
+                console.error(e)
+                getSession(model).notifyError(`${e}`, e)
+              }
+            })()
           }}
           startIcon={<ContentCopyIcon />}
         >
@@ -79,11 +83,9 @@ function SequenceDialog({
           variant="contained"
           onClick={() => {
             try {
-              // Create a blob with the sequence data
-              const blob = new Blob([sequence], { type: 'text/plain' })
-
-              // Create a URL for the blob
-              const url = URL.createObjectURL(blob)
+              const url = URL.createObjectURL(
+                new Blob([sequence], { type: 'text/plain' }),
+              )
 
               // Create a temporary anchor element
               const a = document.createElement('a')
@@ -91,11 +93,11 @@ function SequenceDialog({
               a.download = 'sequence.fasta'
 
               // Trigger the download
-              document.body.appendChild(a)
+              document.body.append(a)
               a.click()
 
               // Clean up
-              document.body.removeChild(a)
+              a.remove()
               URL.revokeObjectURL(url)
 
               getSession(model).notify('Sequence downloaded')

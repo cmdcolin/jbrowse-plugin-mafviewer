@@ -6,10 +6,9 @@ import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import SequenceDialog from './SequenceDialog/index'
-
 import Crosshairs from './Crosshairs'
 import MAFTooltip from './MAFTooltip'
+import SequenceDialog from './SequenceDialog/index'
 import YScaleBars from './YScaleBars'
 
 import type { LinearMafDisplayModel } from '../stateModel'
@@ -86,8 +85,6 @@ const LinearMafDisplay = observer(function (props: {
       const startBp = containingView.pxToBp(dragStartX)
       const endBp = containingView.pxToBp(dragEndX)
 
-      console.log('Drag coordinates in bp:', { startBp, endBp })
-
       // Calculate the drag distance
       const dragDistanceX = Math.abs(dragEndX - dragStartX)
       const dragDistanceY = Math.abs(dragEndY! - dragStartY!)
@@ -119,50 +116,6 @@ const LinearMafDisplay = observer(function (props: {
     setDragStartY(undefined)
     setDragEndX(undefined)
     setDragEndY(undefined)
-  }
-
-  const handleViewSequence = async () => {
-    try {
-      if (!contextCoord) {
-        return
-      }
-      const { rpcManager } = getSession(model)
-      const sessionId = getRpcSessionId(model)
-      const view = getContainingView(model) as LinearGenomeViewModel
-      const refName = view.displayedRegions[0]!.refName
-      const x1 = view.pxToBp(contextCoord.dragStartX)
-      const x2 = view.pxToBp(contextCoord.dragEndX)
-      const currentRegion = {
-        refName,
-        start: x1.coord,
-        end: x2.coord,
-        assemblyName: x1.assemblyName,
-      }
-      console.log({ currentRegion })
-
-      if (currentRegion) {
-        const fastaSequence = await rpcManager.call(
-          sessionId,
-          'MafGetSequences',
-          {
-            sessionId,
-            adapterConfig: model.adapterConfig,
-            regions: [currentRegion],
-            bpPerPx: view.bpPerPx,
-          },
-        )
-
-        // Set the sequence data and show the dialog
-        setSequenceData(fastaSequence as string)
-        setShowSequenceDialog(true)
-      }
-    } catch (e) {
-      console.error(e)
-      getSession(model).notifyError(`${e}`, e)
-    }
-
-    // Close the context menu
-    setContextCoord(undefined)
   }
 
   // Add keydown event handler to clear selection box when Escape key is pressed
@@ -277,17 +230,60 @@ const LinearMafDisplay = observer(function (props: {
         menuItems={[
           {
             label: 'View subsequence',
-            onClick: handleViewSequence,
+            onClick: () => {
+              ;(async () => {
+                try {
+                  if (!contextCoord) {
+                    return
+                  }
+                  const { rpcManager } = getSession(model)
+                  const sessionId = getRpcSessionId(model)
+                  const view = getContainingView(model) as LinearGenomeViewModel
+                  const refName = view.displayedRegions[0]!.refName
+                  const x1 = view.pxToBp(contextCoord.dragStartX)
+                  const x2 = view.pxToBp(contextCoord.dragEndX)
+
+                  const fastaSequence = await rpcManager.call(
+                    sessionId,
+                    'MafGetSequences',
+                    {
+                      sessionId,
+                      adapterConfig: model.adapterConfig,
+                      regions: [
+                        {
+                          refName,
+                          start: x1.coord,
+                          end: x2.coord,
+                          assemblyName: x1.assemblyName,
+                        },
+                      ],
+                      bpPerPx: view.bpPerPx,
+                    },
+                  )
+
+                  // Set the sequence data and show the dialog
+                  setSequenceData(fastaSequence as string)
+                  setShowSequenceDialog(true)
+                } catch (e) {
+                  console.error(e)
+                  getSession(model).notifyError(`${e}`, e)
+                }
+
+                // Close the context menu
+                setContextCoord(undefined)
+              })()
+            },
           },
         ]}
       />
 
-      {/* Sequence Dialog */}
       {showSequenceDialog ? (
         <SequenceDialog
-          onClose={() => setShowSequenceDialog(false)}
           sequenceData={sequenceData}
           model={model}
+          onClose={() => {
+            setShowSequenceDialog(false)
+          }}
         />
       ) : null}
     </div>

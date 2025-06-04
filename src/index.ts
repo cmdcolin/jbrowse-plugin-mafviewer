@@ -7,10 +7,10 @@ import BigMafAdapterF from './BigMafAdapter'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
 import MafAddTrackWorkflowF from './MafAddTrackWorkflow'
+import MafGetSamplesF from './MafGetSamples'
+import MafGetSequencesF from './MafGetSequences'
 import MafTabixAdapterF from './MafTabixAdapter'
 import MafTrackF from './MafTrack'
-import MafGetSequencesF from './MafGetSequences'
-import MafGetSamplesF from './MafGetSamples'
 
 export default class MafViewerPlugin extends Plugin {
   name = 'MafViewerPlugin'
