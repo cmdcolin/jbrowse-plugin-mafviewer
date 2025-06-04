@@ -1,10 +1,12 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Menu } from '@jbrowse/core/ui'
 import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import SequenceDialog from './SequenceDialog/index'
 
 import Crosshairs from './Crosshairs'
 import MAFTooltip from './MAFTooltip'
@@ -40,6 +42,8 @@ const LinearMafDisplay = observer(function (props: {
     dragStartX: number
     dragEndX: number
   }>()
+  const [showSequenceDialog, setShowSequenceDialog] = useState(false)
+  const [sequenceData, setSequenceData] = useState('')
   const { width } = getContainingView(model) as LinearGenomeViewModel
 
   const handleMouseDown = (event: React.MouseEvent) => {
@@ -117,7 +121,7 @@ const LinearMafDisplay = observer(function (props: {
     setDragEndY(undefined)
   }
 
-  const handleCopySequence = async () => {
+  const handleViewSequence = async () => {
     try {
       if (!contextCoord) {
         return
@@ -148,9 +152,9 @@ const LinearMafDisplay = observer(function (props: {
           },
         )
 
-        // Copy to clipboard
-        await navigator.clipboard.writeText(fastaSequence as string)
-        getSession(model).notify('Sequence copied to clipboard')
+        // Set the sequence data and show the dialog
+        setSequenceData(fastaSequence as string)
+        setShowSequenceDialog(true)
       }
     } catch (e) {
       console.error(e)
@@ -162,7 +166,7 @@ const LinearMafDisplay = observer(function (props: {
   }
 
   // Add keydown event handler to clear selection box when Escape key is pressed
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && showSelectionBox) {
         clearSelectionBox()
@@ -272,11 +276,20 @@ const LinearMafDisplay = observer(function (props: {
         }}
         menuItems={[
           {
-            label: 'Copy sequence',
-            onClick: handleCopySequence,
+            label: 'View subsequence',
+            onClick: handleViewSequence,
           },
         ]}
       />
+
+      {/* Sequence Dialog */}
+      {showSequenceDialog ? (
+        <SequenceDialog
+          onClose={() => setShowSequenceDialog(false)}
+          sequenceData={sequenceData}
+          model={model}
+        />
+      ) : null}
     </div>
   )
 })

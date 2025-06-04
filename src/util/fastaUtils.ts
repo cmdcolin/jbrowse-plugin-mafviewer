@@ -55,11 +55,7 @@ export function processFeaturesToFasta(
               extractedSequence.replaceAll('-', '').length
             : alignment.start + actualStart
 
-        const header = `>${assemblyName}.${alignment.chr}:${startCoord}:${
-          alignment.strand === -1 ? '-' : '+'
-        } (selected region ${selectedRegion.start}-${selectedRegion.end})`
-
-        fastaText += `${header}\n${extractedSequence}\n`
+        fastaText += `${`>${assemblyName}.${alignment.chr}:${startCoord}:${alignment.strand === -1 ? '-' : '+'}`}\n${extractedSequence}\n`
       }
     }
   }
