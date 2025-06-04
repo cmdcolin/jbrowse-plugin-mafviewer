@@ -19,8 +19,10 @@ const useStyles = makeStyles()({
   dialogContent: {
     width: '80em',
   },
-  textAreaFont: {
+  textAreaInput: {
     fontFamily: 'Courier New',
+    whiteSpace: 'pre',
+    overflowX: 'auto',
   },
   ml: {
     marginLeft: 10,
@@ -54,7 +56,7 @@ function SequenceDialog({
             input: {
               readOnly: true,
               classes: {
-                input: classes.textAreaFont,
+                input: classes.textAreaInput,
               },
             },
           }}
@@ -68,7 +70,7 @@ function SequenceDialog({
             ;(async () => {
               try {
                 await navigator.clipboard.writeText(sequence)
-                getSession(model).notify('Sequence copied to clipboard')
+                getSession(model).notify('Sequence copied to clipboard', 'info')
               } catch (e) {
                 console.error(e)
                 getSession(model).notifyError(`${e}`, e)
@@ -99,8 +101,7 @@ function SequenceDialog({
               // Clean up
               a.remove()
               URL.revokeObjectURL(url)
-
-              getSession(model).notify('Sequence downloaded')
+              getSession(model).notify('Sequence downloaded', 'info')
             } catch (e) {
               console.error(e)
               getSession(model).notifyError(`${e}`, e)

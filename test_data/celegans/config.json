@@ -62,6 +62,17 @@
         "uri": "chrI.bed.gz"
       },
       "assemblyNames": ["ce10"]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chrI_newick_cf",
+      "name": "chrI w/ newick (plain feature track)",
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "nhUri": "ce10.7way.nh",
+        "uri": "chrI.bed.gz"
+      },
+      "assemblyNames": ["ce10"]
     }
   ]
 }
