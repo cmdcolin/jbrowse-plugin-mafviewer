@@ -1,6 +1,7 @@
 import { test, expect } from 'vitest'
 import { processFeaturesToFasta } from './fastaUtils'
-import { SimpleFeature, type Region } from '@jbrowse/core/util'
+import { SimpleFeature } from '@jbrowse/core/util'
+import type { Region } from '@jbrowse/core/util'
 
 test('processes a feature with no selected region', () => {
   const mockFeature = new SimpleFeature({

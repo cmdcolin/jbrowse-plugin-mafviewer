@@ -1,4 +1,5 @@
 import type { Feature, Region } from '@jbrowse/core/util'
+import { extractSubsequence } from './extractSubsequence'
 
 /**
  * Process features into FASTA format
