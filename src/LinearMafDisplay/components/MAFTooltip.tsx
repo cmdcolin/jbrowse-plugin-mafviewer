@@ -2,7 +2,11 @@ import React from 'react'
 
 import { SanitizedHTML } from '@jbrowse/core/ui'
 import BaseTooltip from '@jbrowse/core/ui/BaseTooltip'
-import { getContainingView, toLocale } from '@jbrowse/core/util'
+import {
+  getBpDisplayStr,
+  getContainingView,
+  toLocale,
+} from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 
 import type { LinearMafDisplayModel } from '../stateModel'
@@ -14,12 +18,14 @@ interface MAFTooltipProps {
   rowHeight: number
   sources: Record<string, any>[]
   model: LinearMafDisplayModel
+  origMouseX?: number
 }
 
 const MAFTooltip = observer(function ({
   model,
   mouseY,
   mouseX,
+  origMouseX,
   rowHeight,
   sources,
 }: MAFTooltipProps) {
@@ -28,11 +34,23 @@ const MAFTooltip = observer(function ({
     .filter(([key]) => key !== 'color' && key !== 'id')
     .map(([key, value]) => `${key}:${value}`)
     .join('\n')
-  const position = view.pxToBp(mouseX)
+  const p1 = origMouseX ? view.pxToBp(origMouseX) : undefined
+  const p2 = view.pxToBp(mouseX)
   return ret ? (
     <BaseTooltip>
       <SanitizedHTML
-        html={`${ret} - ${position.refName}:${toLocale(position.coord)}`}
+        html={[
+          ret,
+          ...(p1
+            ? [
+                `Start: ${p1.refName}:${toLocale(p1.coord)}`,
+                `End: ${p2.refName}:${toLocale(p2.coord)}`,
+                `Length: ${getBpDisplayStr(Math.abs(p1.coord - p2.coord))}`,
+              ]
+            : [`${p2.refName}:${toLocale(p2.coord)}`]),
+        ]
+          .filter(f => !!f)
+          .join('<br/>')}
       />
     </BaseTooltip>
   ) : null

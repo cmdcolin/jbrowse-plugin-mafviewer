@@ -174,6 +174,7 @@ const LinearMafDisplay = observer(function (props: {
             model={model}
             mouseX={mouseX}
             mouseY={mouseY}
+            origMouseX={dragStartX}
             rowHeight={rowHeight}
             sources={sources}
           />
@@ -235,9 +236,12 @@ const LinearMafDisplay = observer(function (props: {
                   const { rpcManager } = getSession(model)
                   const sessionId = getRpcSessionId(model)
                   const view = getContainingView(model) as LinearGenomeViewModel
-                  const refName = view.displayedRegions[0]!.refName
-                  const x1 = view.pxToBp(contextCoord.dragStartX)
-                  const x2 = view.pxToBp(contextCoord.dragEndX)
+                  const { refName, assemblyName } = view.displayedRegions[0]!
+                  const { dragStartX, dragEndX } = contextCoord
+                  const [s, e] = [
+                    Math.min(dragStartX, dragEndX),
+                    Math.max(dragStartX, dragEndX),
+                  ]
 
                   const fastaSequence = await rpcManager.call(
                     sessionId,
@@ -248,9 +252,9 @@ const LinearMafDisplay = observer(function (props: {
                       regions: [
                         {
                           refName,
-                          start: x1.coord,
-                          end: x2.coord,
-                          assemblyName: x1.assemblyName,
+                          start: view.pxToBp(s).coord,
+                          end: view.pxToBp(e).coord,
+                          assemblyName,
                         },
                       ],
                       bpPerPx: view.bpPerPx,

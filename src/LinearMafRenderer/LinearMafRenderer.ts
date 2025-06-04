@@ -19,6 +19,7 @@ interface RenderArgs extends RenderArgsDeserialized {
   showAllLetters: boolean
   mismatchRendering: boolean
   statusCallback?: (arg: string) => void
+  showAsUpperCase: boolean
 }
 
 export default class LinearMafRenderer extends FeatureRendererType {

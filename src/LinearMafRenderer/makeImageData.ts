@@ -62,7 +62,6 @@ export function makeImageData({
   const hp2 = h / 2
   const offset = (rowHeight - h) / 2
 
-  // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
 
   for (const feature of features.values()) {
