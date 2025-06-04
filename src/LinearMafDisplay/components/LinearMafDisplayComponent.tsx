@@ -1,14 +1,14 @@
 import React, { useRef, useState } from 'react'
 
-import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
-import { observer } from 'mobx-react'
 import { Menu } from '@jbrowse/core/ui'
-import { useTheme } from '@mui/material'
+import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
+import { useTheme } from '@mui/material'
+import { observer } from 'mobx-react'
 
-import YScaleBars from './YScaleBars'
 import Crosshairs from './Crosshairs'
 import MAFTooltip from './MAFTooltip'
+import YScaleBars from './YScaleBars'
 
 import type { LinearMafDisplayModel } from '../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
@@ -34,6 +34,7 @@ const LinearMafDisplay = observer(function (props: {
   const [dragStartY, setDragStartY] = useState<number>()
   const [dragEndX, setDragEndX] = useState<number>()
   const [dragEndY, setDragEndY] = useState<number>()
+  const [showSelectionBox, setShowSelectionBox] = useState(false)
   const [contextCoord, setContextCoord] = useState<{
     coord: [number, number]
     dragStartX: number
@@ -48,6 +49,8 @@ const LinearMafDisplay = observer(function (props: {
     const clientX = event.clientX - left
     const clientY = event.clientY - top
 
+    // Clear the previous selection box when starting a new drag
+    setShowSelectionBox(false)
     setIsDragging(true)
     setDragStartX(clientX)
     setDragStartY(clientY)
@@ -73,12 +76,6 @@ const LinearMafDisplay = observer(function (props: {
   }
 
   const handleMouseUp = (event: React.MouseEvent) => {
-    const rect = ref.current?.getBoundingClientRect()
-    const top = rect?.top || 0
-    const left = rect?.left || 0
-    const relX = event.clientX - left
-    const relY = event.clientY - top
-
     if (isDragging && dragStartX !== undefined && dragEndX !== undefined) {
       const containingView = getContainingView(model) as LinearGenomeViewModel
       // Convert drag start and end positions to base pairs
@@ -86,15 +83,34 @@ const LinearMafDisplay = observer(function (props: {
       const endBp = containingView.pxToBp(dragEndX)
 
       console.log('Drag coordinates in bp:', { startBp, endBp })
-      // You can add additional logic here to use these coordinates
-      setContextCoord({
-        coord: [event.clientX, event.clientY],
-        dragEndX: event.clientX!,
-        dragStartX: dragStartX!,
-      })
+
+      // Calculate the drag distance
+      const dragDistanceX = Math.abs(dragEndX - dragStartX)
+      const dragDistanceY = Math.abs(dragEndY! - dragStartY!)
+
+      // Only show context menu if the drag distance is at least 2 pixels in either direction
+      if (dragDistanceX >= 2 || dragDistanceY >= 2) {
+        setContextCoord({
+          coord: [event.clientX, event.clientY],
+          dragEndX: event.clientX,
+          dragStartX: dragStartX,
+        })
+
+        // Set showSelectionBox to true to keep the selection visible
+        setShowSelectionBox(true)
+      } else {
+        // For very small drags (less than 2px), don't show selection box or context menu
+        clearSelectionBox()
+      }
     }
 
+    // Only set isDragging to false, but keep the coordinates
     setIsDragging(false)
+  }
+
+  // Function to clear the selection box
+  const clearSelectionBox = () => {
+    setShowSelectionBox(false)
     setDragStartX(undefined)
     setDragStartY(undefined)
     setDragEndX(undefined)
@@ -145,12 +161,46 @@ const LinearMafDisplay = observer(function (props: {
     setContextCoord(undefined)
   }
 
+  // Add keydown event handler to clear selection box when Escape key is pressed
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showSelectionBox) {
+        clearSelectionBox()
+      }
+    }
+
+    // Add click handler to clear selection box when clicking outside of it
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        ref.current &&
+        !ref.current.contains(event.target as Node) &&
+        showSelectionBox
+      ) {
+        clearSelectionBox()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showSelectionBox, clearSelectionBox])
+
   return (
     <div
       ref={ref}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onDoubleClick={() => {
+        // Clear selection box on double click
+        if (showSelectionBox) {
+          clearSelectionBox()
+        }
+      }}
       onMouseLeave={() => {
         setMouseY(undefined)
         setMouseX(undefined)
@@ -159,7 +209,7 @@ const LinearMafDisplay = observer(function (props: {
     >
       <BaseLinearDisplayComponent {...props} />
       <YScaleBars model={model} />
-      {mouseY && sources ? (
+      {mouseY && mouseX && sources && !contextCoord ? (
         <div style={{ position: 'relative' }}>
           <Crosshairs
             width={width}
@@ -168,10 +218,16 @@ const LinearMafDisplay = observer(function (props: {
             mouseX={mouseX}
             mouseY={mouseY}
           />
-          <MAFTooltip mouseY={mouseY} rowHeight={rowHeight} sources={sources} />
+          <MAFTooltip
+            model={model}
+            mouseX={mouseX}
+            mouseY={mouseY}
+            rowHeight={rowHeight}
+            sources={sources}
+          />
         </div>
       ) : null}
-      {isDragging &&
+      {(isDragging || showSelectionBox) &&
       dragStartX !== undefined &&
       dragStartY !== undefined &&
       dragEndX !== undefined &&

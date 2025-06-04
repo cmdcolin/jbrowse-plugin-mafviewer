@@ -81,7 +81,6 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
       await updateStatus('Processing alignments', statusCallback, () => {
         let firstAssemblyNameFound = ''
         const refAssemblyName = this.getConf('refAssemblyName')
-        console.log({ features })
         for (const feature of features) {
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
