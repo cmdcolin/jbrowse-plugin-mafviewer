@@ -11,10 +11,8 @@ import type { Feature, Region } from '@jbrowse/core/util'
 export function processFeaturesToFasta({
   regions,
   showAllLetters,
-  mismatchRendering,
   samples,
   features,
-  showAsUpperCase,
 }: {
   regions: Region[]
   samples: Sample[]
@@ -25,19 +23,14 @@ export function processFeaturesToFasta({
 }) {
   const region = regions[0]!
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
-  const f = 0.4
-
-  console.log({ samples })
   const rlen = region.end - region.start
-  const outputRows = samples.map(() => ' '.repeat(rlen))
+  const outputRows = samples.map(() => '-'.repeat(rlen))
   for (const feature of features.values()) {
     const leftCoord = feature.get('start')
-    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const vals = feature.get('alignments') as Record<string, { seq: string }>
     const seq = feature.get('seq')
-    console.log({ feature, seq })
-    const r = Object.entries(vals)
-    for (const [sample, val] of r) {
-      const origAlignment = val.data
+    for (const [sample, val] of Object.entries(vals)) {
+      const origAlignment = val.seq
       const alignment = origAlignment
 
       const row = sampleToRowMap.get(sample)

@@ -16,13 +16,13 @@ const mockFeature = new SimpleFeature({
     assembly1: {
       chr: 'chr1',
       start: 100,
-      data: 'ACGTACGTAC',
+      seq: 'ACGTACGTAC',
       strand: 1,
     },
     assembly2: {
       chr: 'chr2',
       start: 200,
-      data: 'AC-TTCGTAC',
+      seq: 'AC-TTCGTAC',
       strand: 1,
     },
   },
@@ -71,13 +71,13 @@ test('gap in assembly1', () => {
       assembly1: {
         chr: 'chr1',
         start: 100,
-        data: 'AC-TACGTAC',
+        seq: 'AC-TACGTAC',
         strand: 1,
       },
       assembly2: {
         chr: 'chr2',
         start: 200,
-        data: 'ACGTTCGTAC',
+        seq: 'ACGTTCGTAC',
         strand: 1,
       },
     },

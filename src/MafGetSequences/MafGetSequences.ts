@@ -20,7 +20,7 @@ export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRe
       sessionId: string
       headers?: Record<string, string>
       regions: Region[]
-      bpPerPx: number
+      showAllLetters: boolean
     },
     rpcDriverClassName: string,
   ) {
@@ -28,25 +28,20 @@ export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRe
       args,
       rpcDriverClassName,
     )
-    const { samples, regions, adapterConfig, sessionId } = deserializedArgs
-    const { dataAdapter } = await getAdapter(
-      this.pluginManager,
-      sessionId,
-      adapterConfig,
-    )
-    if (!regions.length) {
-      throw new Error('No regions selected')
-    }
+    const { samples, regions, adapterConfig, sessionId, showAllLetters } =
+      deserializedArgs
+    const dataAdapter = (
+      await getAdapter(this.pluginManager, sessionId, adapterConfig)
+    ).dataAdapter as BaseFeatureDataAdapter
 
-    // Get features from the adapter
-    const featuresObservable = (
-      dataAdapter as BaseFeatureDataAdapter
-    ).getFeatures(regions[0]!, deserializedArgs)
-    const features = await firstValueFrom(featuresObservable.pipe(toArray()))
+    const features = await firstValueFrom(
+      dataAdapter.getFeatures(regions[0]!, deserializedArgs).pipe(toArray()),
+    )
     return processFeaturesToFasta({
       features: new Map(features.map(f => [f.id(), f])),
       samples,
       regions,
+      showAllLetters,
     })
   }
 }

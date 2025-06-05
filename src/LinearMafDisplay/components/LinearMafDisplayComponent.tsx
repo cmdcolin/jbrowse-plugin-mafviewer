@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
 
 import Crosshairs from './Crosshairs'
-import SequenceDialog from './GetSequenceDialog/index'
+import SequenceDialog from './GetSequenceDialog/GetSequenceDialog'
 import MAFTooltip from './MAFTooltip'
 import YScaleBars from './Sidebar/YScaleBars'
 
@@ -31,9 +31,7 @@ const LinearMafDisplay = observer(function (props: {
   const [mouseX, setMouseX] = useState<number>()
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartX, setDragStartX] = useState<number>()
-  const [dragStartY, setDragStartY] = useState<number>()
   const [dragEndX, setDragEndX] = useState<number>()
-  const [dragEndY, setDragEndY] = useState<number>()
   const [showSelectionBox, setShowSelectionBox] = useState(false)
   const [contextCoord, setContextCoord] = useState<{
     coord: [number, number]
@@ -52,18 +50,14 @@ const LinearMafDisplay = observer(function (props: {
 
   const handleMouseDown = (event: React.MouseEvent) => {
     const rect = ref.current?.getBoundingClientRect()
-    const top = rect?.top || 0
     const left = rect?.left || 0
     const clientX = event.clientX - left
-    const clientY = event.clientY - top
 
     // Clear the previous selection box when starting a new drag
     setShowSelectionBox(false)
     setIsDragging(true)
     setDragStartX(clientX)
-    setDragStartY(clientY)
     setDragEndX(clientX)
-    setDragEndY(clientY)
     event.stopPropagation()
   }
 
@@ -79,7 +73,6 @@ const LinearMafDisplay = observer(function (props: {
 
     if (isDragging) {
       setDragEndX(clientX)
-      setDragEndY(clientY)
     }
   }
 
@@ -87,10 +80,9 @@ const LinearMafDisplay = observer(function (props: {
     if (isDragging && dragStartX !== undefined && dragEndX !== undefined) {
       // Calculate the drag distance
       const dragDistanceX = Math.abs(dragEndX - dragStartX)
-      const dragDistanceY = Math.abs(dragEndY! - dragStartY!)
 
       // Only show context menu if the drag distance is at least 2 pixels in either direction
-      if (dragDistanceX >= 2 || dragDistanceY >= 2) {
+      if (dragDistanceX >= 2) {
         setContextCoord({
           coord: [event.clientX, event.clientY],
           dragEndX: event.clientX,
@@ -113,9 +105,7 @@ const LinearMafDisplay = observer(function (props: {
   const clearSelectionBox = () => {
     setShowSelectionBox(false)
     setDragStartX(undefined)
-    setDragStartY(undefined)
     setDragEndX(undefined)
-    setDragEndY(undefined)
   }
 
   // Add keydown event handler to clear selection box when Escape key is pressed
@@ -187,16 +177,14 @@ const LinearMafDisplay = observer(function (props: {
       ) : null}
       {(isDragging || showSelectionBox) &&
       dragStartX !== undefined &&
-      dragStartY !== undefined &&
-      dragEndX !== undefined &&
-      dragEndY !== undefined ? (
+      dragEndX !== undefined ? (
         <div
           style={{
             position: 'absolute',
             left: Math.min(dragStartX, dragEndX),
-            top: Math.min(dragStartY, dragEndY),
+            top: 0,
             width: Math.abs(dragEndX - dragStartX),
-            height: Math.abs(dragEndY - dragStartY),
+            height,
             backgroundColor: 'rgba(0, 0, 255, 0.2)',
             border: '1px solid rgba(0, 0, 255, 0.5)',
             pointerEvents: 'none',
