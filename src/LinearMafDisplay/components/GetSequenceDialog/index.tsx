@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
 import { Dialog, ErrorMessage, LoadingEllipses } from '@jbrowse/core/ui'
-import { getContainingView, getSession } from '@jbrowse/core/util'
-import { getRpcSessionId } from '@jbrowse/core/util/tracks'
+import { getSession } from '@jbrowse/core/util'
 import { Button, DialogActions, DialogContent, TextField } from '@mui/material'
 import { observer } from 'mobx-react'
 import { makeStyles } from 'tss-react/mui'
 
+import { fetchSequences } from '../../../util/fetchSequences'
 import type { LinearMafDisplayModel } from '../../stateModel'
-import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const useStyles = makeStyles()({
   dialogContent: {
@@ -36,7 +35,6 @@ const SequenceDialog = observer(function ({
     dragEndX: number
   }
 }) {
-  const { samples } = model
   const [sequence, setSequence] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<unknown>()
@@ -53,38 +51,9 @@ const SequenceDialog = observer(function ({
 
       try {
         setLoading(true)
-        setError(null)
+        setError(undefined)
 
-        const { rpcManager } = getSession(model)
-        const sessionId = getRpcSessionId(model)
-        const view = getContainingView(model) as LinearGenomeViewModel
-        const { refName, assemblyName } = view.displayedRegions[0]!
-        const { dragStartX, dragEndX } = selectionCoords
-        const [s, e] = [
-          Math.min(dragStartX, dragEndX),
-          Math.max(dragStartX, dragEndX),
-        ]
-
-        const fastaSequence = await rpcManager.call(
-          sessionId,
-          'MafGetSequences',
-          {
-            sessionId,
-            adapterConfig: model.adapterConfig,
-            samples,
-            regions: [
-              {
-                refName,
-                start: view.pxToBp(s).coord,
-                end: view.pxToBp(e).coord,
-                assemblyName,
-              },
-            ],
-          },
-        )
-
-        // Set the sequence data
-        setSequence(fastaSequence as string)
+        setSequence(await fetchSequences({ model, selectionCoords }))
       } catch (e) {
         console.error(e)
         setError(e)
