@@ -22,7 +22,9 @@ import type { ExportSvgDisplayOptions } from '@jbrowse/plugin-linear-genome-view
 import type { HierarchyNode } from 'd3-hierarchy'
 import type { Instance } from 'mobx-state-tree'
 
-const SetRowHeightDialog = lazy(() => import('./components/SetRowHeightDialog'))
+const SetRowHeightDialog = lazy(
+  () => import('./components/SetRowHeightDialog/SetRowHeightDialog'),
+)
 
 /**
  * #stateModel LinearMafDisplay

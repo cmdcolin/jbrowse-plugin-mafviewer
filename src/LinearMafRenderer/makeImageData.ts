@@ -62,15 +62,16 @@ export function makeImageData({
   const hp2 = h / 2
   const offset = (rowHeight - h) / 2
 
+  // sample as alignments
   ctx.font = 'bold 10px Courier New,monospace'
 
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const vals = feature.get('alignments') as Record<string, { seq: string }>
     const seq = feature.get('seq').toLowerCase()
     const r = Object.entries(vals)
     for (const [sample, val] of r) {
-      const origAlignment = val.data
+      const origAlignment = val.seq
       const alignment = origAlignment.toLowerCase()
 
       const row = sampleToRowMap.get(sample)
@@ -180,11 +181,11 @@ export function makeImageData({
   // insertions are always 'on top' of the other features
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const vals = feature.get('alignments') as Record<string, { seq: string }>
     const seq = feature.get('seq').toLowerCase()
 
     for (const [sample, val] of Object.entries(vals)) {
-      const origAlignment = val.data
+      const origAlignment = val.seq
       const alignment = origAlignment.toLowerCase()
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {

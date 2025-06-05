@@ -71,6 +71,7 @@ const SequenceDialog = observer(function ({
           {
             sessionId,
             adapterConfig: model.adapterConfig,
+            samples,
             regions: [
               {
                 refName,
@@ -79,7 +80,6 @@ const SequenceDialog = observer(function ({
                 assemblyName,
               },
             ],
-            bpPerPx: view.bpPerPx,
           },
         )
 

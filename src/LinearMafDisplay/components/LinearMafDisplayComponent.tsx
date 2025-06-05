@@ -6,9 +6,9 @@ import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
 
 import Crosshairs from './Crosshairs'
+import SequenceDialog from './GetSequenceDialog/index'
 import MAFTooltip from './MAFTooltip'
-import SequenceDialog from './SequenceDialog/index'
-import YScaleBars from './YScaleBars'
+import YScaleBars from './Sidebar/YScaleBars'
 
 import type { LinearMafDisplayModel } from '../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'

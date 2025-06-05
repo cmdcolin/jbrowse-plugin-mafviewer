@@ -3,7 +3,7 @@ import React from 'react'
 import { getContainingView } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 
-import type { LinearMafDisplayModel } from '../stateModel'
+import type { LinearMafDisplayModel } from '../../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const SvgWrapper = observer(function ({

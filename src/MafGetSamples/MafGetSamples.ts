@@ -2,6 +2,7 @@ import { getAdapter } from '@jbrowse/core/data_adapters/dataAdapterCache'
 import RpcMethodTypeWithFiltersAndRenameRegions from '@jbrowse/core/pluggableElementTypes/RpcMethodTypeWithFiltersAndRenameRegions'
 
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
+import type { Region } from '@jbrowse/core/util'
 
 export default class MafGetSamples extends RpcMethodTypeWithFiltersAndRenameRegions {
   name = 'MafGetSamples'

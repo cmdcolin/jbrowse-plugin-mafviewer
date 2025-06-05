@@ -2,20 +2,21 @@
 
 exports[`gap in assembly1 1`] = `
 [
-  ">assembly1.chr1:100:+",
-  "AC-TAC",
-  ">assembly2.chr2:200:+",
-  "ACTTC",
-  "",
+  ".....",
+  "...T.",
 ]
 `;
 
-exports[`processes a feature with a selected region 1`] = `
+exports[`no showAllLetters 1`] = `
 [
-  ">assembly1.chr1:100:+",
+  ".....",
+  "..-.T",
+]
+`;
+
+exports[`showAllLetters 1`] = `
+[
   "ACGTA",
-  ">assembly2.chr2:200:+",
   "AC-TT",
-  "",
 ]
 `;

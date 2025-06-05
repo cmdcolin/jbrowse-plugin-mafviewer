@@ -4,11 +4,10 @@ import { firstValueFrom, toArray } from 'rxjs'
 
 import { processFeaturesToFasta } from '../util/fastaUtils'
 
+import type { Sample } from '../LinearMafDisplay/types'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import type { Region } from '@jbrowse/core/util'
-
-
 
 export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRegions {
   name = 'MafGetSequences'
@@ -16,6 +15,7 @@ export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRe
   async execute(
     args: {
       adapterConfig: AnyConfigurationModel
+      samples: Sample[]
       stopToken?: string
       sessionId: string
       headers?: Record<string, string>
@@ -28,7 +28,7 @@ export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRe
       args,
       rpcDriverClassName,
     )
-    const { regions, adapterConfig, sessionId } = deserializedArgs
+    const { samples, regions, adapterConfig, sessionId } = deserializedArgs
     const { dataAdapter } = await getAdapter(
       this.pluginManager,
       sessionId,
@@ -42,9 +42,11 @@ export default class MafGetSequences extends RpcMethodTypeWithFiltersAndRenameRe
     const featuresObservable = (
       dataAdapter as BaseFeatureDataAdapter
     ).getFeatures(regions[0]!, deserializedArgs)
-    return processFeaturesToFasta(
-      await firstValueFrom(featuresObservable.pipe(toArray())),
-      regions[0],
-    )
+    const features = await firstValueFrom(featuresObservable.pipe(toArray()))
+    return processFeaturesToFasta({
+      features: new Map(features.map(f => [f.id(), f])),
+      samples,
+      regions,
+    })
   }
 }
