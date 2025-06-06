@@ -41,12 +41,36 @@
         "type": "MafTabixAdapter",
         "nhUri": "ce10.7way.nh",
         "samples": [
-          { "id": "ce10", "label": "Ce10", "color": "green" },
-          { "id": "cb4", "label": "Cb4", "color": "red" },
-          { "id": "caeSp111", "label": "CaeSp111", "color": "pink" },
-          { "id": "caeRem4", "label": "CaeRem4", "color": "blue" },
-          { "id": "caeJap4", "label": "CaeJap4", "color": "purple" },
-          { "id": "caePb3", "label": "CaePb3", "color": "orange" }
+          {
+            "id": "ce10",
+            "label": "Ce10",
+            "color": "green"
+          },
+          {
+            "id": "cb4",
+            "label": "Cb4",
+            "color": "red"
+          },
+          {
+            "id": "caeSp111",
+            "label": "CaeSp111",
+            "color": "pink"
+          },
+          {
+            "id": "caeRem4",
+            "label": "CaeRem4",
+            "color": "blue"
+          },
+          {
+            "id": "caeJap4",
+            "label": "CaeJap4",
+            "color": "purple"
+          },
+          {
+            "id": "caePb3",
+            "label": "CaePb3",
+            "color": "orange"
+          }
         ],
         "uri": "chrI.bed.gz"
       },
@@ -62,6 +86,38 @@
         "uri": "chrI.bed.gz"
       },
       "assemblyNames": ["ce10"]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chrI_newick_cf",
+      "name": "chrI w/ newick (plain feature track)",
+      "adapter": {
+        "type": "MafTabixAdapter",
+        "nhUri": "ce10.7way.nh",
+        "uri": "chrI.bed.gz"
+      },
+      "assemblyNames": ["ce10"]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "refGene.gff",
+      "name": "refGene.gff",
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "https://jbrowse.org/ucsc/ce10/refGene.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "https://jbrowse.org/ucsc/ce10/refGene.gff.gz.csi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "CSI"
+        }
+      },
+      "assemblyNames": ["ce10"]
     }
   ]
 }
+

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react'
 import RectBg from './RectBg'
 import Tree from './Tree'
 
-import type { LinearMafDisplayModel } from '../stateModel'
+import type { LinearMafDisplayModel } from '../../stateModel'
 
 const ColorLegend = observer(function ({
   model,

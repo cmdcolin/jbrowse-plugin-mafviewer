@@ -5,7 +5,7 @@ import { observer } from 'mobx-react'
 import ColorLegend from './ColorLegend'
 import SvgWrapper from './SvgWrapper'
 
-import type { LinearMafDisplayModel } from '../stateModel'
+import type { LinearMafDisplayModel } from '../../stateModel'
 
 export const YScaleBars = observer(function (props: {
   model: LinearMafDisplayModel

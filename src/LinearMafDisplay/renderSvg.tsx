@@ -2,7 +2,7 @@ import React from 'react'
 
 import { getContainingView } from '@jbrowse/core/util'
 
-import YScaleBars from './components/YScaleBars'
+import YScaleBars from './components/Sidebar/YScaleBars'
 
 import type { LinearMafDisplayModel } from './stateModel'
 import type {

@@ -16,6 +16,6 @@ export interface NodeWithIdsAndLength {
 
 export interface Sample {
   id: string
-  label: string
+  label?: string
   color?: string
 }

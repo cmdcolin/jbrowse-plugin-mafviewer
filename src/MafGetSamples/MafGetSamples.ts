@@ -1,11 +1,10 @@
 import { getAdapter } from '@jbrowse/core/data_adapters/dataAdapterCache'
 import RpcMethodTypeWithFiltersAndRenameRegions from '@jbrowse/core/pluggableElementTypes/RpcMethodTypeWithFiltersAndRenameRegions'
 
-import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Region } from '@jbrowse/core/util'
 
-export class MafGetSamples extends RpcMethodTypeWithFiltersAndRenameRegions {
+export default class MafGetSamples extends RpcMethodTypeWithFiltersAndRenameRegions {
   name = 'MafGetSamples'
 
   async execute(
@@ -30,10 +29,4 @@ export class MafGetSamples extends RpcMethodTypeWithFiltersAndRenameRegions {
     // @ts-expect-error
     return dataAdapter.getSamples(regions, deserializedArgs)
   }
-}
-
-export default function MafRPCF(pluginManager: PluginManager) {
-  pluginManager.addRpcMethod(() => {
-    return new MafGetSamples(pluginManager)
-  })
 }
