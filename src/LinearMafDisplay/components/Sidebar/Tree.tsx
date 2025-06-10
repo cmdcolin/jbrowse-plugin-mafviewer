@@ -2,7 +2,7 @@ import React from 'react'
 
 import { observer } from 'mobx-react'
 
-import type { LinearMafDisplayModel } from '../stateModel'
+import type { LinearMafDisplayModel } from '../../stateModel'
 
 const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
   const {

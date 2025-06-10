@@ -21,6 +21,11 @@ interface RenderArgs extends RenderArgsDeserialized {
   mismatchRendering: boolean
   features: Map<string, Feature>
   statusCallback?: (arg: string) => void
+  showAsUpperCase: boolean
+}
+
+function getLetter(a: string, showAsUpperCase: boolean) {
+  return showAsUpperCase ? a.toUpperCase() : a
 }
 
 export function makeImageData({
@@ -40,6 +45,7 @@ export function makeImageData({
     samples,
     rowProportion,
     features,
+    showAsUpperCase,
   } = renderArgs
   const region = regions[0]!
   const canvasWidth = (region.end - region.start) / bpPerPx
@@ -61,11 +67,11 @@ export function makeImageData({
 
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const vals = feature.get('alignments') as Record<string, { seq: string }>
     const seq = feature.get('seq').toLowerCase()
     const r = Object.entries(vals)
     for (const [sample, val] of r) {
-      const origAlignment = val.data
+      const origAlignment = val.seq
       const alignment = origAlignment.toLowerCase()
 
       const row = sampleToRowMap.get(sample)
@@ -157,7 +163,11 @@ export function makeImageData({
                 ? (contrastForBase[c] ?? 'white')
                 : 'black'
               if (rowHeight > charHeight) {
-                ctx.fillText(origAlignment[i] || '', l + offset, hp2 + t + 3)
+                ctx.fillText(
+                  getLetter(origAlignment[i] || '', showAsUpperCase),
+                  l + offset,
+                  hp2 + t + 3,
+                )
               }
             }
             o++
@@ -171,11 +181,11 @@ export function makeImageData({
   // insertions are always 'on top' of the other features
   for (const feature of features.values()) {
     const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-    const vals = feature.get('alignments') as Record<string, { data: string }>
+    const vals = feature.get('alignments') as Record<string, { seq: string }>
     const seq = feature.get('seq').toLowerCase()
 
     for (const [sample, val] of Object.entries(vals)) {
-      const origAlignment = val.data
+      const origAlignment = val.seq
       const alignment = origAlignment.toLowerCase()
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {

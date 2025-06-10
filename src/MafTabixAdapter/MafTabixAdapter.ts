@@ -22,7 +22,7 @@ interface OrganismRecord {
   srcSize: number
   strand: number
   unknown: number
-  data: string
+  seq: string
 }
 
 export default class MafTabixAdapter extends BaseFeatureDataAdapter {
@@ -85,7 +85,6 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
 
-           
           const len = data.length
           for (let j = 0; j < len; j++) {
             const elt = data[j]!
@@ -114,7 +113,7 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
                 srcSize: +ad[2]!,
                 strand: ad[3] === '-' ? -1 : 1,
                 unknown: +ad[4]!,
-                data: seq,
+                seq,
               }
             }
           }
@@ -130,8 +129,8 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
                 score: feature.get('score'),
                 alignments,
                 seq:
-                  alignments[refAssemblyName || query.assemblyName]?.data ||
-                  alignments[firstAssemblyNameFound]?.data,
+                  alignments[refAssemblyName || query.assemblyName]?.seq ||
+                  alignments[firstAssemblyNameFound]?.seq,
               },
             }),
           )

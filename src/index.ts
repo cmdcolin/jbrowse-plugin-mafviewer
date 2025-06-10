@@ -7,7 +7,8 @@ import BigMafAdapterF from './BigMafAdapter'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
 import MafAddTrackWorkflowF from './MafAddTrackWorkflow'
-import MafRPCF from './MafRPC'
+import MafGetSamplesF from './MafGetSamples'
+import MafGetSequencesF from './MafGetSequences'
 import MafTabixAdapterF from './MafTabixAdapter'
 import MafTrackF from './MafTrack'
 
@@ -23,7 +24,8 @@ export default class MafViewerPlugin extends Plugin {
     MafTabixAdapterF(pluginManager)
     BgzipTaffyAdapterF(pluginManager)
     MafAddTrackWorkflowF(pluginManager)
-    MafRPCF(pluginManager)
+    MafGetSequencesF(pluginManager)
+    MafGetSamplesF(pluginManager)
   }
 
   configure(_pluginManager: PluginManager) {}
