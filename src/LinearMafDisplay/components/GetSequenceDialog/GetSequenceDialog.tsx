@@ -100,6 +100,7 @@ const GetSequenceDialog = observer(function ({
           </Button>
           <Button
             variant="contained"
+            color="secondary"
             disabled={loading || !sequence}
             onClick={() => {
               try {

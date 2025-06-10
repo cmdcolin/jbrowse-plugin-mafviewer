@@ -90,7 +90,7 @@
     {
       "type": "FeatureTrack",
       "trackId": "chrI_newick_cf",
-      "name": "chrI w/ newick (plain feature track)",
+      "name": "chrI CF",
       "adapter": {
         "type": "MafTabixAdapter",
         "nhUri": "ce10.7way.nh",
@@ -120,4 +120,3 @@
     }
   ]
 }
-
