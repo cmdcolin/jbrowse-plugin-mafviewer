@@ -609,7 +609,7 @@
       "adapter": {
         "type": "BigBedAdapter",
         "bigBedLocation": {
-          "uri": "bigMaf.bb"
+          "uri": "https://jbrowse.org/demos/maf/hg38/bigMaf.bb"
         }
       },
       "assemblyNames": ["hg38"]
@@ -630,7 +630,7 @@
           "monDom5"
         ],
         "bigBedLocation": {
-          "uri": "bigMaf.bb"
+          "uri": "https://jbrowse.org/demos/maf/hg38/bigMaf.bb"
         }
       },
       "assemblyNames": ["hg38"]

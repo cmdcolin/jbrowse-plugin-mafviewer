@@ -17,7 +17,7 @@ interface OrganismRecord {
   srcSize: number
   strand: number
   unknown: number
-  data: string
+  seq: string
 }
 export default class BigMafAdapter extends BaseFeatureDataAdapter {
   public setupP?: Promise<{ adapter: BaseFeatureDataAdapter }>
@@ -98,7 +98,7 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
               srcSize: +ad[2]!,
               strand: ad[3] === '+' ? 1 : -1,
               unknown: +ad[4]!,
-              data: alns[i]!,
+              seq: alns[i]!,
             }
           }
           observer.next(
