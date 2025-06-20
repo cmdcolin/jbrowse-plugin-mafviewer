@@ -9,7 +9,7 @@ JBrowse 2
 
 ## Demo
 
-https://jbrowse.org/code/jb2/main/?config=%2Fdemos%2Fmaf%2Fhg38%2Fdistconfig.json&session=share-jREsrEm0Q-&password=fRZjQ
+https://jbrowse.org/code/jb2/main/?config=%2Fdemos%2Fmaf%2Fhg38%2Fdistconfig.json&session=share-2v5qIkvufP&password=uYpiC
 
 ## GUI usage (e.g. in JBrowse Desktop)
 
