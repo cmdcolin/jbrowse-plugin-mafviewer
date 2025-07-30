@@ -92,36 +92,6 @@ can use nhLocation or samples array on adapter
 }
 ```
 
-### Example BgzipTaffyAdapter config
-
-Note: TAF files are actually significantly slower and has known bugs...will
-update once fixed
-
-This notice will be removed it it is improved
-
-As with other adapters, you can use nhLocation or samples array on adapter
-
-```json
-{
-  "type": "MafTrack",
-  "trackId": "bigMaf",
-  "name": "taffy",
-  "adapter": {
-    "type": "BgzipTaffyAdapter",
-    "nhLocation": {
-      "uri": "hg38.30way.nh"
-    },
-    "tafGzLocation": {
-      "uri": "30way.taf.gz"
-    },
-    "taiGzLocation": {
-      "uri": "30way.taf.gz.tai"
-    }
-  },
-  "assemblyNames": ["hg38"]
-}
-```
-
 ### Example with customized sample names and colors
 
 ```json
@@ -191,9 +161,6 @@ the case
 2. MAF tabix based format, based on a custom BED created via conversion tools in
    this repo (see maf2bed)
 
-3. TAF format (new!). Currently only supports bgzip'd TAF. This is pioneered by
-   https://github.com/ComparativeGenomicsToolkit/taffy
-
 _Note: All these formats generally start with a MAF as input. Note that your MAF
 file should contain the species name and chromosome name e.g. hg38.chr1 in the
 sequence identifiers._
@@ -229,17 +196,3 @@ separated by `:`.
 
 Note: If you can't use the `cargo install maf2bed` binary, there is a
 `bin/maf2bed.pl` perl version of it in this repo
-
-### Option 3. Preparing TAF
-
-Follow steps from https://github.com/ComparativeGenomicsToolkit/taffy
-
-```
-taffy view -i chr22.maf -o chr22.taf
-bgzip chr22.taf
-taffy index -i chr22.taf.gz
-```
-
-The above workflow requires that taffy is built with "htslib support"
-
-Note that the TAF support is beta, let me know if you run into any issues
