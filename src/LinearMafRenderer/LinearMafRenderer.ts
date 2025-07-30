@@ -48,14 +48,13 @@ export default class LinearMafRenderer extends FeatureRendererType {
     const features = await this.getFeatures(renderProps)
     const res = await updateStatus('Rendering alignment', statusCallback, () =>
       renderToAbstractCanvas(width, height, renderProps, ctx => {
-        makeImageData({
+        return makeImageData({
           ctx,
           renderArgs: {
             ...renderProps,
             features,
           },
         })
-        return undefined
       }),
     )
     const results = await super.render({

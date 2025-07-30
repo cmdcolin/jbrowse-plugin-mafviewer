@@ -38,6 +38,7 @@
     "@types/d3-array": "^3.2.1",
     "@types/d3-hierarchy": "^3.1.7",
     "@types/node": "^22.15.16",
+    "@types/rbush": "^4.0.0",
     "@types/react": "^19.0.1",
     "chalk": "^5.3.0",
     "esbuild": "^0.25.0",

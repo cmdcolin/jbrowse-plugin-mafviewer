@@ -1,6 +1,7 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
 import { Feature, featureSpanPx, measureText } from '@jbrowse/core/util'
+import RBush from 'rbush'
 
 import {
   fillRect,
@@ -44,7 +45,6 @@ interface RenderedBase {
   minY: number
   maxX: number
   maxY: number
-  
   // Genomic information
   genomicPosition: number
   sampleId: string
@@ -53,7 +53,6 @@ interface RenderedBase {
   isMismatch: boolean
   isGap: boolean
   isInsertion: boolean
-  
   // Feature reference
   featureId: string
 }
@@ -116,13 +115,13 @@ function createRenderedBase(
 }
 
 /**
- * Adds a rendered base to the spatial index collection if enabled
+ * Adds a rendered base directly to the RBush spatial index
  */
 function addToSpatialIndex(
   context: RenderingContext,
   renderedBase: RenderedBase,
 ): void {
-  context.renderedBases.push(renderedBase)
+  context.spatialIndex.insert(renderedBase)
 }
 
 /**
@@ -141,9 +140,9 @@ interface RenderingContext {
   showAllLetters: boolean
   mismatchRendering: boolean
   showAsUpperCase: boolean
-  
-  // Collection for spatial indexing with RBush
-  renderedBases: RenderedBase[]
+
+  // RBush spatial index for efficient spatial queries
+  spatialIndex: RBush<RenderedBase>
 }
 
 /**
@@ -165,21 +164,34 @@ function renderGaps(
 ) {
   const { ctx, scale } = context
   const h2 = context.rowHeight / 2
-  
+
   ctx.beginPath()
   ctx.fillStyle = 'black'
-  
-  for (let i = 0, genomicOffset = 0, seqLength = alignment.length; i < seqLength; i++) {
+
+  for (
+    let i = 0, genomicOffset = 0, seqLength = alignment.length;
+    i < seqLength;
+    i++
+  ) {
     if (seq[i] !== '-') {
       if (alignment[i] === '-') {
         const xPos = leftPx + scale * genomicOffset
         ctx.moveTo(xPos, rowTop + h2)
         ctx.lineTo(xPos + scale + GAP_STROKE_OFFSET, rowTop + h2)
-        
+
         // Add to spatial index
         const renderedBase = createRenderedBase(
-          xPos, rowTop, context, genomicOffset, sampleId, '-', 
-          false, false, true, false, featureId
+          xPos,
+          rowTop,
+          context,
+          genomicOffset,
+          sampleId,
+          '-',
+          false,
+          false,
+          true,
+          false,
+          featureId,
         )
         addToSpatialIndex(context, renderedBase)
       }
@@ -210,22 +222,40 @@ function renderMatches(
   if (context.showAllLetters) {
     return
   }
-  
+
   const { ctx, scale, h, canvasWidth } = context
   ctx.fillStyle = 'lightgrey'
-  
+
   // Highlight matching bases with light grey background
-  for (let i = 0, genomicOffset = 0, seqLength = alignment.length; i < seqLength; i++) {
-    if (seq[i] !== '-') { // Only process non-gap positions in reference
+  for (
+    let i = 0, genomicOffset = 0, seqLength = alignment.length;
+    i < seqLength;
+    i++
+  ) {
+    if (seq[i] !== '-') {
+      // Only process non-gap positions in reference
       const currentChar = alignment[i]
       const xPos = leftPx + scale * genomicOffset
-      if (seq[i] === currentChar && currentChar !== '-' && currentChar !== ' ') {
+      if (
+        seq[i] === currentChar &&
+        currentChar !== '-' &&
+        currentChar !== ' '
+      ) {
         fillRect(ctx, xPos, rowTop, scale + GAP_STROKE_OFFSET, h, canvasWidth)
-        
+
         // Add to spatial index
         const renderedBase = createRenderedBase(
-          xPos, rowTop, context, genomicOffset, sampleId, currentChar || '', 
-          true, false, false, false, featureId
+          xPos,
+          rowTop,
+          context,
+          genomicOffset,
+          sampleId,
+          currentChar || '',
+          true,
+          false,
+          false,
+          false,
+          featureId,
         )
         addToSpatialIndex(context, renderedBase)
       }
@@ -252,9 +282,21 @@ function renderMismatches(
   sampleId: string,
   featureId: string,
 ) {
-  const { ctx, scale, h, canvasWidth, showAllLetters, mismatchRendering, colorForBase } = context
-  
-  for (let i = 0, genomicOffset = 0, seqLength = alignment.length; i < seqLength; i++) {
+  const {
+    ctx,
+    scale,
+    h,
+    canvasWidth,
+    showAllLetters,
+    mismatchRendering,
+    colorForBase,
+  } = context
+
+  for (
+    let i = 0, genomicOffset = 0, seqLength = alignment.length;
+    i < seqLength;
+    i++
+  ) {
     const currentChar = alignment[i]
     if (seq[i] !== '-') {
       if (currentChar !== '-') {
@@ -272,11 +314,20 @@ function renderMismatches(
               ? (colorForBase[currentChar!] ?? 'black')
               : 'orange',
           )
-          
+
           // Add to spatial index
           const renderedBase = createRenderedBase(
-            xPos, rowTop, context, genomicOffset, sampleId, currentChar!, 
-            false, true, false, false, featureId
+            xPos,
+            rowTop,
+            context,
+            genomicOffset,
+            sampleId,
+            currentChar!,
+            false,
+            true,
+            false,
+            false,
+            featureId,
           )
           addToSpatialIndex(context, renderedBase)
         } else if (showAllLetters) {
@@ -292,11 +343,20 @@ function renderMismatches(
               ? (colorForBase[currentChar!] ?? 'black')
               : 'lightblue',
           )
-          
+
           // Add to spatial index
           const renderedBase = createRenderedBase(
-            xPos, rowTop, context, genomicOffset, sampleId, currentChar!, 
-            true, false, false, false, featureId
+            xPos,
+            rowTop,
+            context,
+            genomicOffset,
+            sampleId,
+            currentChar!,
+            true,
+            false,
+            false,
+            false,
+            featureId,
           )
           addToSpatialIndex(context, renderedBase)
         }
@@ -326,13 +386,27 @@ function renderText(
   _sampleId: string,
   _featureId: string,
 ) {
-  const { ctx, scale, hp2, rowHeight, showAllLetters, mismatchRendering, contrastForBase, showAsUpperCase } = context
+  const {
+    ctx,
+    scale,
+    hp2,
+    rowHeight,
+    showAllLetters,
+    mismatchRendering,
+    contrastForBase,
+    showAsUpperCase,
+  } = context
   const { charHeight } = getCharWidthHeight()
-  
+
   // Render text labels when zoomed in enough and row is tall enough
   if (scale >= CHAR_SIZE_WIDTH) {
-    for (let i = 0, genomicOffset = 0, seqLength = alignment.length; i < seqLength; i++) {
-      if (seq[i] !== '-') { // Only process non-gap positions in reference
+    for (
+      let i = 0, genomicOffset = 0, seqLength = alignment.length;
+      i < seqLength;
+      i++
+    ) {
+      if (seq[i] !== '-') {
+        // Only process non-gap positions in reference
         const xPos = leftPx + scale * genomicOffset
         const textOffset = (scale - CHAR_SIZE_WIDTH) / 2 + 1 // Center text in available space
         const currentChar = alignment[i]!
@@ -341,7 +415,8 @@ function renderText(
           ctx.fillStyle = mismatchRendering
             ? (contrastForBase[currentChar] ?? 'white') // Use contrasting color for readability
             : 'black'
-          if (rowHeight > charHeight) { // Only render if row is tall enough
+          if (rowHeight > charHeight) {
+            // Only render if row is tall enough
             ctx.fillText(
               getLetter(origAlignment[i] || '', showAsUpperCase),
               xPos + textOffset,
@@ -377,8 +452,12 @@ function renderInsertions(
 ) {
   const { ctx, scale, h, canvasWidth, rowHeight } = context
   const { charHeight } = getCharWidthHeight()
-  
-  for (let i = 0, genomicOffset = 0, seqLength = alignment.length; i < seqLength; i++) {
+
+  for (
+    let i = 0, genomicOffset = 0, seqLength = alignment.length;
+    i < seqLength;
+    i++
+  ) {
     let insertionSequence = ''
     while (seq[i] === '-') {
       if (alignment[i] !== '-' && alignment[i] !== ' ') {
@@ -386,7 +465,8 @@ function renderInsertions(
       }
       i++
     }
-    if (insertionSequence.length > 0) { // Found an insertion
+    if (insertionSequence.length > 0) {
+      // Found an insertion
       const xPos = leftPx + scale * genomicOffset - INSERTION_LINE_WIDTH
 
       // Large insertions: show count instead of individual bases
@@ -394,7 +474,15 @@ function renderInsertions(
         const lengthText = `${insertionSequence.length}`
         if (bpPerPx > HIGH_BP_PER_PX_THRESHOLD) {
           // Very zoomed out: simple line
-          fillRect(ctx, xPos - INSERTION_LINE_WIDTH, rowTop, INSERTION_BORDER_WIDTH, h, canvasWidth, 'purple')
+          fillRect(
+            ctx,
+            xPos - INSERTION_LINE_WIDTH,
+            rowTop,
+            INSERTION_BORDER_WIDTH,
+            h,
+            canvasWidth,
+            'purple',
+          )
         } else if (h > charHeight) {
           // Medium zoom: show count in colored box
           const textWidth = measureText(lengthText, CHAR_SIZE_WIDTH)
@@ -424,18 +512,52 @@ function renderInsertions(
         }
       } else {
         // Small insertions: vertical line with optional border at high zoom
-        fillRect(ctx, xPos, rowTop, INSERTION_LINE_WIDTH, h, canvasWidth, 'purple')
-        if (bpPerPx < HIGH_ZOOM_THRESHOLD && rowHeight > MIN_ROW_HEIGHT_FOR_BORDERS) {
+        fillRect(
+          ctx,
+          xPos,
+          rowTop,
+          INSERTION_LINE_WIDTH,
+          h,
+          canvasWidth,
+          'purple',
+        )
+        if (
+          bpPerPx < HIGH_ZOOM_THRESHOLD &&
+          rowHeight > MIN_ROW_HEIGHT_FOR_BORDERS
+        ) {
           // Add horizontal borders for visibility at high zoom
-          fillRect(ctx, xPos - INSERTION_BORDER_WIDTH, rowTop, INSERTION_BORDER_HEIGHT, INSERTION_LINE_WIDTH, canvasWidth)
-          fillRect(ctx, xPos - INSERTION_BORDER_WIDTH, rowTop + h - INSERTION_LINE_WIDTH, INSERTION_BORDER_HEIGHT, INSERTION_LINE_WIDTH, canvasWidth)
+          fillRect(
+            ctx,
+            xPos - INSERTION_BORDER_WIDTH,
+            rowTop,
+            INSERTION_BORDER_HEIGHT,
+            INSERTION_LINE_WIDTH,
+            canvasWidth,
+          )
+          fillRect(
+            ctx,
+            xPos - INSERTION_BORDER_WIDTH,
+            rowTop + h - INSERTION_LINE_WIDTH,
+            INSERTION_BORDER_HEIGHT,
+            INSERTION_LINE_WIDTH,
+            canvasWidth,
+          )
         }
       }
-      
+
       // Add insertion to spatial index
       const renderedBase = createRenderedBase(
-        xPos, rowTop, context, genomicOffset, sampleId, insertionSequence, 
-        false, false, false, true, featureId
+        xPos,
+        rowTop,
+        context,
+        genomicOffset,
+        sampleId,
+        insertionSequence,
+        false,
+        false,
+        false,
+        true,
+        featureId,
       )
       addToSpatialIndex(context, renderedBase)
     }
@@ -459,9 +581,13 @@ function processFeatureAlignment(
   renderingContext: RenderingContext,
 ) {
   const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-  const alignments = feature.get('alignments') as Record<string, { seq: string }>
+  const alignments = feature.get('alignments') as Record<
+    string,
+    { seq: string }
+  >
   const referenceSeq = feature.get('seq').toLowerCase()
-  const featureId = feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
+  const featureId =
+    feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
 
   for (const [sampleId, alignmentData] of Object.entries(alignments)) {
     const row = sampleToRowMap.get(sampleId)
@@ -473,10 +599,43 @@ function processFeatureAlignment(
     const alignment = originalAlignment.toLowerCase()
     const rowTop = renderingContext.offset + renderingContext.rowHeight * row
 
-    renderGaps(renderingContext, alignment, referenceSeq, leftPx, rowTop, sampleId, featureId)
-    renderMatches(renderingContext, alignment, referenceSeq, leftPx, rowTop, sampleId, featureId)
-    renderMismatches(renderingContext, alignment, referenceSeq, leftPx, rowTop, sampleId, featureId)
-    renderText(renderingContext, alignment, originalAlignment, referenceSeq, leftPx, rowTop, sampleId, featureId)
+    renderGaps(
+      renderingContext,
+      alignment,
+      referenceSeq,
+      leftPx,
+      rowTop,
+      sampleId,
+      featureId,
+    )
+    renderMatches(
+      renderingContext,
+      alignment,
+      referenceSeq,
+      leftPx,
+      rowTop,
+      sampleId,
+      featureId,
+    )
+    renderMismatches(
+      renderingContext,
+      alignment,
+      referenceSeq,
+      leftPx,
+      rowTop,
+      sampleId,
+      featureId,
+    )
+    renderText(
+      renderingContext,
+      alignment,
+      originalAlignment,
+      referenceSeq,
+      leftPx,
+      rowTop,
+      sampleId,
+      featureId,
+    )
   }
 }
 
@@ -497,9 +656,13 @@ function processFeatureInsertions(
   renderingContext: RenderingContext,
 ) {
   const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-  const alignments = feature.get('alignments') as Record<string, { seq: string }>
+  const alignments = feature.get('alignments') as Record<
+    string,
+    { seq: string }
+  >
   const referenceSeq = feature.get('seq').toLowerCase()
-  const featureId = feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
+  const featureId =
+    feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
 
   for (const [sampleId, alignmentData] of Object.entries(alignments)) {
     const row = sampleToRowMap.get(sampleId)
@@ -510,34 +673,47 @@ function processFeatureInsertions(
     const alignment = alignmentData.seq.toLowerCase()
     const rowTop = renderingContext.offset + renderingContext.rowHeight * row
 
-    renderInsertions(renderingContext, alignment, referenceSeq, leftPx, rowTop, bpPerPx, sampleId, featureId)
+    renderInsertions(
+      renderingContext,
+      alignment,
+      referenceSeq,
+      leftPx,
+      rowTop,
+      bpPerPx,
+      sampleId,
+      featureId,
+    )
   }
 }
 
 /**
  * Main rendering function that creates the MAF alignment visualization
  * Uses a two-pass approach: first renders alignments, then insertions on top
- * 
- * The function now automatically collects spatial data for RBush indexing:
- * 
+ *
+ * The function automatically creates and populates an RBush spatial index with all rendered elements:
+ *
  * @example
  * ```typescript
  * import RBush from 'rbush'
- * 
+ *
  * const result = makeImageData({ ctx, renderArgs })
  * const spatialIndex = new RBush<RenderedBase>()
- * spatialIndex.load(result.renderedBases)
- * 
- * // Query by bounding box
+ * spatialIndex.fromJSON(result.spatialIndex)
+ *
+ * // Query by bounding box (e.g., mouse hover area)
  * const hits = spatialIndex.search({ minX: 100, minY: 50, maxX: 200, maxY: 100 })
- * 
- * // Find bases at specific genomic position
- * const basesAtPosition = result.renderedBases.filter(b => b.genomicPosition === 12345)
+ *
+ * // Find bases at specific screen position
+ * const basesAtPoint = spatialIndex.search({ minX: x-1, minY: y-1, maxX: x+1, maxY: y+1 })
+ *
+ * // Access all indexed items for custom filtering
+ * const allItems = spatialIndex.all()
+ * const basesAtGenomicPosition = allItems.filter(b => b.genomicPosition === 12345)
  * ```
- * 
+ *
  * @param ctx - Canvas 2D rendering context
  * @param renderArgs - All rendering parameters and data
- * @returns Object containing collected RenderedBase objects for spatial indexing with RBush
+ * @returns Object containing serialized RBush spatial index data
  */
 export function makeImageData({
   ctx,
@@ -558,7 +734,7 @@ export function makeImageData({
     features,
     showAsUpperCase,
   } = renderArgs
-  
+
   const region = regions[0]!
   const canvasWidth = (region.end - region.start) / bpPerPx
   const h = rowHeight * rowProportion
@@ -585,21 +761,33 @@ export function makeImageData({
     showAllLetters,
     mismatchRendering,
     showAsUpperCase,
-    renderedBases: [],
+    spatialIndex: new RBush<RenderedBase>(),
   }
 
   // First pass: render alignments (gaps, matches, mismatches, text)
   for (const feature of features.values()) {
-    processFeatureAlignment(feature, region, bpPerPx, sampleToRowMap, renderingContext)
+    processFeatureAlignment(
+      feature,
+      region,
+      bpPerPx,
+      sampleToRowMap,
+      renderingContext,
+    )
   }
 
   // Second pass: render insertions on top
   for (const feature of features.values()) {
-    processFeatureInsertions(feature, region, bpPerPx, sampleToRowMap, renderingContext)
+    processFeatureInsertions(
+      feature,
+      region,
+      bpPerPx,
+      sampleToRowMap,
+      renderingContext,
+    )
   }
 
-  // Return spatial index data if requested
+  // Return serialized RBush spatial index
   return {
-    renderedBases: renderingContext.renderedBases,
+    rbush: renderingContext.spatialIndex.toJSON(),
   }
 }

@@ -88,6 +88,10 @@ export default function stateModelFactory(
       /**
        * #volatile
        */
+      hoveredInfo: undefined as Record<string, unknown> | undefined,
+      /**
+       * #volatile
+       */
       prefersOffset: true,
       /**
        * #volatile
@@ -99,6 +103,12 @@ export default function stateModelFactory(
       volatileTree: undefined as any,
     }))
     .actions(self => ({
+      /**
+       * #action
+       */
+      setHoveredInfo(arg?: Record<string, unknown>) {
+        self.hoveredInfo = arg
+      },
       /**
        * #action
        */

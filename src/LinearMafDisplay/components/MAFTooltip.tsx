@@ -12,15 +12,6 @@ import { observer } from 'mobx-react'
 import type { LinearMafDisplayModel } from '../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
-interface MAFTooltipProps {
-  mouseY: number
-  mouseX: number
-  rowHeight: number
-  sources: Record<string, any>[]
-  model: LinearMafDisplayModel
-  origMouseX?: number
-}
-
 const MAFTooltip = observer(function ({
   model,
   mouseY,
@@ -28,7 +19,15 @@ const MAFTooltip = observer(function ({
   origMouseX,
   rowHeight,
   sources,
-}: MAFTooltipProps) {
+}: {
+  mouseY: number
+  mouseX: number
+  rowHeight: number
+  sources: Record<string, any>[]
+  model: LinearMafDisplayModel
+  origMouseX?: number
+}) {
+  const { hoveredInfo } = model
   const view = getContainingView(model) as LinearGenomeViewModel
   const ret = Object.entries(sources[Math.floor(mouseY / rowHeight)] || {})
     .filter(([key]) => key !== 'color' && key !== 'id')
@@ -36,7 +35,7 @@ const MAFTooltip = observer(function ({
     .join('\n')
   const p1 = origMouseX ? view.pxToBp(origMouseX) : undefined
   const p2 = view.pxToBp(mouseX)
-  return ret ? (
+  return ret !== '' ? (
     <BaseTooltip>
       <SanitizedHTML
         html={[
@@ -47,7 +46,12 @@ const MAFTooltip = observer(function ({
                 `End: ${p2.refName}:${toLocale(p2.coord)}`,
                 `Length: ${getBpDisplayStr(Math.abs(p1.coord - p2.coord))}`,
               ]
-            : [`${p2.refName}:${toLocale(p2.coord)}`]),
+            : [
+                `${p2.refName}:${toLocale(p2.coord)}`,
+                hoveredInfo
+                  ? `${hoveredInfo.sampleId}:${hoveredInfo?.genomicPosition} (${hoveredInfo?.base})`
+                  : undefined,
+              ]),
         ]
           .filter(f => !!f)
           .join('<br/>')}
