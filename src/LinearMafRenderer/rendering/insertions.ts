@@ -99,7 +99,7 @@ export function renderInsertions(
             'purple',
           )
           ctx.fillStyle = 'white'
-          ctx.fillText(lengthText, xPos - textWidth / 2, rowTop + h)
+          ctx.fillText(lengthText, xPos - textWidth / 2, rowTop + (h * 7) / 8)
         } else {
           const padding = INSERTION_PADDING
           actualXPos = xPos - padding

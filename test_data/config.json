@@ -653,44 +653,6 @@
       }
     },
     {
-      "trackId": "TAF",
-      "name": "447-way alignment TAFFY",
-      "type": "MafTrack",
-      "assemblyNames": ["hg38"],
-      "adapter": {
-        "type": "BgzipTaffyAdapter",
-        "tafGzLocation": {
-          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.gz"
-        },
-        "taiLocation": {
-          "uri": "447-mammalian-2022v1_hg38_chr22_22000000_22100000.anc.norm.taf.gz.tai"
-        },
-        "nhLocation": {
-          "uri": "447-mammalian-2022v1.nh"
-        }
-      }
-    },
-
-    {
-      "trackId": "30waytaf",
-      "name": "30-way alignment (chr22, TAF)",
-      "type": "MafTrack",
-      "assemblyNames": ["hg38"],
-      "adapter": {
-        "type": "BgzipTaffyAdapter",
-        "tafGzLocation": {
-          "uri": "chr22.taf.gz"
-        },
-        "taiLocation": {
-          "uri": "chr22.taf.gz.tai"
-        },
-        "nhLocation": {
-          "uri": "hg38.30way.nh"
-        }
-      }
-    },
-
-    {
       "trackId": "30wayMAF",
       "name": "30-way alignment (chr22, MAF)",
       "type": "MafTrack",
@@ -709,6 +671,32 @@
           "uri": "hg38.30way.nh"
         }
       }
+    },
+    {
+      "trackId": "447way",
+      "name": "447way",
+      "type": "MafTrack",
+      "assemblyNames": ["hg38"],
+      "adapter": {
+        "type": "BigMafAdapter",
+        "bigBedLocation": {
+          "uri": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/cactus447way/hg38.cactus447way.bb"
+        },
+        "nhLocation": {
+          "uri": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/cactus447way/hg38.447way.nh.txt"
+        }
+      }
     }
-  ]
+  ],
+  "defaultSession": {
+    "views": [
+      {
+        "type": "LinearGenomeView",
+        "init": {
+          "assembly": "hg38",
+          "loc": "1:57,149,977..57,150,977"
+        }
+      }
+    ]
+  }
 }
