@@ -116,12 +116,24 @@ function createRenderedBase(
 
 /**
  * Adds a rendered base directly to the RBush spatial index
+ * Only inserts if the X position is >0.5px away from the last inserted item
+ * This reduces spatial index density while maintaining useful spatial queries
+ * 
+ * @example
+ * // Items at X positions: 100.0, 100.3, 100.8, 101.5
+ * // Only items at 100.0, 100.8, 101.5 would be inserted (>0.5px apart)
  */
 function addToSpatialIndex(
   context: RenderingContext,
   renderedBase: RenderedBase,
 ): void {
-  context.spatialIndex.insert(renderedBase)
+  const MIN_X_DISTANCE = 0.5
+  
+  // Check if this item is far enough from the last inserted item
+  if (Math.abs(renderedBase.minX - context.lastInsertedX) > MIN_X_DISTANCE) {
+    context.spatialIndex.insert(renderedBase)
+    context.lastInsertedX = renderedBase.minX
+  }
 }
 
 /**
@@ -143,6 +155,9 @@ interface RenderingContext {
 
   // RBush spatial index for efficient spatial queries
   spatialIndex: RBush<RenderedBase>
+  
+  // Track last X position for spatial index optimization
+  lastInsertedX: number
 }
 
 /**
@@ -690,7 +705,8 @@ function processFeatureInsertions(
  * Main rendering function that creates the MAF alignment visualization
  * Uses a two-pass approach: first renders alignments, then insertions on top
  *
- * The function automatically creates and populates an RBush spatial index with all rendered elements:
+ * The function automatically creates and populates an RBush spatial index with rendered elements.
+ * Items are only indexed if they are >0.5px apart in the X-direction to optimize index density:
  *
  * @example
  * ```typescript
@@ -762,6 +778,7 @@ export function makeImageData({
     mismatchRendering,
     showAsUpperCase,
     spatialIndex: new RBush<RenderedBase>(),
+    lastInsertedX: -Infinity, // Start with -Infinity so first item is always inserted
   }
 
   // First pass: render alignments (gaps, matches, mismatches, text)
