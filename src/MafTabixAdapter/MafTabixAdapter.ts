@@ -81,38 +81,93 @@ export default class MafTabixAdapter extends BaseFeatureDataAdapter {
       await updateStatus('Processing alignments', statusCallback, () => {
         let firstAssemblyNameFound = ''
         const refAssemblyName = this.getConf('refAssemblyName')
+
         for (const feature of features) {
           const data = (feature.get('field5') as string).split(',')
           const alignments = {} as Record<string, OrganismRecord>
+          const dataLength = data.length
 
-          const len = data.length
-          for (let j = 0; j < len; j++) {
+          for (let j = 0; j < dataLength; j++) {
             const elt = data[j]!
-            const seq = elt.split(':')[5]!
-            const ad = elt.split(':')
-            const ag = ad[0]!.split('.')
-            const [n1, n2 = '', ...rest] = ag
-            let assemblyName
-            let last = ''
-            if (ag.length === 2) {
-              assemblyName = n1
-              last = n2!
-            } else if (!Number.isNaN(+n2)) {
-              assemblyName = `${n1}.${n2}`
-              last = rest.join('.')
-            } else {
-              assemblyName = n1
-              last = [n2, ...rest].join('.')
-            }
-            if (assemblyName) {
-              firstAssemblyNameFound = firstAssemblyNameFound || assemblyName
+            // Cache split result to avoid redundant operations
+            const parts = elt.split(':')
 
+            // Use destructuring for better performance than multiple array access
+            const [
+              assemblyAndChr,
+              startStr,
+              srcSizeStr,
+              strandStr,
+              unknownStr,
+              seq,
+            ] = parts
+
+            // Skip if we don't have all required parts
+            if (!assemblyAndChr || !seq) {
+              continue
+            }
+
+            // Optimized assembly name parsing with simplified logic
+            let assemblyName: string
+            let chr: string
+
+            const firstDotIndex = assemblyAndChr.indexOf('.')
+            if (firstDotIndex === -1) {
+              // No dot found, entire string is assembly name
+              assemblyName = assemblyAndChr
+              chr = ''
+            } else {
+              const secondDotIndex = assemblyAndChr.indexOf(
+                '.',
+                firstDotIndex + 1,
+              )
+              if (secondDotIndex === -1) {
+                // Only one dot: assembly.chr
+                assemblyName = assemblyAndChr.slice(
+                  0,
+                  Math.max(0, firstDotIndex),
+                )
+                chr = assemblyAndChr.slice(Math.max(0, firstDotIndex + 1))
+              } else {
+                // Multiple dots: check if second part is numeric (version number)
+                const secondPart = assemblyAndChr.slice(
+                  firstDotIndex + 1,
+                  secondDotIndex,
+                )
+                const isNumeric =
+                  secondPart.length > 0 && !Number.isNaN(+secondPart)
+
+                if (isNumeric) {
+                  // assembly.version.chr format
+                  assemblyName = assemblyAndChr.slice(
+                    0,
+                    Math.max(0, secondDotIndex),
+                  )
+                  chr = assemblyAndChr.slice(Math.max(0, secondDotIndex + 1))
+                } else {
+                  // assembly.chr.more format
+                  assemblyName = assemblyAndChr.slice(
+                    0,
+                    Math.max(0, firstDotIndex),
+                  )
+                  chr = assemblyAndChr.slice(Math.max(0, firstDotIndex + 1))
+                }
+              }
+            }
+
+            if (assemblyName) {
+              // Set first assembly name found (only once)
+              if (!firstAssemblyNameFound) {
+                firstAssemblyNameFound = assemblyName
+              }
+
+              // Create alignment record with optimized number conversion
               alignments[assemblyName] = {
-                chr: last,
-                start: +ad[1]!,
-                srcSize: +ad[2]!,
-                strand: ad[3] === '-' ? -1 : 1,
-                unknown: +ad[4]!,
+                chr,
+                start: +startStr!,
+                srcSize: +srcSizeStr!,
+                strand: strandStr === '-' ? -1 : 1,
+                unknown: +unknownStr!,
                 seq,
               }
             }
