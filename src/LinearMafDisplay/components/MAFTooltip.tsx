@@ -29,17 +29,13 @@ const MAFTooltip = observer(function ({
 }) {
   const { hoveredInfo } = model
   const view = getContainingView(model) as LinearGenomeViewModel
-  const ret = Object.entries(sources[Math.floor(mouseY / rowHeight)] || {})
-    .filter(([key]) => key !== 'color' && key !== 'id')
-    .map(([key, value]) => `${key}:${value}`)
-    .join('\n')
+
   const p1 = origMouseX ? view.pxToBp(origMouseX) : undefined
   const p2 = view.pxToBp(mouseX)
-  return ret !== '' ? (
+  return hoveredInfo ? (
     <BaseTooltip>
       <SanitizedHTML
         html={[
-          ret,
           ...(p1
             ? [
                 `Start: ${p1.refName}:${toLocale(p1.coord)}`,
@@ -47,10 +43,12 @@ const MAFTooltip = observer(function ({
                 `Length: ${getBpDisplayStr(Math.abs(p1.coord - p2.coord))}`,
               ]
             : [
-                `${p2.refName}:${toLocale(p2.coord)}`,
-                hoveredInfo
-                  ? `${hoveredInfo.sampleId}:${hoveredInfo?.genomicPosition} (${hoveredInfo?.base})`
-                  : undefined,
+                `Ref: ${p2.refName}:${toLocale(p2.coord)}`,
+                `Alt: ${
+                  hoveredInfo
+                    ? `${hoveredInfo.sampleId}:${hoveredInfo?.genomicPosition} (${hoveredInfo?.base})`
+                    : undefined
+                }`,
               ]),
         ]
           .filter(f => !!f)
