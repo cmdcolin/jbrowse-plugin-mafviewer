@@ -2,14 +2,13 @@ import React from 'react'
 
 import { SanitizedHTML } from '@jbrowse/core/ui'
 import BaseTooltip from '@jbrowse/core/ui/BaseTooltip'
-import {
-  getBpDisplayStr,
-  getContainingView,
-  toLocale,
-} from '@jbrowse/core/util'
+import { getContainingView } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 
+import { generateTooltipContent } from '../util'
+
 import type { LinearMafDisplayModel } from '../stateModel'
+import type { HoveredInfo } from '../util'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const MAFTooltip = observer(function ({
@@ -28,27 +27,11 @@ const MAFTooltip = observer(function ({
   const view = getContainingView(model) as LinearGenomeViewModel
   const p1 = origMouseX ? view.pxToBp(origMouseX) : undefined
   const p2 = view.pxToBp(mouseX)
+
   return hoveredInfo ? (
     <BaseTooltip>
       <SanitizedHTML
-        html={[
-          ...(p1
-            ? [
-                `Start: ${p1.refName}:${toLocale(p1.coord)}`,
-                `End: ${p2.refName}:${toLocale(p2.coord)}`,
-                `Length: ${getBpDisplayStr(Math.abs(p1.coord - p2.coord))}`,
-              ]
-            : [
-                `Ref: ${p2.refName}:${toLocale(p2.coord)}`,
-                `Alt: ${
-                  hoveredInfo
-                    ? `${hoveredInfo.sampleId}:${hoveredInfo?.pos} (${hoveredInfo?.base})`
-                    : undefined
-                }`,
-              ]),
-        ]
-          .filter(f => !!f)
-          .join('<br/>')}
+        html={generateTooltipContent(hoveredInfo as HoveredInfo, p1, p2)}
       />
     </BaseTooltip>
   ) : null
