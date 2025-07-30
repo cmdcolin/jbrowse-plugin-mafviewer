@@ -35,13 +35,7 @@ const Crosshairs = ({
         top: scrollTop,
       }}
     >
-      <line
-        x1={0}
-        x2={width}
-        y1={mouseY - scrollTop}
-        y2={mouseY - scrollTop}
-        stroke="black"
-      />
+      <line x1={0} x2={width} y1={mouseY} y2={mouseY} stroke="black" />
       <line x1={mouseX} x2={mouseX} y1={0} y2={height} stroke="black" />
     </svg>
   )

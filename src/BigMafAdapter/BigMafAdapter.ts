@@ -105,8 +105,8 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
 
               // Parse organism and chromosome once
               const dotIndex = organismChr.indexOf('.')
-              const org = organismChr.substring(0, dotIndex)
-              const chr = organismChr.substring(dotIndex + 1)
+              const org = organismChr.slice(0, Math.max(0, dotIndex))
+              const chr = organismChr.slice(Math.max(0, dotIndex + 1))
 
               // Create alignment record directly
               alignments[org] = {
