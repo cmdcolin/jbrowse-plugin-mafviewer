@@ -16,6 +16,8 @@ import type { RenderingContext } from './types'
  * @param seq - The reference sequence
  * @param leftPx - Left pixel position of the feature
  * @param rowTop - Top pixel position of the row
+ * @param alignmentStart - Start position of the alignment
+ * @param chr - Chromosome/sequence name
  */
 export function renderMismatches(
   context: RenderingContext,
@@ -25,6 +27,8 @@ export function renderMismatches(
   rowTop: number,
   sampleId: string,
   featureId: string,
+  alignmentStart: number,
+  chr: string,
 ) {
   const {
     ctx,
@@ -61,20 +65,23 @@ export function renderMismatches(
 
           // Add to spatial index if distance filter allows
           if (shouldAddToSpatialIndex(xPos, context)) {
-            const renderedBase = createRenderedBase(
-              xPos,
-              rowTop,
+            addToSpatialIndex(
               context,
-              genomicOffset,
-              sampleId,
-              currentChar!,
-              false,
-              true,
-              false,
-              false,
-              featureId,
+              createRenderedBase(
+                xPos,
+                rowTop,
+                context,
+                genomicOffset + alignmentStart,
+                chr,
+                sampleId,
+                currentChar!,
+                false,
+                true,
+                false,
+                false,
+                featureId,
+              ),
             )
-            addToSpatialIndex(context, renderedBase)
           }
         } else if (showAllLetters) {
           // Match (when showing all letters): use base-specific color or light blue
@@ -92,20 +99,23 @@ export function renderMismatches(
 
           // Add to spatial index if distance filter allows
           if (shouldAddToSpatialIndex(xPos, context)) {
-            const renderedBase = createRenderedBase(
-              xPos,
-              rowTop,
+            addToSpatialIndex(
               context,
-              genomicOffset,
-              sampleId,
-              currentChar!,
-              true,
-              false,
-              false,
-              false,
-              featureId,
+              createRenderedBase(
+                xPos,
+                rowTop,
+                context,
+                genomicOffset + alignmentStart,
+                chr,
+                sampleId,
+                currentChar!,
+                true,
+                false,
+                false,
+                false,
+                featureId,
+              ),
             )
-            addToSpatialIndex(context, renderedBase)
           }
         }
       }

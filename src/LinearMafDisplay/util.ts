@@ -8,6 +8,7 @@ export interface HoveredInfo {
   sampleId: string
   pos: number
   base: string
+  chr: string
   [key: string]: unknown // Allow additional properties for compatibility
 }
 
@@ -43,7 +44,7 @@ export function generateTooltipContent(
     contentLines.push(`Ref: ${p2.refName}:${toLocale(p2.coord)}`)
 
     if (hoveredInfo) {
-      const base = hoveredInfo.base
+      const { base, sampleId, pos, chr } = hoveredInfo
       const thresh = 20
       const len = base.length
       const lengthSuffix = len > 1 ? ` ${len}bp` : ''
@@ -51,7 +52,7 @@ export function generateTooltipContent(
         base.length > thresh ? base.slice(0, thresh) + '...' : base
 
       contentLines.push(
-        `Alt: ${hoveredInfo.sampleId}:${hoveredInfo.pos} (${baseDisplay}${lengthSuffix})`,
+        `Alt ${sampleId}: ${chr}:${pos.toLocaleString('en-US')} (${baseDisplay}${lengthSuffix})`,
       )
     }
   }

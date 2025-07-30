@@ -1,5 +1,6 @@
 import { Sample } from '../LinearMafDisplay/types'
 
+import type { AlignmentRecord } from '../LinearMafRenderer/rendering'
 import type { Feature, Region } from '@jbrowse/core/util'
 
 /**
@@ -27,7 +28,7 @@ export function processFeaturesToFasta({
   const outputRows = samples.map(() => '-'.repeat(rlen))
   for (const feature of features.values()) {
     const leftCoord = feature.get('start')
-    const vals = feature.get('alignments') as Record<string, { seq: string }>
+    const vals = feature.get('alignments') as Record<string, AlignmentRecord>
     const seq = feature.get('seq')
     for (const [sample, val] of Object.entries(vals)) {
       const origAlignment = val.seq

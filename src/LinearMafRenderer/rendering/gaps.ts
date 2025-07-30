@@ -14,6 +14,8 @@ import type { RenderingContext } from './types'
  * @param seq - The reference sequence
  * @param leftPx - Left pixel position of the feature
  * @param rowTop - Top pixel position of the row
+ * @param alignmentStart - Start position of the alignment
+ * @param chr - Chromosome/sequence name
  */
 export function renderGaps(
   context: RenderingContext,
@@ -23,6 +25,8 @@ export function renderGaps(
   rowTop: number,
   sampleId: string,
   featureId: string,
+  alignmentStart: number,
+  chr: string,
 ) {
   const { ctx, scale } = context
   const h2 = context.rowHeight / 2
@@ -47,7 +51,8 @@ export function renderGaps(
             xPos,
             rowTop,
             context,
-            genomicOffset,
+            genomicOffset + alignmentStart,
+            chr,
             sampleId,
             '-',
             false,

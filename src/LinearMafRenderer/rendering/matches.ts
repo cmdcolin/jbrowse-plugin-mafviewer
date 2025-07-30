@@ -16,6 +16,8 @@ import type { RenderingContext } from './types'
  * @param seq - The reference sequence
  * @param leftPx - Left pixel position of the feature
  * @param rowTop - Top pixel position of the row
+ * @param alignmentStart - Start position of the alignment
+ * @param chr - Chromosome/sequence name
  */
 export function renderMatches(
   context: RenderingContext,
@@ -25,6 +27,8 @@ export function renderMatches(
   rowTop: number,
   sampleId: string,
   featureId: string,
+  alignmentStart: number,
+  chr: string,
 ) {
   if (context.showAllLetters) {
     return
@@ -56,7 +60,8 @@ export function renderMatches(
             xPos,
             rowTop,
             context,
-            genomicOffset,
+            genomicOffset + alignmentStart,
+            chr,
             sampleId,
             currentChar || '',
             true,

@@ -8,6 +8,7 @@ import type { RenderedBase, RenderingContext } from './types'
  * @param rowTop - Y coordinate of the row top
  * @param context - Rendering context with dimensions
  * @param pos - Genomic coordinate
+ * @param chr - Chromosome/sequence name
  * @param sampleId - Sample identifier
  * @param base - The base character
  * @param isMatch - Whether this base matches the reference
@@ -21,6 +22,7 @@ export function createRenderedBase(
   rowTop: number,
   context: RenderingContext,
   pos: number,
+  chr: string,
   sampleId: string,
   base: string,
   isMatch: boolean,
@@ -35,6 +37,7 @@ export function createRenderedBase(
     maxX: xPos + context.scale + GAP_STROKE_OFFSET,
     maxY: rowTop + context.h,
     pos,
+    chr,
     sampleId,
     base,
     isMatch,
@@ -58,6 +61,7 @@ export function createRenderedBase(
  * @param width - Actual rendered width of the insertion
  * @param context - Rendering context with dimensions
  * @param pos - Genomic coordinate
+ * @param chr - Chromosome/sequence name
  * @param sampleId - Sample identifier
  * @param insertionSequence - The insertion sequence
  * @param featureId - Feature identifier
@@ -68,6 +72,7 @@ export function createRenderedInsertion(
   width: number,
   context: RenderingContext,
   pos: number,
+  chr: string,
   sampleId: string,
   insertionSequence: string,
   featureId: string,
@@ -78,6 +83,7 @@ export function createRenderedInsertion(
     maxX: xPos + width,
     maxY: rowTop + context.h,
     pos,
+    chr,
     sampleId,
     base: insertionSequence,
     isMatch: false,

@@ -6,7 +6,7 @@ import { renderMatches } from './matches'
 import { renderMismatches } from './mismatches'
 import { renderText } from './text'
 
-import type { GenomicRegion, RenderingContext } from './types'
+import type { AlignmentRecord, GenomicRegion, RenderingContext } from './types'
 
 /**
  * Processes alignment data for a single feature, rendering gaps, matches, mismatches, and text
@@ -26,7 +26,7 @@ export function processFeatureAlignment(
   const [leftPx] = featureSpanPx(feature, region, bpPerPx)
   const alignments = feature.get('alignments') as Record<
     string,
-    { seq: string }
+    AlignmentRecord
   >
   const referenceSeq = feature.get('seq').toLowerCase()
   const featureId =
@@ -50,6 +50,8 @@ export function processFeatureAlignment(
       rowTop,
       sampleId,
       featureId,
+      alignmentData.start,
+      alignmentData.chr,
     )
     renderMatches(
       renderingContext,
@@ -59,6 +61,8 @@ export function processFeatureAlignment(
       rowTop,
       sampleId,
       featureId,
+      alignmentData.start,
+      alignmentData.chr,
     )
     renderMismatches(
       renderingContext,
@@ -68,6 +72,8 @@ export function processFeatureAlignment(
       rowTop,
       sampleId,
       featureId,
+      alignmentData.start,
+      alignmentData.chr,
     )
     renderText(
       renderingContext,
@@ -101,7 +107,7 @@ export function processFeatureInsertions(
   const [leftPx] = featureSpanPx(feature, region, bpPerPx)
   const alignments = feature.get('alignments') as Record<
     string,
-    { seq: string }
+    AlignmentRecord
   >
   const referenceSeq = feature.get('seq').toLowerCase()
   const featureId =
@@ -125,6 +131,8 @@ export function processFeatureInsertions(
       bpPerPx,
       sampleId,
       featureId,
+      alignmentData.start,
+      alignmentData.chr,
     )
   }
 }

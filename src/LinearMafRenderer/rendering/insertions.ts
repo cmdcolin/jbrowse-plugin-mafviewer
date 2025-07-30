@@ -29,6 +29,8 @@ import type { RenderingContext } from './types'
  * @param leftPx - Left pixel position of the feature
  * @param rowTop - Top pixel position of the row
  * @param bpPerPx - Base pairs per pixel (zoom level)
+ * @param alignmentStart - Start position of the alignment
+ * @param chr - Chromosome/sequence name
  */
 export function renderInsertions(
   context: RenderingContext,
@@ -39,6 +41,8 @@ export function renderInsertions(
   bpPerPx: number,
   sampleId: string,
   featureId: string,
+  alignmentStart: number,
+  chr: string,
 ) {
   const { ctx, scale, h, canvasWidth, rowHeight } = context
   const { charHeight } = getCharWidthHeight()
@@ -145,17 +149,20 @@ export function renderInsertions(
       // Add insertion to spatial index with actual rendered dimensions
       // Insertions always bypass distance filter
       if (shouldAddToSpatialIndex(actualXPos, context, true)) {
-        const renderedInsertion = createRenderedInsertion(
-          actualXPos,
-          rowTop,
-          actualWidth,
+        addToSpatialIndex(
           context,
-          genomicOffset,
-          sampleId,
-          insertionSequence,
-          featureId,
+          createRenderedInsertion(
+            actualXPos,
+            rowTop,
+            actualWidth,
+            context,
+            genomicOffset + alignmentStart,
+            chr,
+            sampleId,
+            insertionSequence,
+            featureId,
+          ),
         )
-        addToSpatialIndex(context, renderedInsertion)
       }
     }
     genomicOffset++

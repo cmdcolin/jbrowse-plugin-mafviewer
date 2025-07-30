@@ -38,6 +38,7 @@ export interface RenderedBase {
   maxY: number
   // Genomic information
   pos: number
+  chr: string
   sampleId: string
   base: string
   isMatch: boolean
@@ -70,4 +71,11 @@ export interface RenderingContext {
 
   // Track last X position for spatial index optimization
   lastInsertedX: number
+}
+
+export interface AlignmentRecord {
+  seq: string
+  start: number
+  strand: number
+  chr: string
 }
