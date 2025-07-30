@@ -29,7 +29,7 @@ const LinearMafRendering = observer(function (props: {
     if (ref.current) {
       const r = ref.current.getBoundingClientRect()
       offsetX = eventClientX - r.left
-      offsetY = eventClientY - r.top - (displayModel?.scrollTop || 0)
+      offsetY = eventClientY - r.top
     }
 
     const x = rbush2.search({
