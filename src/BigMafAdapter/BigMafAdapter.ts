@@ -57,6 +57,9 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
 
   getFeatures(query: Region, opts?: BaseOptions) {
     const { statusCallback = () => {} } = opts || {}
+    // Pre-compile regex for better performance
+    const WHITESPACE_REGEX = / +/
+
     return ObservableCreate<Feature>(async observer => {
       const { adapter } = await this.setup()
       const features = await updateStatus(
@@ -68,39 +71,57 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
         for (const feature of features) {
           const maf = feature.get('mafBlock') as string
           const blocks = maf.split(';')
-          let aln: string | undefined
-          const alns = [] as string[]
-          const alignments = {} as Record<string, OrganismRecord>
-          const blocks2 = [] as string[]
+
+          // Count sequence blocks first to pre-size arrays
+          let sequenceBlockCount = 0
           for (const block of blocks) {
             if (block.startsWith('s')) {
-              if (aln) {
-                alns.push(block.split(/ +/)[6]!)
-                blocks2.push(block)
-              } else {
-                aln = block.split(/ +/)[6]
-                alns.push(aln!)
-                blocks2.push(block)
+              sequenceBlockCount++
+            }
+          }
+
+          // Pre-size arrays based on actual sequence block count
+          const alns = new Array<string>(sequenceBlockCount)
+          const alignments = {} as Record<string, OrganismRecord>
+
+          let sequenceIndex = 0
+          let referenceSeq: string | undefined
+
+          // Single-pass processing: combine both loops
+          for (const block of blocks) {
+            if (block.startsWith('s')) {
+              // Split once and cache the result
+              const parts = block.split(WHITESPACE_REGEX)
+              const sequence = parts[6]!
+              const organismChr = parts[1]!
+
+              // Store sequence in pre-sized array
+              alns[sequenceIndex] = sequence
+
+              // Set reference sequence from first block
+              if (referenceSeq === undefined) {
+                referenceSeq = sequence
               }
+
+              // Parse organism and chromosome once
+              const dotIndex = organismChr.indexOf('.')
+              const org = organismChr.substring(0, dotIndex)
+              const chr = organismChr.substring(dotIndex + 1)
+
+              // Create alignment record directly
+              alignments[org] = {
+                chr,
+                start: +parts[2]!,
+                srcSize: +parts[3]!,
+                strand: parts[4] === '+' ? 1 : -1,
+                unknown: +parts[5]!,
+                seq: sequence,
+              }
+
+              sequenceIndex++
             }
           }
 
-          for (let i = 0; i < blocks2.length; i++) {
-            const elt = blocks2[i]!
-            const ad = elt.split(/ +/)
-            const y = ad[1]!.split('.')
-            const org = y[0]!
-            const chr = y[1]!
-
-            alignments[org] = {
-              chr: chr,
-              start: +ad[1]!,
-              srcSize: +ad[2]!,
-              strand: ad[3] === '+' ? 1 : -1,
-              unknown: +ad[4]!,
-              seq: alns[i]!,
-            }
-          }
           observer.next(
             new SimpleFeature({
               id: feature.id(),
@@ -108,8 +129,8 @@ export default class BigMafAdapter extends BaseFeatureDataAdapter {
                 start: feature.get('start'),
                 end: feature.get('end'),
                 refName: feature.get('refName'),
-                seq: alns[0],
-                alignments: alignments,
+                seq: referenceSeq,
+                alignments,
               },
             }),
           )
