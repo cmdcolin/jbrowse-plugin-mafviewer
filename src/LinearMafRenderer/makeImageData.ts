@@ -46,7 +46,7 @@ interface RenderedBase {
   maxX: number
   maxY: number
   // Genomic information
-  genomicPosition: number
+  pos: number
   sampleId: string
   base: string
   isMatch: boolean
@@ -76,7 +76,7 @@ function getLetter(a: string, showAsUpperCase: boolean) {
  * @param xPos - X coordinate of the base
  * @param rowTop - Y coordinate of the row top
  * @param context - Rendering context with dimensions
- * @param genomicPosition - Genomic coordinate
+ * @param pos - Genomic coordinate
  * @param sampleId - Sample identifier
  * @param base - The base character
  * @param isMatch - Whether this base matches the reference
@@ -89,7 +89,7 @@ function createRenderedBase(
   xPos: number,
   rowTop: number,
   context: RenderingContext,
-  genomicPosition: number,
+  pos: number,
   sampleId: string,
   base: string,
   isMatch: boolean,
@@ -103,7 +103,7 @@ function createRenderedBase(
     minY: rowTop,
     maxX: xPos + context.scale + GAP_STROKE_OFFSET,
     maxY: rowTop + context.h,
-    genomicPosition,
+    pos,
     sampleId,
     base,
     isMatch,
@@ -115,22 +115,74 @@ function createRenderedBase(
 }
 
 /**
+ * Creates a RenderedBase object for insertions with custom width
+ * Uses the actual rendered width instead of the standard scale-based width
+ * This ensures accurate spatial queries for different insertion rendering types:
+ * - Small insertions: INSERTION_LINE_WIDTH (1px) or INSERTION_BORDER_HEIGHT (5px) with borders
+ * - Large insertions (text): measured text width + padding
+ * - Large insertions (line): INSERTION_BORDER_WIDTH (2px)
+ *
+ * @param xPos - X coordinate of the insertion
+ * @param rowTop - Y coordinate of the row top
+ * @param width - Actual rendered width of the insertion
+ * @param context - Rendering context with dimensions
+ * @param pos - Genomic coordinate
+ * @param sampleId - Sample identifier
+ * @param insertionSequence - The insertion sequence
+ * @param featureId - Feature identifier
+ */
+function createRenderedInsertion(
+  xPos: number,
+  rowTop: number,
+  width: number,
+  context: RenderingContext,
+  pos: number,
+  sampleId: string,
+  insertionSequence: string,
+  featureId: string,
+): RenderedBase {
+  return {
+    minX: xPos,
+    minY: rowTop,
+    maxX: xPos + width,
+    maxY: rowTop + context.h,
+    pos,
+    sampleId,
+    base: insertionSequence,
+    isMatch: false,
+    isMismatch: false,
+    isGap: false,
+    isInsertion: true,
+    featureId,
+  }
+}
+
+/**
  * Adds a rendered base directly to the RBush spatial index
  * Only inserts if the X position is >0.5px away from the last inserted item
  * This reduces spatial index density while maintaining useful spatial queries
- * 
+ *
+ * @param context - Rendering context with spatial index
+ * @param renderedBase - The base to add to the spatial index
+ * @param bypassDistanceFilter - If true, always insert regardless of distance (e.g., for insertions)
+ *
  * @example
  * // Items at X positions: 100.0, 100.3, 100.8, 101.5
  * // Only items at 100.0, 100.8, 101.5 would be inserted (>0.5px apart)
+ * // Unless bypassDistanceFilter=true, then all would be inserted
  */
 function addToSpatialIndex(
   context: RenderingContext,
   renderedBase: RenderedBase,
-): void {
+  bypassDistanceFilter = false,
+) {
   const MIN_X_DISTANCE = 0.5
-  
-  // Check if this item is far enough from the last inserted item
-  if (Math.abs(renderedBase.minX - context.lastInsertedX) > MIN_X_DISTANCE) {
+
+  // Always insert if bypassing distance filter, or if far enough from last item
+  if (
+    bypassDistanceFilter ||
+    Math.abs(renderedBase.minX - context.lastInsertedX) > MIN_X_DISTANCE
+  ) {
     context.spatialIndex.insert(renderedBase)
     context.lastInsertedX = renderedBase.minX
   }
@@ -155,7 +207,7 @@ interface RenderingContext {
 
   // RBush spatial index for efficient spatial queries
   spatialIndex: RBush<RenderedBase>
-  
+
   // Track last X position for spatial index optimization
   lastInsertedX: number
 }
@@ -484,16 +536,22 @@ function renderInsertions(
       // Found an insertion
       const xPos = leftPx + scale * genomicOffset - INSERTION_LINE_WIDTH
 
+      // Determine actual rendered width and position for spatial index
+      let actualXPos: number
+      let actualWidth: number
+
       // Large insertions: show count instead of individual bases
       if (insertionSequence.length > LARGE_INSERTION_THRESHOLD) {
         const lengthText = `${insertionSequence.length}`
         if (bpPerPx > HIGH_BP_PER_PX_THRESHOLD) {
           // Very zoomed out: simple line
+          actualXPos = xPos - INSERTION_LINE_WIDTH
+          actualWidth = INSERTION_BORDER_WIDTH
           fillRect(
             ctx,
-            xPos - INSERTION_LINE_WIDTH,
+            actualXPos,
             rowTop,
-            INSERTION_BORDER_WIDTH,
+            actualWidth,
             h,
             canvasWidth,
             'purple',
@@ -502,11 +560,13 @@ function renderInsertions(
           // Medium zoom: show count in colored box
           const textWidth = measureText(lengthText, CHAR_SIZE_WIDTH)
           const padding = INSERTION_PADDING
+          actualXPos = xPos - textWidth / 2 - padding
+          actualWidth = textWidth + 2 * padding
           fillRect(
             ctx,
-            xPos - textWidth / 2 - padding,
+            actualXPos,
             rowTop,
-            textWidth + 2 * padding,
+            actualWidth,
             h,
             canvasWidth,
             'purple',
@@ -515,11 +575,13 @@ function renderInsertions(
           ctx.fillText(lengthText, xPos - textWidth / 2, rowTop + h)
         } else {
           const padding = INSERTION_PADDING
+          actualXPos = xPos - padding
+          actualWidth = 2 * padding
           fillRect(
             ctx,
-            xPos - padding,
+            actualXPos,
             rowTop,
-            2 * padding,
+            actualWidth,
             h,
             canvasWidth,
             'purple',
@@ -527,20 +589,17 @@ function renderInsertions(
         }
       } else {
         // Small insertions: vertical line with optional border at high zoom
-        fillRect(
-          ctx,
-          xPos,
-          rowTop,
-          INSERTION_LINE_WIDTH,
-          h,
-          canvasWidth,
-          'purple',
-        )
+        actualXPos = xPos
+        actualWidth = INSERTION_LINE_WIDTH
+        fillRect(ctx, actualXPos, rowTop, actualWidth, h, canvasWidth, 'purple')
         if (
           bpPerPx < HIGH_ZOOM_THRESHOLD &&
           rowHeight > MIN_ROW_HEIGHT_FOR_BORDERS
         ) {
           // Add horizontal borders for visibility at high zoom
+          // Note: borders extend the effective clickable area
+          actualXPos = xPos - INSERTION_BORDER_WIDTH
+          actualWidth = INSERTION_BORDER_HEIGHT
           fillRect(
             ctx,
             xPos - INSERTION_BORDER_WIDTH,
@@ -560,21 +619,18 @@ function renderInsertions(
         }
       }
 
-      // Add insertion to spatial index
-      const renderedBase = createRenderedBase(
-        xPos,
+      // Add insertion to spatial index with actual rendered dimensions
+      const renderedInsertion = createRenderedInsertion(
+        actualXPos,
         rowTop,
+        actualWidth,
         context,
         genomicOffset,
         sampleId,
         insertionSequence,
-        false,
-        false,
-        false,
-        true,
         featureId,
       )
-      addToSpatialIndex(context, renderedBase)
+      addToSpatialIndex(context, renderedInsertion, true) // Bypass distance filter for insertions
     }
     genomicOffset++
   }
@@ -706,7 +762,9 @@ function processFeatureInsertions(
  * Uses a two-pass approach: first renders alignments, then insertions on top
  *
  * The function automatically creates and populates an RBush spatial index with rendered elements.
- * Items are only indexed if they are >0.5px apart in the X-direction to optimize index density:
+ * Most items are only indexed if they are >0.5px apart in the X-direction to optimize index density.
+ * Insertions are always indexed regardless of distance and use their actual rendered dimensions
+ * (text width, line width, etc.) instead of the standard scale-based width:
  *
  * @example
  * ```typescript
@@ -724,7 +782,7 @@ function processFeatureInsertions(
  *
  * // Access all indexed items for custom filtering
  * const allItems = spatialIndex.all()
- * const basesAtGenomicPosition = allItems.filter(b => b.genomicPosition === 12345)
+ * const basesAtGenomicPosition = allItems.filter(b => b.pos === 12345)
  * ```
  *
  * @param ctx - Canvas 2D rendering context

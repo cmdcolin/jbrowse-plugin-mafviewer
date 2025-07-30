@@ -14,11 +14,8 @@ import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const MAFTooltip = observer(function ({
   model,
-  mouseY,
   mouseX,
   origMouseX,
-  rowHeight,
-  sources,
 }: {
   mouseY: number
   mouseX: number
@@ -29,7 +26,6 @@ const MAFTooltip = observer(function ({
 }) {
   const { hoveredInfo } = model
   const view = getContainingView(model) as LinearGenomeViewModel
-
   const p1 = origMouseX ? view.pxToBp(origMouseX) : undefined
   const p2 = view.pxToBp(mouseX)
   return hoveredInfo ? (
@@ -46,7 +42,7 @@ const MAFTooltip = observer(function ({
                 `Ref: ${p2.refName}:${toLocale(p2.coord)}`,
                 `Alt: ${
                   hoveredInfo
-                    ? `${hoveredInfo.sampleId}:${hoveredInfo?.genomicPosition} (${hoveredInfo?.base})`
+                    ? `${hoveredInfo.sampleId}:${hoveredInfo?.pos} (${hoveredInfo?.base})`
                     : undefined
                 }`,
               ]),

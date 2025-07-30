@@ -3,7 +3,6 @@ import React, { useMemo, useRef } from 'react'
 import { PrerenderedCanvas } from '@jbrowse/core/ui'
 import { observer } from 'mobx-react'
 import RBush from 'rbush'
-import { minElt } from './util'
 
 type SerializedRBush = any
 
@@ -12,8 +11,7 @@ interface RBushData {
   maxX: number
   minY: number
   maxY: number
-  genotype: string
-  featureId: string
+  isInsertion: boolean
 }
 const LinearMafRendering = observer(function (props: {
   width: number
@@ -41,7 +39,9 @@ const LinearMafRendering = observer(function (props: {
       maxY: offsetY + 1,
     })
     if (x.length) {
-      const { minX, minY, maxX, maxY, ...rest } = x[0]!
+      // prioritize insertions
+      const { minX, minY, maxX, maxY, ...rest } =
+        x.find(f => f.isInsertion) || x[0]!
       return rest
     } else {
       return undefined
