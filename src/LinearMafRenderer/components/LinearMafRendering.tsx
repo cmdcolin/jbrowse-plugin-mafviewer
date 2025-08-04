@@ -3,6 +3,8 @@ import React, { useMemo, useRef } from 'react'
 import { PrerenderedCanvas } from '@jbrowse/core/ui'
 import Flatbush from 'flatbush'
 import { observer } from 'mobx-react'
+import { RenderedBase } from '../rendering'
+import { Sample } from '../../LinearMafDisplay/types'
 
 type SerializedRBush = any
 
@@ -11,9 +13,10 @@ const LinearMafRendering = observer(function (props: {
   height: number
   displayModel: any
   flatbush: SerializedRBush
-  items: any[]
+  items: RenderedBase[]
+  samples: Sample[]
 }) {
-  const { items, displayModel, height, flatbush } = props
+  const { items, displayModel, height, samples, flatbush } = props
   const ref = useRef<HTMLDivElement>(null)
   const rbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
 
@@ -28,9 +31,13 @@ const LinearMafRendering = observer(function (props: {
 
     const x = rbush2.search(offsetX, offsetY, offsetX + 1, offsetY + 1)
     if (x.length) {
-      // prioritize insertions
-      const { minX, minY, maxX, maxY, ...rest } = items[x[0]!]
-      return rest
+      const elt = x.findIndex(idx => items[idx]?.isInsertion)
+      const r = elt !== -1 ? items[elt]! : items[x[0]!]!
+      const s = samples[r.sampleId]
+      return {
+        ...r,
+        sampleId: s?.label || s?.id || 'unknown',
+      }
     } else {
       return undefined
     }

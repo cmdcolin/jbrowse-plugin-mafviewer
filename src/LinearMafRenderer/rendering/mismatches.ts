@@ -1,9 +1,5 @@
 import { fillRect } from '../util'
-import {
-  addToSpatialIndex,
-  createRenderedBase,
-  shouldAddToSpatialIndex,
-} from './spatialIndex'
+import { addToSpatialIndex, shouldAddToSpatialIndex } from './spatialIndex'
 import { GAP_STROKE_OFFSET } from './types'
 
 import type { RenderingContext } from './types'
@@ -25,8 +21,8 @@ export function renderMismatches(
   seq: string,
   leftPx: number,
   rowTop: number,
-  sampleId: string,
-  featureId: string,
+  sampleId: number,
+  _featureId: string,
   alignmentStart: number,
   chr: string,
 ) {
@@ -67,20 +63,16 @@ export function renderMismatches(
           if (shouldAddToSpatialIndex(xPos, context)) {
             addToSpatialIndex(
               context,
-              createRenderedBase(
-                xPos,
-                rowTop,
-                context,
-                genomicOffset + alignmentStart,
+              xPos,
+              rowTop,
+              xPos + context.scale + GAP_STROKE_OFFSET,
+              rowTop + context.h,
+              {
+                pos: genomicOffset + alignmentStart,
                 chr,
-                sampleId,
-                currentChar!,
-                false,
-                true,
-                false,
-                false,
-                featureId,
-              ),
+                base: currentChar!,
+                sampleId: i,
+              },
             )
           }
         } else if (showAllLetters) {
@@ -101,20 +93,16 @@ export function renderMismatches(
           if (shouldAddToSpatialIndex(xPos, context)) {
             addToSpatialIndex(
               context,
-              createRenderedBase(
-                xPos,
-                rowTop,
-                context,
-                genomicOffset + alignmentStart,
+              xPos,
+              rowTop,
+              xPos + context.scale + GAP_STROKE_OFFSET,
+              rowTop + context.h,
+              {
+                pos: genomicOffset + alignmentStart,
                 chr,
+                base: currentChar!,
                 sampleId,
-                currentChar!,
-                true,
-                false,
-                false,
-                false,
-                featureId,
-              ),
+              },
             )
           }
         }

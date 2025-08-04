@@ -8,14 +8,6 @@ import { renderText } from './text'
 
 import type { AlignmentRecord, GenomicRegion, RenderingContext } from './types'
 
-/**
- * Processes alignment data for a single feature, rendering gaps, matches, mismatches, and text
- * @param feature - JBrowse feature containing alignment data
- * @param region - Genomic region being rendered
- * @param bpPerPx - Base pairs per pixel (zoom level)
- * @param sampleToRowMap - Maps sample IDs to row indices
- * @param renderingContext - Shared rendering parameters
- */
 export function processFeatureAlignment(
   feature: Feature,
   region: GenomicRegion,
@@ -42,24 +34,14 @@ export function processFeatureAlignment(
     const alignment = originalAlignment.toLowerCase()
     const rowTop = renderingContext.offset + renderingContext.rowHeight * row
 
-    renderGaps(
-      renderingContext,
-      alignment,
-      referenceSeq,
-      leftPx,
-      rowTop,
-      sampleId,
-      featureId,
-      alignmentData.start,
-      alignmentData.chr,
-    )
+    renderGaps(renderingContext, alignment, referenceSeq, leftPx, rowTop)
     renderMatches(
       renderingContext,
       alignment,
       referenceSeq,
       leftPx,
       rowTop,
-      sampleId,
+      row,
       featureId,
       alignmentData.start,
       alignmentData.chr,
@@ -70,7 +52,7 @@ export function processFeatureAlignment(
       referenceSeq,
       leftPx,
       rowTop,
-      sampleId,
+      row,
       featureId,
       alignmentData.start,
       alignmentData.chr,
@@ -88,15 +70,6 @@ export function processFeatureAlignment(
   }
 }
 
-/**
- * Processes insertion data for a single feature in a separate pass
- * Insertions are rendered on top to ensure visibility
- * @param feature - JBrowse feature containing alignment data
- * @param region - Genomic region being rendered
- * @param bpPerPx - Base pairs per pixel (zoom level)
- * @param sampleToRowMap - Maps sample IDs to row indices
- * @param renderingContext - Shared rendering parameters
- */
 export function processFeatureInsertions(
   feature: Feature,
   region: GenomicRegion,
@@ -129,7 +102,7 @@ export function processFeatureInsertions(
       leftPx,
       rowTop,
       bpPerPx,
-      sampleId,
+      row,
       featureId,
       alignmentData.start,
       alignmentData.chr,

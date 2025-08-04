@@ -24,27 +24,12 @@ export interface GenomicRegion {
   refName: string
 }
 
-/**
- * Represents a rendered letter/base with its spatial and genomic coordinates
- * This structure is designed for insertion into an RBush spatial index
- */
 export interface RenderedBase {
-  // Spatial bounding box (required by RBush)
-  minX: number
-  minY: number
-  maxX: number
-  maxY: number
-  // Genomic information
   pos: number
   chr: string
-  sampleId: string
   base: string
-  isMatch: boolean
-  isMismatch: boolean
-  isGap: boolean
-  isInsertion: boolean
-  // Feature reference
-  featureId: string
+  sampleId: number
+  isInsertion?: boolean
 }
 
 /**
@@ -66,6 +51,7 @@ export interface RenderingContext {
 
   // RBush spatial index for efficient spatial queries
   spatialIndex: RenderedBase[]
+  spatialIndexCoords: number[]
 
   // Track last X position for spatial index optimization
   lastInsertedX: number

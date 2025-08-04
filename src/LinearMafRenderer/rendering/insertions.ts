@@ -1,11 +1,7 @@
 import { measureText } from '@jbrowse/core/util'
 
 import { fillRect, getCharWidthHeight } from '../util'
-import {
-  addToSpatialIndex,
-  createRenderedInsertion,
-  shouldAddToSpatialIndex,
-} from './spatialIndex'
+import { addToSpatialIndex, shouldAddToSpatialIndex } from './spatialIndex'
 import {
   CHAR_SIZE_WIDTH,
   HIGH_BP_PER_PX_THRESHOLD,
@@ -20,18 +16,6 @@ import {
 
 import type { RenderingContext } from './types'
 
-/**
- * Renders insertion markers where the alignment has bases not present in reference
- * Large insertions show count, small ones show as colored bars with optional borders
- * @param context - Rendering context with canvas and styling info
- * @param alignment - The aligned sequence for this sample
- * @param seq - The reference sequence
- * @param leftPx - Left pixel position of the feature
- * @param rowTop - Top pixel position of the row
- * @param bpPerPx - Base pairs per pixel (zoom level)
- * @param alignmentStart - Start position of the alignment
- * @param chr - Chromosome/sequence name
- */
 export function renderInsertions(
   context: RenderingContext,
   alignment: string,
@@ -39,8 +23,8 @@ export function renderInsertions(
   leftPx: number,
   rowTop: number,
   bpPerPx: number,
-  sampleId: string,
-  featureId: string,
+  sampleId: number,
+  _featureId: string,
   alignmentStart: number,
   chr: string,
 ) {
@@ -151,17 +135,17 @@ export function renderInsertions(
       if (shouldAddToSpatialIndex(actualXPos, context, true)) {
         addToSpatialIndex(
           context,
-          createRenderedInsertion(
-            actualXPos,
-            rowTop,
-            actualWidth,
-            context,
-            genomicOffset + alignmentStart,
+          actualXPos,
+          rowTop,
+          actualXPos + actualWidth,
+          rowTop + context.h,
+          {
+            pos: genomicOffset + alignmentStart,
             chr,
+            base: insertionSequence,
             sampleId,
-            insertionSequence,
-            featureId,
-          ),
+            isInsertion: true,
+          },
         )
       }
     }
