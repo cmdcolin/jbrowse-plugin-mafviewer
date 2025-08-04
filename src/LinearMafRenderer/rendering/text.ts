@@ -24,8 +24,6 @@ export function renderText(
   seq: string,
   leftPx: number,
   rowTop: number,
-  _sampleId: string,
-  _featureId: string,
 ) {
   const {
     ctx,

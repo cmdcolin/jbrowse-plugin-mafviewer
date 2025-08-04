@@ -24,7 +24,6 @@ export function renderInsertions(
   rowTop: number,
   bpPerPx: number,
   sampleId: number,
-  _featureId: string,
   alignmentStart: number,
   chr: string,
 ) {

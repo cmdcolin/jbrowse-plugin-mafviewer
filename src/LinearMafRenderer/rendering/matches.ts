@@ -11,7 +11,6 @@ export function renderMatches(
   leftPx: number,
   rowTop: number,
   sampleId: number,
-  _featureId: string,
   alignmentStart: number,
   chr: string,
 ) {

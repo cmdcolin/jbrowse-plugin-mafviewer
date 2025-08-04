@@ -21,8 +21,6 @@ export function processFeatureAlignment(
     AlignmentRecord
   >
   const referenceSeq = feature.get('seq').toLowerCase()
-  const featureId =
-    feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
 
   for (const [sampleId, alignmentData] of Object.entries(alignments)) {
     const row = sampleToRowMap.get(sampleId)
@@ -42,7 +40,6 @@ export function processFeatureAlignment(
       leftPx,
       rowTop,
       row,
-      featureId,
       alignmentData.start,
       alignmentData.chr,
     )
@@ -53,7 +50,6 @@ export function processFeatureAlignment(
       leftPx,
       rowTop,
       row,
-      featureId,
       alignmentData.start,
       alignmentData.chr,
     )
@@ -64,8 +60,6 @@ export function processFeatureAlignment(
       referenceSeq,
       leftPx,
       rowTop,
-      sampleId,
-      featureId,
     )
   }
 }
@@ -83,9 +77,6 @@ export function processFeatureInsertions(
     AlignmentRecord
   >
   const referenceSeq = feature.get('seq').toLowerCase()
-  const featureId =
-    feature.id() || `feature_${feature.get('start')}_${feature.get('end')}`
-
   for (const [sampleId, alignmentData] of Object.entries(alignments)) {
     const row = sampleToRowMap.get(sampleId)
     if (row === undefined) {
@@ -103,7 +94,6 @@ export function processFeatureInsertions(
       rowTop,
       bpPerPx,
       row,
-      featureId,
       alignmentData.start,
       alignmentData.chr,
     )

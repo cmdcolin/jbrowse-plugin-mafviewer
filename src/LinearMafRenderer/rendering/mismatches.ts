@@ -22,7 +22,6 @@ export function renderMismatches(
   leftPx: number,
   rowTop: number,
   sampleId: number,
-  _featureId: string,
   alignmentStart: number,
   chr: string,
 ) {
@@ -71,7 +70,7 @@ export function renderMismatches(
                 pos: genomicOffset + alignmentStart,
                 chr,
                 base: currentChar!,
-                sampleId: i,
+                sampleId,
               },
             )
           }

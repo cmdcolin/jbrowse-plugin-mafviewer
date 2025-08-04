@@ -31,8 +31,9 @@ const LinearMafRendering = observer(function (props: {
 
     const x = rbush2.search(offsetX, offsetY, offsetX + 1, offsetY + 1)
     if (x.length) {
-      const elt = x.findIndex(idx => items[idx]?.isInsertion)
-      const r = elt !== -1 ? items[elt]! : items[x[0]!]!
+      const elt = x.find(idx => items[idx]?.isInsertion)
+      const r = elt !== undefined ? items[elt]! : items[x[0]!]!
+      console.log({ x, r })
       const s = samples[r.sampleId]
       return {
         ...r,
