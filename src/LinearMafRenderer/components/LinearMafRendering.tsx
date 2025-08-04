@@ -33,7 +33,6 @@ const LinearMafRendering = observer(function (props: {
     if (x.length) {
       const elt = x.find(idx => items[idx]?.isInsertion)
       const r = elt !== undefined ? items[elt]! : items[x[0]!]!
-      console.log({ x, r })
       const s = samples[r.sampleId]
       return {
         ...r,
