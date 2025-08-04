@@ -1,5 +1,3 @@
-import RBush from 'rbush'
-
 // Rendering constants
 export const FONT_CONFIG = 'bold 10px Courier New,monospace'
 export const CHAR_SIZE_WIDTH = 10
@@ -67,7 +65,7 @@ export interface RenderingContext {
   showAsUpperCase: boolean
 
   // RBush spatial index for efficient spatial queries
-  spatialIndex: RBush<RenderedBase>
+  spatialIndex: RenderedBase[]
 
   // Track last X position for spatial index optimization
   lastInsertedX: number

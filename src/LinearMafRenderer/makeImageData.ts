@@ -1,11 +1,10 @@
 import { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/BoxRendererType'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
 import { Feature } from '@jbrowse/core/util'
-import RBush from 'rbush'
+import Flatbush from 'flatbush'
 
 import {
   FONT_CONFIG,
-  RenderedBase,
   RenderingContext,
   Sample,
   processFeatureAlignment,
@@ -70,7 +69,7 @@ export function makeImageData({
     showAllLetters,
     mismatchRendering,
     showAsUpperCase,
-    spatialIndex: new RBush<RenderedBase>(),
+    spatialIndex: [],
     lastInsertedX: -Infinity, // Start with -Infinity so first item is always inserted
   }
 
@@ -96,8 +95,15 @@ export function makeImageData({
     )
   }
 
+  const flatbush = new Flatbush(renderingContext.spatialIndex.length)
+  for (let i = 0, l = renderingContext.spatialIndex.length; i < l; i++) {
+    const r = renderingContext.spatialIndex[i]!
+    flatbush.add(r.minX, r.minY, r.maxX, r.maxY)
+  }
+  flatbush.finish()
   // Return serialized RBush spatial index
   return {
-    rbush: renderingContext.spatialIndex.toJSON(),
+    flatbush: flatbush.data,
+    items: renderingContext.spatialIndex,
   }
 }

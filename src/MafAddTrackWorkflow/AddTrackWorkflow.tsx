@@ -37,10 +37,7 @@ const useStyles = makeStyles()(theme => ({
   },
 }))
 
-type AdapterTypeOptions =
-  | 'BigMafAdapter'
-  | 'MafTabixAdapter'
-  | 'BgzipTaffyAdapter'
+type AdapterTypeOptions = 'BigMafAdapter' | 'MafTabixAdapter'
 type IndexTypeOptions = 'TBI' | 'CSI'
 
 export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
@@ -89,7 +86,8 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
               setLoc(arg)
             }}
           />
-        ) : fileTypeChoice === 'MafTabixAdapter' ? (
+        ) : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        fileTypeChoice === 'MafTabixAdapter' ? (
           <>
             <FormControl>
               <FormLabel>Index type</FormLabel>
@@ -212,7 +210,8 @@ export default function MultiMAFWidget({ model }: { model: AddTrackModel }) {
                         samples: sampleNames,
                         nhLocation: nhLoc,
                       }
-                    : fileTypeChoice === 'MafTabixAdapter'
+                    : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                      fileTypeChoice === 'MafTabixAdapter'
                       ? {
                           type: fileTypeChoice,
                           bedGzLocation: loc,

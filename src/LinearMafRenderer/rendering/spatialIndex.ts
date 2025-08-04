@@ -131,6 +131,6 @@ export function addToSpatialIndex(
   context: RenderingContext,
   renderedBase: RenderedBase,
 ) {
-  context.spatialIndex.insert(renderedBase)
+  context.spatialIndex.push(renderedBase)
   context.lastInsertedX = renderedBase.minX
 }

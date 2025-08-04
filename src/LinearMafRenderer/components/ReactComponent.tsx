@@ -1,27 +1,21 @@
 import React, { useMemo, useRef } from 'react'
 
 import { PrerenderedCanvas } from '@jbrowse/core/ui'
+import Flatbush from 'flatbush'
 import { observer } from 'mobx-react'
-import RBush from 'rbush'
 
 type SerializedRBush = any
 
-interface RBushData {
-  minX: number
-  maxX: number
-  minY: number
-  maxY: number
-  isInsertion: boolean
-}
 const LinearMafRendering = observer(function (props: {
   width: number
   height: number
   displayModel: any
-  rbush: SerializedRBush
+  flatbush: SerializedRBush
+  items: any[]
 }) {
-  const { displayModel, height, rbush } = props
+  const { items, displayModel, height, flatbush } = props
   const ref = useRef<HTMLDivElement>(null)
-  const rbush2 = useMemo(() => new RBush<RBushData>().fromJSON(rbush), [rbush])
+  const rbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
 
   function getFeatureUnderMouse(eventClientX: number, eventClientY: number) {
     let offsetX = 0
@@ -32,16 +26,10 @@ const LinearMafRendering = observer(function (props: {
       offsetY = eventClientY - r.top
     }
 
-    const x = rbush2.search({
-      minX: offsetX,
-      maxX: offsetX + 1,
-      minY: offsetY,
-      maxY: offsetY + 1,
-    })
+    const x = rbush2.search(offsetX, offsetY, offsetX + 1, offsetY + 1)
     if (x.length) {
       // prioritize insertions
-      const { minX, minY, maxX, maxY, ...rest } =
-        x.find(f => f.isInsertion) || x[0]!
+      const { minX, minY, maxX, maxY, ...rest } = items[x[0]!]
       return rest
     } else {
       return undefined

@@ -2,7 +2,6 @@ import Plugin from '@jbrowse/core/Plugin'
 import PluginManager from '@jbrowse/core/PluginManager'
 
 import { version } from '../package.json'
-import BgzipTaffyAdapterF from './BgzipTaffyAdapter'
 import BigMafAdapterF from './BigMafAdapter'
 import LinearMafDisplayF from './LinearMafDisplay'
 import LinearMafRendererF from './LinearMafRenderer'
@@ -22,7 +21,6 @@ export default class MafViewerPlugin extends Plugin {
     LinearMafDisplayF(pluginManager)
     LinearMafRendererF(pluginManager)
     MafTabixAdapterF(pluginManager)
-    BgzipTaffyAdapterF(pluginManager)
     MafAddTrackWorkflowF(pluginManager)
     MafGetSequencesF(pluginManager)
     MafGetSamplesF(pluginManager)
