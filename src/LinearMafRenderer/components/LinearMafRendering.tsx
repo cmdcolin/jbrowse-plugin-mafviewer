@@ -3,8 +3,9 @@ import React, { useMemo, useRef } from 'react'
 import { PrerenderedCanvas } from '@jbrowse/core/ui'
 import Flatbush from 'flatbush'
 import { observer } from 'mobx-react'
-import { RenderedBase } from '../rendering'
+
 import { Sample } from '../../LinearMafDisplay/types'
+import { RenderedBase } from '../rendering'
 
 type SerializedRBush = any
 

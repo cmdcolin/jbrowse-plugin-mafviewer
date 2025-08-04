@@ -105,8 +105,8 @@ export function makeImageData({
     flatbush.add(
       renderingContext.spatialIndexCoords[i]!,
       renderingContext.spatialIndexCoords[i + 1]!,
-      renderingContext.spatialIndexCoords[i + 2]!,
-      renderingContext.spatialIndexCoords[i + 3]!,
+      renderingContext.spatialIndexCoords[i + 2],
+      renderingContext.spatialIndexCoords[i + 3],
     )
   }
   flatbush.finish()
