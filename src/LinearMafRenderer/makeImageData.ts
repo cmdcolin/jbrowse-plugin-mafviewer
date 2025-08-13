@@ -95,19 +95,22 @@ export function makeImageData({
       renderingContext,
     )
   }
-
-  const flatbush = new Flatbush(renderingContext.spatialIndex.length)
-  for (
-    let i = 0, l = renderingContext.spatialIndexCoords.length;
-    i < l;
-    i += 4
-  ) {
-    flatbush.add(
-      renderingContext.spatialIndexCoords[i]!,
-      renderingContext.spatialIndexCoords[i + 1]!,
-      renderingContext.spatialIndexCoords[i + 2],
-      renderingContext.spatialIndexCoords[i + 3],
-    )
+  const flatbush = new Flatbush(renderingContext.spatialIndex.length || 1)
+  if (renderingContext.spatialIndex.length === 0) {
+    flatbush.add(0, 0, 1, 1)
+  } else {
+    for (
+      let i = 0, l = renderingContext.spatialIndexCoords.length;
+      i < l;
+      i += 4
+    ) {
+      flatbush.add(
+        renderingContext.spatialIndexCoords[i]!,
+        renderingContext.spatialIndexCoords[i + 1]!,
+        renderingContext.spatialIndexCoords[i + 2],
+        renderingContext.spatialIndexCoords[i + 3],
+      )
+    }
   }
   flatbush.finish()
   return {
