@@ -2,7 +2,7 @@
   "plugins": [
     {
       "name": "MafViewer",
-      "url": "http://localhost:9000/dist/out.js"
+      "url": "https://unpkg.com/jbrowse-plugin-mafviewer/dist/jbrowse-plugin-mafviewer.umd.production.min.js"
     }
   ],
   "assemblies": [
