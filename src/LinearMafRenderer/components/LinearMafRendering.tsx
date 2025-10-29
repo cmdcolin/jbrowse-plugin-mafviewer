@@ -19,7 +19,7 @@ const LinearMafRendering = observer(function (props: {
 }) {
   const { items, displayModel, height, samples, flatbush } = props
   const ref = useRef<HTMLDivElement>(null)
-  const rbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
+  const flatbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
 
   function getFeatureUnderMouse(eventClientX: number, eventClientY: number) {
     let offsetX = 0
@@ -30,7 +30,7 @@ const LinearMafRendering = observer(function (props: {
       offsetY = eventClientY - r.top
     }
 
-    const x = rbush2.search(offsetX, offsetY, offsetX + 1, offsetY + 1)
+    const x = flatbush2.search(offsetX, offsetY, offsetX + 1, offsetY + 1)
     if (x.length) {
       const elt = x.find(idx => items[idx]?.isInsertion)
       const r = elt !== undefined ? items[elt]! : items[x[0]!]!
