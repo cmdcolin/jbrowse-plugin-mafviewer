@@ -44,15 +44,16 @@ export function generateTooltipContent(
     contentLines.push(`Ref: ${p2.refName}:${toLocale(p2.coord)}`)
 
     if (hoveredInfo) {
-      const { base, sampleId, pos, chr } = hoveredInfo
+      const { base, sampleId, pos, chr, isInsertion } = hoveredInfo
       const thresh = 20
       const len = base.length
       const lengthSuffix = len > 1 ? ` ${len}bp` : ''
       const baseDisplay =
         base.length > thresh ? base.slice(0, thresh) + '...' : base
+      const insertionLabel = isInsertion ? ' Insertion' : ''
 
       contentLines.push(
-        `Alt ${sampleId}: ${chr}:${pos.toLocaleString('en-US')} (${baseDisplay}${lengthSuffix})`,
+        `Alt ${sampleId}: ${chr}:${pos.toLocaleString('en-US')} (${baseDisplay}${lengthSuffix}${insertionLabel})`,
       )
     }
   }

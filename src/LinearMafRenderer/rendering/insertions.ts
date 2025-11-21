@@ -102,14 +102,17 @@ export function renderInsertions(
         actualXPos = xPos
         actualWidth = INSERTION_LINE_WIDTH
         fillRect(ctx, actualXPos, rowTop, actualWidth, h, canvasWidth, 'purple')
+
+        // Always use a wider hit box for spatial index, even if visual is 1px
+        const hitBoxPadding = 2
+        actualXPos = xPos - hitBoxPadding
+        actualWidth = INSERTION_LINE_WIDTH + 2 * hitBoxPadding
+
         if (
           bpPerPx < HIGH_ZOOM_THRESHOLD &&
           rowHeight > MIN_ROW_HEIGHT_FOR_BORDERS
         ) {
           // Add horizontal borders for visibility at high zoom
-          // Note: borders extend the effective clickable area
-          actualXPos = xPos - INSERTION_BORDER_WIDTH
-          actualWidth = INSERTION_BORDER_HEIGHT
           fillRect(
             ctx,
             xPos - INSERTION_BORDER_WIDTH,
