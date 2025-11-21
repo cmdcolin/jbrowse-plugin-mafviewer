@@ -101,6 +101,10 @@ export default function stateModelFactory(
        * #volatile
        */
       volatileTree: undefined as any,
+      /**
+       * #volatile
+       */
+      highlightedRowNames: undefined as string[] | undefined,
     }))
     .actions(self => ({
       /**
@@ -149,6 +153,12 @@ export default function stateModelFactory(
        */
       setShowAsUpperCase(arg: boolean) {
         self.showAsUpperCase = arg
+      },
+      /**
+       * #action
+       */
+      setHighlightedRowNames(names?: string[]) {
+        self.highlightedRowNames = names
       },
     }))
     .views(self => ({
@@ -237,6 +247,38 @@ export default function stateModelFactory(
        */
       get leaves() {
         return self.root?.leaves()
+      },
+      /**
+       * #getter
+       */
+      get leafMap() {
+        return new Map(this.leaves?.map(leaf => [leaf.data.name, leaf]))
+      },
+      /**
+       * #getter
+       * Precomputed map from hierarchy node to its descendant leaf names
+       */
+      get nodeDescendantNames() {
+        const map = new Map<unknown, string[]>()
+        function computeDescendants(
+          node: HierarchyNode<NodeWithIdsAndLength>,
+        ): string[] {
+          if (!node.children || node.children.length === 0) {
+            const names = [node.data.name]
+            map.set(node, names)
+            return names
+          }
+          const names: string[] = []
+          for (const child of node.children) {
+            names.push(...computeDescendants(child))
+          }
+          map.set(node, names)
+          return names
+        }
+        if (this.hierarchy) {
+          computeDescendants(this.hierarchy)
+        }
+        return map
       },
       /**
        * #getter
@@ -376,6 +418,12 @@ export default function stateModelFactory(
             .map(width => (this.canDisplayLabel ? width : minWidth)) || [],
           0,
         )
+      },
+      /**
+       * #getter
+       */
+      get sidebarWidth() {
+        return this.labelWidth + 5 + self.treeWidth
       },
     }))
     .actions(self => ({

@@ -25,72 +25,44 @@ export function processFeaturesToFasta({
   const region = regions[0]!
   const sampleToRowMap = new Map(samples.map((s, i) => [s.id, i]))
   const rlen = region.end - region.start
-  const outputRows = samples.map(() => '-'.repeat(rlen))
+
+  // Use character arrays instead of strings for O(1) mutations
+  const outputRowsArrays = samples.map(() => new Array(rlen).fill('-'))
+
   for (const feature of features.values()) {
     const leftCoord = feature.get('start')
     const vals = feature.get('alignments') as Record<string, AlignmentRecord>
     const seq = feature.get('seq')
-    for (const [sample, val] of Object.entries(vals)) {
-      const origAlignment = val.seq
-      const alignment = origAlignment
 
+    for (const [sample, val] of Object.entries(vals)) {
+      const alignment = val.seq
       const row = sampleToRowMap.get(sample)
       if (row === undefined) {
         continue
       }
 
-      // gaps
+      const rowArray = outputRowsArrays[row]!
+
+      // Single-pass processing: handle gaps, matches, and mismatches together
       for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
         if (seq[i] !== '-') {
-          if (alignment[i] === '-') {
-            const l = leftCoord + o - region.start
-            if (l >= 0 && l < rlen) {
-              outputRows[row] =
-                outputRows[row]!.slice(0, l) +
-                '-' +
-                outputRows[row]!.slice(l + 1)
-            }
-          }
-          o++
-        }
-      }
+          const c = alignment[i]
+          const pos = leftCoord + o - region.start
 
-      if (!showAllLetters) {
-        // matches
-        for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
-          if (seq[i] !== '-') {
-            const c = alignment[i]
-            const l = leftCoord + o - region.start
-            if (l >= 0 && l < rlen) {
-              if (seq[i] === c && c !== '-' && c !== ' ') {
-                outputRows[row] =
-                  outputRows[row]!.slice(0, l) +
-                  '.' +
-                  outputRows[row]!.slice(l + 1)
-              }
-            }
-            o++
-          }
-        }
-      }
-
-      // mismatches
-      for (let i = 0, o = 0, l = alignment.length; i < l; i++) {
-        const c = alignment[i]
-        if (seq[i] !== '-') {
-          if (c !== '-') {
-            const l = leftCoord + o - region.start
-            if (l >= 0 && l < rlen) {
-              if (seq[i] !== c && c !== ' ') {
-                outputRows[row] =
-                  outputRows[row]!.slice(0, l) +
-                  c +
-                  outputRows[row]!.slice(l + 1)
-              } else if (showAllLetters) {
-                outputRows[row] =
-                  outputRows[row]!.slice(0, l) +
-                  c +
-                  outputRows[row]!.slice(l + 1)
+          if (pos >= 0 && pos < rlen) {
+            if (c === '-') {
+              // Gap
+              rowArray[pos] = '-'
+            } else if (c !== ' ') {
+              if (showAllLetters) {
+                // Show all letters mode: write character directly
+                rowArray[pos] = c
+              } else if (seq[i] === c) {
+                // Match: use dot notation
+                rowArray[pos] = '.'
+              } else {
+                // Mismatch: write character
+                rowArray[pos] = c
               }
             }
           }
@@ -99,5 +71,7 @@ export function processFeaturesToFasta({
       }
     }
   }
-  return outputRows
+
+  // Convert character arrays back to strings
+  return outputRowsArrays.map(arr => arr.join(''))
 }
