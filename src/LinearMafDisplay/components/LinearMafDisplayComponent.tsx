@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Menu } from '@jbrowse/core/ui'
 import { getContainingView, getEnv } from '@jbrowse/core/util'
@@ -102,11 +102,11 @@ const LinearMafDisplay = observer(function (props: {
   }
 
   // Function to clear the selection box
-  const clearSelectionBox = () => {
+  const clearSelectionBox = useCallback(() => {
     setShowSelectionBox(false)
     setDragStartX(undefined)
     setDragEndX(undefined)
-  }
+  }, [])
 
   // Add keydown event handler to clear selection box when Escape key is pressed
   useEffect(() => {

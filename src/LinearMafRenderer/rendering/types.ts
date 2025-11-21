@@ -38,6 +38,7 @@ export interface RenderedBase {
 export interface RenderingContext {
   ctx: CanvasRenderingContext2D
   scale: number
+  bpPerPx: number
   canvasWidth: number
   rowHeight: number
   h: number
