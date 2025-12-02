@@ -9,9 +9,9 @@ export function renderMatches(
   seq: string,
   leftPx: number,
   rowTop: number,
-  sampleId: number,
-  alignmentStart: number,
-  chr: string,
+  _sampleId: number,
+  _alignmentStart: number,
+  _chr: string,
 ) {
   if (context.showAllLetters) {
     return

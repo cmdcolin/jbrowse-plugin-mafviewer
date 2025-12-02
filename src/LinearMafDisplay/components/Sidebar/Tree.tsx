@@ -13,6 +13,7 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
 
     hierarchy,
     showBranchLen,
+    nodeDescendantNames,
   } = model
 
   return (
@@ -26,14 +27,42 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
             const tx = showBranchLen ? target.len : target.y
             // @ts-expect-error
             const sx = showBranchLen ? source.len : source.y
+            const key = `${sy}-${ty}-${tx}-${sx}`
 
-            // 1d line intersection to check if line crosses block at all, this is
-            // an optimization that allows us to skip drawing most tree links
-            // outside the block
             return (
-              <React.Fragment key={[sy, ty, tx, sx].join('-')}>
-                <line stroke="black" x1={sx} y1={sy} x2={sx} y2={ty} />
-                <line stroke="black" x1={sx} y1={ty} x2={tx} y2={ty} />
+              <React.Fragment key={key}>
+                <line
+                  stroke="black"
+                  x1={sx}
+                  y1={sy}
+                  x2={sx}
+                  y2={ty}
+                  style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                  onMouseEnter={() => {
+                    model.setHighlightedRowNames(
+                      nodeDescendantNames.get(source),
+                    )
+                  }}
+                  onMouseLeave={() => {
+                    model.setHighlightedRowNames(undefined)
+                  }}
+                />
+                <line
+                  stroke="black"
+                  x1={sx}
+                  y1={ty}
+                  x2={tx}
+                  y2={ty}
+                  style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                  onMouseEnter={() => {
+                    model.setHighlightedRowNames(
+                      nodeDescendantNames.get(target),
+                    )
+                  }}
+                  onMouseLeave={() => {
+                    model.setHighlightedRowNames(undefined)
+                  }}
+                />
               </React.Fragment>
             )
           })

@@ -37,7 +37,8 @@ const LinearMafRendering = observer(function (props: {
       const s = samples[r.sampleId]
       return {
         ...r,
-        sampleId: s?.label || s?.id || 'unknown',
+        sampleId: s?.id ?? 'unknown',
+        sampleLabel: s?.label || s?.id || 'unknown',
       }
     } else {
       return undefined
@@ -46,16 +47,20 @@ const LinearMafRendering = observer(function (props: {
   return (
     <div
       ref={ref}
-      onMouseMove={e =>
-        displayModel.setHoveredInfo?.(
-          getFeatureUnderMouse(e.clientX, e.clientY),
+      onMouseMove={e => {
+        const feature = getFeatureUnderMouse(e.clientX, e.clientY)
+        displayModel.setHoveredInfo?.(feature)
+        displayModel.setHighlightedRowNames?.(
+          feature?.sampleId ? [feature.sampleId] : undefined,
         )
-      }
+      }}
       onMouseLeave={() => {
         displayModel.setHoveredInfo?.(undefined)
+        displayModel.setHighlightedRowNames?.(undefined)
       }}
       onMouseOut={() => {
         displayModel.setHoveredInfo?.(undefined)
+        displayModel.setHighlightedRowNames?.(undefined)
       }}
       style={{
         overflow: 'visible',

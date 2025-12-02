@@ -59,6 +59,7 @@ export function makeImageData({
   const renderingContext: RenderingContext = {
     ctx,
     scale,
+    bpPerPx,
     canvasWidth,
     rowHeight,
     h,
