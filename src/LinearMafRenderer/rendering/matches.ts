@@ -9,9 +9,6 @@ export function renderMatches(
   seq: string,
   leftPx: number,
   rowTop: number,
-  _sampleId: number,
-  _alignmentStart: number,
-  _chr: string,
 ) {
   if (context.showAllLetters) {
     return
@@ -29,12 +26,8 @@ export function renderMatches(
     if (seq[i] !== '-') {
       // Only process non-gap positions in reference
       const currentChar = alignment[i]
-      const xPos = leftPx + scale * genomicOffset
-      if (
-        seq[i] === currentChar &&
-        currentChar !== '-' &&
-        currentChar !== ' '
-      ) {
+      if (seq[i] === currentChar && currentChar !== ' ') {
+        const xPos = leftPx + scale * genomicOffset
         fillRect(ctx, xPos, rowTop, scale + GAP_STROKE_OFFSET, h, canvasWidth)
       }
       genomicOffset++

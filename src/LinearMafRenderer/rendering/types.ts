@@ -13,10 +13,7 @@ export const HIGH_BP_PER_PX_THRESHOLD = 10
 export const INSERTION_BORDER_HEIGHT = 5
 export const MIN_X_DISTANCE = 0.5
 
-export interface Sample {
-  id: string
-  color?: string
-}
+export type { Sample } from '../../LinearMafDisplay/types'
 
 export interface GenomicRegion {
   start: number
@@ -30,6 +27,7 @@ export interface RenderedBase {
   base: string
   sampleId: number
   isInsertion?: boolean
+  isLargeInsertion?: boolean
 }
 
 /**
@@ -49,6 +47,10 @@ export interface RenderingContext {
   showAllLetters: boolean
   mismatchRendering: boolean
   showAsUpperCase: boolean
+
+  // Cached char dimensions
+  charWidth: number
+  charHeight: number
 
   // RBush spatial index for efficient spatial queries
   spatialIndex: RenderedBase[]

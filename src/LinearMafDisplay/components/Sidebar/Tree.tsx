@@ -1,20 +1,47 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { observer } from 'mobx-react'
 
 import type { LinearMafDisplayModel } from '../../stateModel'
+import type { NodeWithIdsAndLength } from '../../types'
+import type { HierarchyNode } from 'd3-hierarchy'
+
+const hitboxStyle = {
+  pointerEvents: 'all',
+  cursor: 'pointer',
+  strokeWidth: 8,
+  stroke: 'transparent',
+} as const
 
 const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
   const {
-    // this is needed for redrawing after zoom change, similar to react-msaview
-    // renderTreeCanvas
+    // rowHeight is needed for redrawing after zoom change
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     rowHeight: _rowHeight,
-
+    treeAreaWidth,
     hierarchy,
     showBranchLen,
     nodeDescendantNames,
   } = model
+
+  const clearHighlight = useCallback(() => {
+    model.setHighlightedRowNames(undefined)
+  }, [model])
+
+  const nodeHandlers = useMemo(() => {
+    const handlers = new Map<HierarchyNode<NodeWithIdsAndLength>, () => void>()
+    if (hierarchy) {
+      for (const node of hierarchy.descendants()) {
+        handlers.set(node, () => {
+          model.setHighlightedRowNames(nodeDescendantNames.get(node), {
+            x: node.x!,
+            y: node.y!,
+          })
+        })
+      }
+    }
+    return handlers
+  }, [model, hierarchy, nodeDescendantNames, treeAreaWidth])
 
   return (
     <>
@@ -27,41 +54,30 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
             const tx = showBranchLen ? target.len : target.y
             // @ts-expect-error
             const sx = showBranchLen ? source.len : source.y
-            const key = `${sy}-${ty}-${tx}-${sx}`
 
             return (
-              <React.Fragment key={key}>
+              <React.Fragment key={`${treeAreaWidth}-${sy}-${ty}-${tx}-${sx}`}>
+                {/* Visible lines */}
+                <line stroke="black" x1={sx} y1={sy} x2={sx} y2={ty} />
+                <line stroke="black" x1={sx} y1={ty} x2={tx} y2={ty} />
+                {/* Invisible hitbox lines */}
                 <line
-                  stroke="black"
                   x1={sx}
                   y1={sy}
                   x2={sx}
                   y2={ty}
-                  style={{ pointerEvents: 'all', cursor: 'pointer' }}
-                  onMouseEnter={() => {
-                    model.setHighlightedRowNames(
-                      nodeDescendantNames.get(source),
-                    )
-                  }}
-                  onMouseLeave={() => {
-                    model.setHighlightedRowNames(undefined)
-                  }}
+                  style={hitboxStyle}
+                  onMouseEnter={nodeHandlers.get(source)}
+                  onMouseLeave={clearHighlight}
                 />
                 <line
-                  stroke="black"
                   x1={sx}
                   y1={ty}
                   x2={tx}
                   y2={ty}
-                  style={{ pointerEvents: 'all', cursor: 'pointer' }}
-                  onMouseEnter={() => {
-                    model.setHighlightedRowNames(
-                      nodeDescendantNames.get(target),
-                    )
-                  }}
-                  onMouseLeave={() => {
-                    model.setHighlightedRowNames(undefined)
-                  }}
+                  style={hitboxStyle}
+                  onMouseEnter={nodeHandlers.get(target)}
+                  onMouseLeave={clearHighlight}
                 />
               </React.Fragment>
             )

@@ -26,6 +26,10 @@ const SetRowHeightDialog = lazy(
   () => import('./components/SetRowHeightDialog/SetRowHeightDialog'),
 )
 
+const InsertionSequenceDialog = lazy(
+  () => import('./components/InsertionSequenceDialog/InsertionSequenceDialog'),
+)
+
 /**
  * #stateModel LinearMafDisplay
  * extends LinearBasicDisplay
@@ -105,6 +109,10 @@ export default function stateModelFactory(
        * #volatile
        */
       highlightedRowNames: undefined as string[] | undefined,
+      /**
+       * #volatile
+       */
+      hoveredTreeNode: undefined as { x: number; y: number } | undefined,
     }))
     .actions(self => ({
       /**
@@ -157,8 +165,36 @@ export default function stateModelFactory(
       /**
        * #action
        */
-      setHighlightedRowNames(names?: string[]) {
+      setTreeAreaWidth(width: number) {
+        self.treeAreaWidth = width
+      },
+      /**
+       * #action
+       */
+      setHighlightedRowNames(
+        names?: string[],
+        nodePosition?: { x: number; y: number },
+      ) {
         self.highlightedRowNames = names
+        self.hoveredTreeNode = nodePosition
+      },
+      /**
+       * #action
+       */
+      showInsertionSequenceDialog(insertionData: {
+        sequence: string
+        sampleLabel: string
+        chr: string
+        pos: number
+      }) {
+        getSession(self).queueDialog(handleClose => [
+          InsertionSequenceDialog,
+          {
+            model: self,
+            onClose: handleClose,
+            insertionData,
+          },
+        ])
       },
     }))
     .views(self => ({
@@ -208,10 +244,16 @@ export default function stateModelFactory(
         const r = self.root
         if (r) {
           const width = self.treeAreaWidth
+          // Use totalHeight - rowHeight so leaves are centered in rows
+          // (first leaf at rowHeight/2, last at totalHeight - rowHeight/2)
           const clust = cluster<NodeWithIds>()
-            .size([this.totalHeight, width])
+            .size([this.totalHeight - self.rowHeight, width])
             .separation(() => 1)
           clust(r)
+          // Offset all nodes by rowHeight/2 to center in rows
+          for (const node of r.descendants()) {
+            node.x = node.x! + self.rowHeight / 2
+          }
           setBrLength(r, (r.data.length = 0), width / maxLength(r))
           return r as HierarchyNode<NodeWithIdsAndLength>
         } else {
