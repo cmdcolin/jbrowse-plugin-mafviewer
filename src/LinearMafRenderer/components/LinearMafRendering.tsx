@@ -58,10 +58,6 @@ const LinearMafRendering = observer(function (props: {
         displayModel.setHoveredInfo?.(undefined)
         displayModel.setHighlightedRowNames?.(undefined)
       }}
-      onMouseOut={() => {
-        displayModel.setHoveredInfo?.(undefined)
-        displayModel.setHighlightedRowNames?.(undefined)
-      }}
       style={{
         overflow: 'visible',
         position: 'relative',

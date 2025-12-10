@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { observer } from 'mobx-react'
 
 import type { LinearMafDisplayModel } from '../../stateModel'
+import type { HierarchyNode } from 'd3-hierarchy'
+import type { NodeWithIdsAndLength } from '../../types'
 
 const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
   const {
@@ -15,6 +17,17 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
     showBranchLen,
     nodeDescendantNames,
   } = model
+
+  const clearHighlight = useCallback(() => {
+    model.setHighlightedRowNames(undefined)
+  }, [model])
+
+  const makeMouseEnterHandler = useCallback(
+    (node: HierarchyNode<NodeWithIdsAndLength>) => () => {
+      model.setHighlightedRowNames(nodeDescendantNames.get(node))
+    },
+    [model, nodeDescendantNames],
+  )
 
   return (
     <>
@@ -38,14 +51,8 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
                   x2={sx}
                   y2={ty}
                   style={{ pointerEvents: 'all', cursor: 'pointer' }}
-                  onMouseEnter={() => {
-                    model.setHighlightedRowNames(
-                      nodeDescendantNames.get(source),
-                    )
-                  }}
-                  onMouseLeave={() => {
-                    model.setHighlightedRowNames(undefined)
-                  }}
+                  onMouseEnter={makeMouseEnterHandler(source)}
+                  onMouseLeave={clearHighlight}
                 />
                 <line
                   stroke="black"
@@ -54,14 +61,8 @@ const Tree = observer(function ({ model }: { model: LinearMafDisplayModel }) {
                   x2={tx}
                   y2={ty}
                   style={{ pointerEvents: 'all', cursor: 'pointer' }}
-                  onMouseEnter={() => {
-                    model.setHighlightedRowNames(
-                      nodeDescendantNames.get(target),
-                    )
-                  }}
-                  onMouseLeave={() => {
-                    model.setHighlightedRowNames(undefined)
-                  }}
+                  onMouseEnter={makeMouseEnterHandler(target)}
+                  onMouseLeave={clearHighlight}
                 />
               </React.Fragment>
             )

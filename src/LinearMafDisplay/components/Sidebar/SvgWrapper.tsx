@@ -37,11 +37,11 @@ const SvgWrapper = observer(function ({
 
             if (highlightedRowNames) {
               ctx.fillStyle = 'rgba(255,165,0,0.2)'
+              const halfRowHeight = rowHeight / 2
               for (const name of highlightedRowNames) {
                 const leaf = leafMap.get(name)
                 if (leaf) {
-                  const y = leaf.x!
-                  ctx.fillRect(0, y - rowHeight / 2, sidebarWidth, rowHeight)
+                  ctx.fillRect(0, leaf.x! - halfRowHeight, sidebarWidth, rowHeight)
                 }
               }
             }
