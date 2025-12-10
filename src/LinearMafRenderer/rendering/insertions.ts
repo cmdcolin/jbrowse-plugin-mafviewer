@@ -1,6 +1,6 @@
 import { measureText } from '@jbrowse/core/util'
 
-import { fillRect, getCharWidthHeight } from '../util'
+import { fillRect } from '../util'
 import { addToSpatialIndex, shouldAddToSpatialIndex } from './spatialIndex'
 import {
   CHAR_SIZE_WIDTH,
@@ -27,8 +27,7 @@ export function renderInsertions(
   alignmentStart: number,
   chr: string,
 ) {
-  const { ctx, scale, h, canvasWidth, rowHeight } = context
-  const { charHeight } = getCharWidthHeight()
+  const { ctx, scale, h, canvasWidth, rowHeight, charHeight } = context
 
   for (
     let i = 0, genomicOffset = 0, seqLength = alignment.length;

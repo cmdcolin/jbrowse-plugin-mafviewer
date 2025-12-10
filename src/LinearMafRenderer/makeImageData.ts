@@ -8,9 +8,8 @@ import {
   RenderingContext,
   Sample,
   processFeatureAlignment,
-  processFeatureInsertions,
 } from './rendering'
-import { getColorBaseMap, getContrastBaseMap } from './util'
+import { getCharWidthHeight, getColorBaseMap, getContrastBaseMap } from './util'
 
 interface RenderArgs extends RenderArgsDeserialized {
   samples: Sample[]
@@ -53,6 +52,7 @@ export function makeImageData({
   const scale = 1 / bpPerPx
   const hp2 = h / 2
   const offset = (rowHeight - h) / 2
+  const { charWidth, charHeight } = getCharWidthHeight()
 
   ctx.font = FONT_CONFIG
 
@@ -70,25 +70,15 @@ export function makeImageData({
     showAllLetters,
     mismatchRendering,
     showAsUpperCase,
+    charWidth,
+    charHeight,
     spatialIndex: [],
     spatialIndexCoords: [],
     lastInsertedX: -Infinity, // Start with -Infinity so first item is always inserted
   }
 
-  // First pass: render alignments (gaps, matches, mismatches, text)
   for (const feature of features.values()) {
     processFeatureAlignment(
-      feature,
-      region,
-      bpPerPx,
-      sampleToRowMap,
-      renderingContext,
-    )
-  }
-
-  // Second pass: render insertions on top
-  for (const feature of features.values()) {
-    processFeatureInsertions(
       feature,
       region,
       bpPerPx,

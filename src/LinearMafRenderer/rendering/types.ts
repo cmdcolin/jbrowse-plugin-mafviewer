@@ -50,6 +50,10 @@ export interface RenderingContext {
   mismatchRendering: boolean
   showAsUpperCase: boolean
 
+  // Cached char dimensions
+  charWidth: number
+  charHeight: number
+
   // RBush spatial index for efficient spatial queries
   spatialIndex: RenderedBase[]
   spatialIndexCoords: number[]

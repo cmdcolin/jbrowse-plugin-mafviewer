@@ -20,7 +20,7 @@ export function processFeatureAlignment(
     string,
     AlignmentRecord
   >
-  const referenceSeq = feature.get('seq').toLowerCase()
+  const referenceSeq = (feature.get('seq') as string).toLowerCase()
 
   for (const [sampleId, alignmentData] of Object.entries(alignments)) {
     const row = sampleToRowMap.get(sampleId)
@@ -33,16 +33,7 @@ export function processFeatureAlignment(
     const rowTop = renderingContext.offset + renderingContext.rowHeight * row
 
     renderGaps(renderingContext, alignment, referenceSeq, leftPx, rowTop)
-    renderMatches(
-      renderingContext,
-      alignment,
-      referenceSeq,
-      leftPx,
-      rowTop,
-      row,
-      alignmentData.start,
-      alignmentData.chr,
-    )
+    renderMatches(renderingContext, alignment, referenceSeq, leftPx, rowTop)
     renderMismatches(
       renderingContext,
       alignment,
@@ -61,31 +52,6 @@ export function processFeatureAlignment(
       leftPx,
       rowTop,
     )
-  }
-}
-
-export function processFeatureInsertions(
-  feature: Feature,
-  region: GenomicRegion,
-  bpPerPx: number,
-  sampleToRowMap: Map<string, number>,
-  renderingContext: RenderingContext,
-) {
-  const [leftPx] = featureSpanPx(feature, region, bpPerPx)
-  const alignments = feature.get('alignments') as Record<
-    string,
-    AlignmentRecord
-  >
-  const referenceSeq = feature.get('seq').toLowerCase()
-  for (const [sampleId, alignmentData] of Object.entries(alignments)) {
-    const row = sampleToRowMap.get(sampleId)
-    if (row === undefined) {
-      continue
-    }
-
-    const alignment = alignmentData.seq.toLowerCase()
-    const rowTop = renderingContext.offset + renderingContext.rowHeight * row
-
     renderInsertions(
       renderingContext,
       alignment,

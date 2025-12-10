@@ -1,4 +1,3 @@
-import { getCharWidthHeight } from '../util'
 import { CHAR_SIZE_WIDTH, VERTICAL_TEXT_OFFSET } from './types'
 
 import type { RenderingContext } from './types'
@@ -34,8 +33,8 @@ export function renderText(
     mismatchRendering,
     contrastForBase,
     showAsUpperCase,
+    charHeight,
   } = context
-  const { charHeight } = getCharWidthHeight()
 
   // Render text labels when zoomed in enough and row is tall enough
   if (scale >= CHAR_SIZE_WIDTH) {
