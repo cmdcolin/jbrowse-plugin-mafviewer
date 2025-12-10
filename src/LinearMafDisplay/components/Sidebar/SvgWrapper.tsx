@@ -5,19 +5,25 @@ import { getContainingView } from '@jbrowse/core/util'
 import { autorun } from 'mobx'
 import { observer } from 'mobx-react'
 import { isAlive } from 'mobx-state-tree'
+import { makeStyles } from 'tss-react/mui'
 
 import type { LinearMafDisplayModel } from '../../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
-const resizeHandleStyle = {
-  position: 'absolute',
-  top: 0,
-  height: '100%',
-  width: 4,
-  zIndex: 1001,
-  background: 'rgba(0,0,0,0.1)',
-  cursor: 'col-resize',
-} as const
+const useStyles = makeStyles()({
+  resizeHandle: {
+    position: 'absolute',
+    top: 0,
+    height: '100%',
+    width: 4,
+    zIndex: 1001,
+    background: 'transparent',
+    cursor: 'col-resize',
+    '&:hover': {
+      background: 'rgba(0,0,0,0.2)',
+    },
+  },
+})
 
 const SvgWrapper = observer(function ({
   children,
@@ -28,6 +34,7 @@ const SvgWrapper = observer(function ({
   children: React.ReactNode
   exportSVG?: boolean
 }) {
+  const { classes } = useStyles()
   const mouseoverRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -122,10 +129,8 @@ const SvgWrapper = observer(function ({
                 )
                 return undefined
               }}
-              style={{
-                ...resizeHandleStyle,
-                left: treeWidth,
-              }}
+              className={classes.resizeHandle}
+              style={{ left: treeWidth }}
               vertical
             />
           </div>
