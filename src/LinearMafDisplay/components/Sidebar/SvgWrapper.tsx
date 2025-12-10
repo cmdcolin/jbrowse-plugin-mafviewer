@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
+import { ResizeHandle } from '@jbrowse/core/ui'
 import { getContainingView } from '@jbrowse/core/util'
 import { autorun } from 'mobx'
 import { observer } from 'mobx-react'
@@ -7,6 +8,16 @@ import { isAlive } from 'mobx-state-tree'
 
 import type { LinearMafDisplayModel } from '../../stateModel'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
+
+const resizeHandleStyle = {
+  position: 'absolute',
+  top: 0,
+  height: '100%',
+  width: 4,
+  zIndex: 1001,
+  background: 'rgba(0,0,0,0.1)',
+  cursor: 'col-resize',
+} as const
 
 const SvgWrapper = observer(function ({
   children,
@@ -26,14 +37,17 @@ const SvgWrapper = observer(function ({
           if (isAlive(model)) {
             const {
               totalHeight,
-              sidebarWidth,
               leafMap,
               rowHeight,
               highlightedRowNames,
+              hoveredTreeNode,
             } = model
+            const { width: viewWidth } = getContainingView(
+              model,
+            ) as LinearGenomeViewModel
 
             ctx.resetTransform()
-            ctx.clearRect(0, 0, sidebarWidth, totalHeight)
+            ctx.clearRect(0, 0, viewWidth, totalHeight)
 
             if (highlightedRowNames) {
               ctx.fillStyle = 'rgba(255,165,0,0.2)'
@@ -41,8 +55,19 @@ const SvgWrapper = observer(function ({
               for (const name of highlightedRowNames) {
                 const leaf = leafMap.get(name)
                 if (leaf) {
-                  ctx.fillRect(0, leaf.x! - halfRowHeight, sidebarWidth, rowHeight)
+                  ctx.fillRect(0, leaf.x! - halfRowHeight, viewWidth, rowHeight)
                 }
+              }
+
+              // Draw orange dot at hovered tree node
+              if (hoveredTreeNode) {
+                ctx.fillStyle = 'rgba(255,165,0,0.8)'
+                ctx.beginPath()
+                ctx.arc(hoveredTreeNode.y, hoveredTreeNode.x, 4, 0, 2 * Math.PI)
+                ctx.fill()
+                ctx.strokeStyle = 'rgba(255,140,0,1)'
+                ctx.lineWidth = 1
+                ctx.stroke()
               }
             }
           }
@@ -53,7 +78,7 @@ const SvgWrapper = observer(function ({
   if (exportSVG) {
     return <>{children}</>
   } else {
-    const { totalHeight, sidebarWidth } = model
+    const { totalHeight, treeWidth, hierarchy } = model
     const { width } = getContainingView(model) as LinearGenomeViewModel
     return (
       <>
@@ -72,18 +97,39 @@ const SvgWrapper = observer(function ({
         </svg>
         <canvas
           ref={mouseoverRef}
-          width={sidebarWidth}
+          width={width}
           height={totalHeight}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            width: sidebarWidth,
+            width,
             height: totalHeight,
             zIndex: 1000,
             pointerEvents: 'none',
           }}
         />
+        {hierarchy ? (
+          <div
+            onMouseDown={e => {
+              e.stopPropagation()
+            }}
+          >
+            <ResizeHandle
+              onDrag={distance => {
+                model.setTreeAreaWidth(
+                  Math.max(20, model.treeAreaWidth + distance),
+                )
+                return undefined
+              }}
+              style={{
+                ...resizeHandleStyle,
+                left: treeWidth,
+              }}
+              vertical
+            />
+          </div>
+        ) : null}
       </>
     )
   }

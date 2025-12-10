@@ -8,10 +8,8 @@ import {
 
 import { makeImageData } from './makeImageData'
 
-interface Sample {
-  id: string
-  color?: string
-}
+import type { Sample } from '../LinearMafDisplay/types'
+
 interface RenderArgs extends RenderArgsDeserialized {
   samples: Sample[]
   rowHeight: number

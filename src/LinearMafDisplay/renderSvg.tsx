@@ -28,7 +28,7 @@ export async function renderSvg(
       <g clipPath={`url(#${clipid})`}>
         <g id="snpcov">{await superRenderSvg(opts)}</g>
         <g transform={`translate(${Math.max(-offsetPx, 0)})`}>
-          <YScaleBars model={self} orientation="left" exportSVG />
+          <YScaleBars model={self} exportSVG />
         </g>
       </g>
     </>

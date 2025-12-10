@@ -9,7 +9,6 @@ import type { LinearMafDisplayModel } from '../../stateModel'
 
 export const YScaleBars = observer(function (props: {
   model: LinearMafDisplayModel
-  orientation?: string
   exportSVG?: boolean
 }) {
   const { model } = props

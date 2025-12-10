@@ -17,6 +17,7 @@ const ColorLegend = observer(function ({
     canDisplayLabel,
     totalHeight,
     treeWidth,
+    sidebarWidth,
     samples = [],
     rowHeight,
     svgFontSize,
@@ -25,12 +26,7 @@ const ColorLegend = observer(function ({
 
   return (
     <>
-      <RectBg
-        y={0}
-        x={0}
-        width={labelWidth + 5 + treeWidth}
-        height={totalHeight}
-      />
+      <RectBg y={0} x={0} width={sidebarWidth} height={totalHeight} />
       <Tree model={model} />
       <g transform={`translate(${treeWidth + 5},0)`}>
         {samples.map((sample, idx) => (

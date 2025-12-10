@@ -133,6 +133,8 @@ export function renderInsertions(
 
       // Add insertion to spatial index with actual rendered dimensions
       // Insertions always bypass distance filter
+      const isLargeInsertion =
+        insertionSequence.length > LARGE_INSERTION_THRESHOLD
       if (shouldAddToSpatialIndex(actualXPos, context, true)) {
         addToSpatialIndex(
           context,
@@ -146,6 +148,7 @@ export function renderInsertions(
             base: insertionSequence,
             sampleId,
             isInsertion: true,
+            isLargeInsertion,
           },
         )
       }
