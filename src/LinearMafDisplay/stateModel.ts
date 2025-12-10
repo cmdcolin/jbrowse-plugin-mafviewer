@@ -86,6 +86,10 @@ export default function stateModelFactory(
          * #property
          */
         showAsUpperCase: true,
+        /**
+         * #property
+         */
+        showSidebar: true,
       }),
     )
     .volatile(() => ({
@@ -167,6 +171,12 @@ export default function stateModelFactory(
        */
       setTreeAreaWidth(width: number) {
         self.treeAreaWidth = width
+      },
+      /**
+       * #action
+       */
+      setShowSidebar(arg: boolean) {
+        self.showSidebar = arg
       },
       /**
        * #action
@@ -432,6 +442,14 @@ export default function stateModelFactory(
                 self.setMismatchRendering(!self.mismatchRendering)
               },
             },
+            {
+              label: 'Show sidebar',
+              type: 'checkbox',
+              checked: self.showSidebar,
+              onClick: () => {
+                self.setShowSidebar(!self.showSidebar)
+              },
+            },
           ]
         },
       }
@@ -465,7 +483,7 @@ export default function stateModelFactory(
        * #getter
        */
       get sidebarWidth() {
-        return this.labelWidth + 5 + self.treeWidth
+        return self.showSidebar ? this.labelWidth + 5 + self.treeWidth : 0
       },
     }))
     .actions(self => ({

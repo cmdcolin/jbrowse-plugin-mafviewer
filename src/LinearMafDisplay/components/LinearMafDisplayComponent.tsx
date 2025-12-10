@@ -155,7 +155,7 @@ const LinearMafDisplay = observer(function (props: {
       }}
     >
       <BaseLinearDisplayComponent {...props} />
-      <YScaleBars model={model} />
+      {model.showSidebar ? <YScaleBars model={model} /> : null}
       {mouseY && mouseX && sources && !contextCoord && !showSequenceDialog ? (
         <div style={{ position: 'relative' }}>
           <Crosshairs
